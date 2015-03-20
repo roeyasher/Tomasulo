@@ -650,7 +650,7 @@ int detectEnd(){
 
 	FpReservationStation_Line *temp3=FpReservationStation_MUL;
 
-	LoadBuffer *temp4=LoadBufferResarvation;
+	LoadBuffer *temp4=LoadBufferResarvation;dskjhfkhfkjlwhflkjsjflhdkjfh
 
 	StoreBuffer *temp5=StoreBufferResarvation;
 
