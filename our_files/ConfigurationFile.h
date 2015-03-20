@@ -1,4 +1,7 @@
 
+
+
+
 #ifndef CONFIGURATION_FILE
 
 #define CONFIGURATION_FILE
@@ -50,6 +53,8 @@ typedef struct{
 	int mul_delay;
 
 	int mem_delay;
+	
+	int rob_entries;
 
 	int add_nr_reservation;
 

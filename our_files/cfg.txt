@@ -1,9 +1,0 @@
-int_delay = 1
-add_delay = 1
-mul_delay = 1
-mem_delay = 1
-add_nr_reservation = 1
-mul_nr_reservation = 1
-int_nr_reservation = 1
-mem_nr_load_buffers = 1
-mem_nr_store_buffers = 1

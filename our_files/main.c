@@ -252,7 +252,7 @@ int main(int argc,char* argv[]){
 
 	/**/
 
-	strcpy(CdbToResarvation.label,"roie");
+	strcpy(CdbToResarvation.label,"Init");
 
 		
 
@@ -307,7 +307,7 @@ int main(int argc,char* argv[]){
 		
 
 		if ((flag == TRUE) || (instr_reservation == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
-
+								//TODO: remove the blbla condition (meutar).
 				instr_reservation=TRUE;
 
 		}
@@ -344,7 +344,7 @@ int main(int argc,char* argv[]){
 
 	/*getting here means all instructions were issued followed by HALT instruction.*/
 
-	instr.OPCODE=-1;	/*not necessary*/
+	instr.OPCODE=-1;	/*not necessary*/ //TODO remove
 
 
 
@@ -355,6 +355,7 @@ int main(int argc,char* argv[]){
 
 
 	/* gadi : the second mistake is here and should be ! detectEND competibale to the way we wrote this function*/
+	//TODO remove the gadi comment
 
 	/*while(detectEnd()){*/
 
@@ -412,6 +413,7 @@ int main(int argc,char* argv[]){
 
 	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n",argv[3],argv[4],argv[5],argv[6]);
 
+	getchar();
 	return  0;
 
 }	
