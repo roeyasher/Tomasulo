@@ -6,14 +6,7 @@
 
 #define LOAD_BUFFER_H
 
-
-
-#include <stdio.h>
-
-#include <stdlib.h>
-
-#include <string.h>
-
+#include "common.h"
 
 
 #define MEMORY_SIZE 1024

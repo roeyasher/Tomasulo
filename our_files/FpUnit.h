@@ -8,13 +8,7 @@
 
 #define FP_UNIT_H
 
-
-
-#include <stdio.h>
-
-#include <stdlib.h>
-
-#include <string.h>
+#include "common.h"
 
 
 
@@ -32,31 +26,7 @@
 
 
 
-#define LD 0
 
-#define ST 1
-
-#define JUMP 2
-
-#define BEQ 3
-
-#define BNE 4
-
-#define ADD 5
-
-#define ADDI 6
-
-#define SUB 7
-
-#define SUBI 8
-
-#define ADDS 9
-
-#define SUBS 10
-
-#define MULTS 11 
-
-#define HALT 12
 
 
 

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_DEPRECATE
 #include "Fetch_And_Decode.h"
 
 //oooooo a stucture for a data base link,hands the Queue insruction decode and fetch ooo/////
