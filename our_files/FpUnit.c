@@ -4,31 +4,6 @@
 
 /*extern database of FP Unit, next instruction and configuration file*/
 
-extern Configuration_Data *Configuration;
-
-extern Instruction instr;
-
-
-
-extern FpRegister FP_Registers[NUM_OF_FP_REGISTERS];
-
-extern FpReservationStation_Line *FpReservationStation_ADD;
-
-extern FpReservationStation_Line *FpReservationStation_MUL;
-
-extern FP_PipelineStage *FP_executionPipeline_ADD;
-
-extern FP_PipelineStage *FP_executionPipeline_MUL;
-
-extern StoreBuffer *StoreBufferResarvation;
-
-
-
-extern int cycle;
-
-extern Trace trace[TRACE_SIZE];
-
-
 
 
 

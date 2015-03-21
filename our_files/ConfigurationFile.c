@@ -1,11 +1,6 @@
 #include "shared.h"
 
 
-
-extern Configuration_Data *Configuration;
-
-
-
 void InitializeConfiguration(char *ConfigFile){
 
 	char buffer[BUFFER_SIZE];

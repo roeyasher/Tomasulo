@@ -1,25 +1,6 @@
 #include "shared.h"
 
 
-
-extern IntegerRegister Integer_Registers[NUM_OF_INT_REGISTERS];
-
-extern Configuration_Data *Configuration;
-
-extern IntReservationStation_Line *IntReservationStation;
-
-extern IntALU_PipelineStage *Integer_ALU_Unit;
-
-extern Instruction instr;
-
-
-
-extern int cycle;
-
-extern Trace trace[TRACE_SIZE];
-
-
-
 void Initialize_IntRegisters(){
 
 	int i=0;
