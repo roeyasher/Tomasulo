@@ -102,7 +102,7 @@ void FP_EvictFromReservationStation(){
 	FpReservationStation_Line *line=FpReservationStation_ADD;
 
 	/*evict for ADD reservation station*/
-	while (line->next != NULL){
+	while (line != NULL){
 		if (line->done == TRUE){
 			line->busy=FALSE;
 			line->done=FALSE;
@@ -117,7 +117,7 @@ void FP_EvictFromReservationStation(){
 	/*evict for MUL reservation station*/
 	line=FpReservationStation_MUL;
 
-	while (line->next != NULL){
+	while (line != NULL){
 		if (line->done == TRUE){
 			line->busy=FALSE;
 			line->done=FALSE;
@@ -139,7 +139,7 @@ void FP_ReservationStationToExecution(){
 	FpReservationStation_Line *line=FpReservationStation_ADD;
 
 	/*send from ADD reservation station to ADD execution unit*/
-	while (line->next != NULL){
+	while (line != NULL){
 
 		if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
 			FP_executionPipeline_ADD->busy=TRUE;
@@ -161,7 +161,7 @@ void FP_ReservationStationToExecution(){
 
 	/*send from MUL reservation station to MUL execution unit*/
 		line=FpReservationStation_MUL;
-		while (line->next != NULL){
+		while (line != NULL){
 
 			if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
 				FP_executionPipeline_MUL->busy=TRUE;
@@ -189,7 +189,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 	int i=0;
 
 	/*find an available line in reseravation station*/
-	while (iter->next != NULL){
+	while (iter != NULL){
 
 		if (iter->busy==FALSE){
 			available=iter;
@@ -203,7 +203,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 		return FALSE;
 
 	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
-	if(instr.OPCODE==9 || instr.OPCODE==10)
+	if(instr.OPCODE==ADDS || instr.OPCODE==SUBS)
 		available->OPCODE = instr.OPCODE;
 	else
 		return FALSE;
@@ -247,396 +247,181 @@ BOOL FP_InsertToReservationStations_MUL(){
 
 
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_MUL;
-
 	int lengthMUL=Configuration->mul_nr_reservation;
-
 	int i=0;
-
-	
-
-
 
 	/*find an available line in reseravation station*/
 
-	
-
-	for (i=0;i<lengthMUL;i++){
-
-		if (iter->busy==FALSE){
-
-			available=iter;
-
+	while (iter != NULL){
+		/*if not busy then assign to available*/
+		if (iter->busy == FALSE){
+			available = iter;
 			break;
-
 		}
-
-		iter=iter->next;
-
+		iter = iter->next;
 	}
-
-
 
 	/*case no available lines in reservation station*/
-
-	if (available == NULL){
-
+	if (available == NULL)
 		return FALSE;
 
-	}
-
-
-
 	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
-
-	
-
-	switch (instr.OPCODE){
-
-	case MULTS:
-
-		available->OPCODE=MULTS;
-
-		break;
-
-	default:
-
-		return FALSE;				/*not my responsability*/
-
-		break;
-
-	}
-
-
+	if(instr.OPCODE==MULTS)
+		available->OPCODE = instr.OPCODE;
+	else
+		return FALSE;
 
 	/*operand j*/
-
 	if (FP_Registers[instr.SRC0].busy == FALSE){
-
 		available->Vj = FP_Registers[instr.SRC0].value;
-
 		available->NumOfRightOperands++;			/*operand j is ready*/
-
-		
-
 	}
-
 	else{
-
 		strcpy(available->Qj,FP_Registers[instr.SRC0].label);	/*copy label of supplier if register is busy*/
-
 	}
-
-
 
 	/*operand k. in FP ops there are no immediate*/
-
 	if (FP_Registers[instr.SRC1].busy == FALSE){
-
 		available->Vk = FP_Registers[instr.SRC1].value;
-
 		available->NumOfRightOperands++;			/*operand j is ready*/
-
 	}
-
 	else{
-
 		strcpy(available->Qk,FP_Registers[instr.SRC1].label);	/*copy label of supplier if register is busy*/
-
 	}
-
-
 
 	/*update destination register*/
-
 	FP_Registers[instr.DST].busy=TRUE;
-
 	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
-
 	strcpy(FP_Registers[instr.DST].label,available->label);
 
-
-
 	available->busy=TRUE;
-
 	available->done=FALSE;
-
 	available->inExecution=FALSE;
 
-
-
 	available->issued=cycle;
-
 	trace[cycle].issued=cycle;
-
 	trace[cycle].valid=TRUE;
-
 	strcpy(trace[cycle].instruction,instr.name);
-
-
 
 	return TRUE;
 
-
-
 }
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
-
-
 
 void FP_AdvanceFpPipeline_ADD(){
 
 	int j;
-
 	int lengthADD=Configuration->add_delay;
-
-	FP_PipelineStage *last=NULL,*temp=NULL,*NewNode=NULL;
-
-	FpReservationStation_Line *Line=NULL;
-
-	StoreBuffer *Line2=NULL;
-
+	FP_PipelineStage *last=NULL, *prevLast=NULL, *temp=NULL,*NewNode=NULL;
+	FpReservationStation_Line *line=NULL;
+	StoreBuffer *storeLine=NULL;
 	int i=0;
 
-
-
 	/*start with ADD unit*/
-
 	/*get last to point to last stage of pipeline*/
-
 	last=FP_executionPipeline_ADD;
-
-	for (i=1;i<lengthADD;i++){
-
+	prevLast = last;
+	while (last->next != NULL) {
+		prevLast = last;
 		last=last->next;
-
 	}
 
-	
-
 	/*calculate result value*/
-
 	if (last->busy == TRUE){
-
+		
 		switch(last->OPCODE){
-
 		case ADDS:
-
 			last->result=(last->operand1)+(last->operand2);
-
 			break;
 
 		case SUBS:
-
 			last->result=(last->operand1)-(last->operand2);
-
 			break;
 
 		default:
-
-			//printf("Error: wrong Opcode in FP_ADD execution unit\n");
-
+			//Opcode not in FP_ADD unit
 			break;
 
 		}
 
-
-
 		/*operate as CDB and update reservation station lines waiting for result and FP register file*/
-
 		/*update reservation stations. first ADD*/
 
-		Line=FpReservationStation_ADD;
+		line=FpReservationStation_ADD;
 
-		for (i=0;i<Configuration->add_nr_reservation;i++){
+		while (line != NULL){
 
 			/*update ADD reservation station*/
-
-			if (!strcmp(Line->Qj,last->LabelOfSupplier)){
-
-				Line->Vj=last->result;
-
-				memset((void*)Line->Qj,0,LABEL_SIZE);
-
-				Line->NumOfRightOperands++;
-
+			if (!strcmp(line->Qj,last->LabelOfSupplier)){
+				line->Vj=last->result;
+				memset((void*)line->Qj,0,LABEL_SIZE);
+				line->NumOfRightOperands++;
 			}
 
-
-
-			if (!strcmp(Line->Qk,last->LabelOfSupplier)){
-
-				Line->Vk=last->result;
-
-				memset((void*)Line->Qk,0,LABEL_SIZE);
-
-				Line->NumOfRightOperands++;
-
+			if (!strcmp(line->Qk,last->LabelOfSupplier)){
+				line->Vk=last->result;
+				memset((void*)line->Qk,0,LABEL_SIZE);
+				line->NumOfRightOperands++;
 			}
-
-
 
 			/*update instruction in reservation station as done*/
-
-			if (!strcmp(last->LabelOfSupplier,Line->label)){
-
-				Line->done=TRUE;
-
+			if (!strcmp(last->LabelOfSupplier,line->label)){
+				line->done=TRUE;
 					for (j=0;j<TRACE_SIZE;j++){
-
-				if (trace[j].issued == Line->issued)
-
+				if (trace[j].issued == line->issued)
 					break;
-
 			}
-
 				trace[j].CDB=cycle-1;
-
 			}
-
-			
-
-			Line=Line->next;
-
+			line=line->next;
 		}
-
-
-
 		/*update MUL reservation station*/
-
-		Line=FpReservationStation_MUL;
-
-		for (i=0;i<Configuration->mul_nr_reservation;i++){
+		line=FpReservationStation_MUL;
+		while (line != NULL){
 
 			/*update ADD reservation station*/
-
-			if (!strcmp(Line->Qj,last->LabelOfSupplier)){
-
-				Line->Vj=last->result;
-
-				memset((void*)Line->Qj,0,LABEL_SIZE);
-
-				Line->NumOfRightOperands++;
-
+			if (!strcmp(line->Qj,last->LabelOfSupplier)){
+				line->Vj=last->result;
+				memset((void*)line->Qj,0,LABEL_SIZE);
+				line->NumOfRightOperands++;
 			}
 
-
-
-			if (!strcmp(Line->Qk,last->LabelOfSupplier)){
-
-				Line->Vk=last->result;
-
-				memset((void*)Line->Qk,0,LABEL_SIZE);
-
-				Line->NumOfRightOperands++;
-
+			if (!strcmp(line->Qk,last->LabelOfSupplier)){
+				line->Vk=last->result;
+				memset((void*)line->Qk,0,LABEL_SIZE);
+				line->NumOfRightOperands++;
 			}
-
-
-
 			/*impossible for instruction to come from MUL as it's in ADD piepline*/		
-
-			Line=Line->next;
-
+			line=line->next;
 		}
 
-
-
 			/*update store buffers*/
+			storeLine=StoreBufferResarvation;
 
-			Line2=StoreBufferResarvation;
+		while (storeLine != NULL){
 
-			for (i=0;i<Configuration->mem_nr_store_buffers;i++){
-
-				if (!strcmp(Line2->Qj,last->LabelOfSupplier)){
-
-					Line2->vj=last->result;
-
-					memset((void*)Line2->Qj,0,LABEL_SIZE);
-
-					Line2->NumOfRightOperands++;
-
+				if (!strcmp(storeLine->Qj,last->LabelOfSupplier)){
+					storeLine->vj=last->result;
+					memset((void*)storeLine->Qj,0,LABEL_SIZE);
+					storeLine->NumOfRightOperands++;
 				}
-
-				Line2=Line2->next;
-
-			}
-
-
+				storeLine=storeLine->next;
+		}
 
 		/*update registers*/
-
 		for (i=0;i<NUM_OF_FP_REGISTERS;i++){
-
 			if ((FP_Registers[i].busy==TRUE) && (!(strcmp(FP_Registers[i].label,last->LabelOfSupplier)))){
-
 				FP_Registers[i].value=last->result;
-
 				FP_Registers[i].busy=FALSE;
-
 				memset(FP_Registers[i].label,0,LABEL_SIZE);
-
-			}}
-
+			}
+		}
 	}
-
-			
-
-		/*advance ADD pipeline one stage forward*/	
-
-			
-
-			if (lengthADD==1){
-
-				memset(last,0,sizeof(FP_PipelineStage));
-
-				last->busy = FALSE;
-
-				last->next=NULL;
-
-			}
-
-			else{
-
-				/*free last stage. create new one and point to start*/
-
-				free(last);
-
-				NewNode=(FP_PipelineStage*)malloc(sizeof(FP_PipelineStage));
-
-				memset(NewNode,0,sizeof(FP_PipelineStage));
-
-				NewNode->busy=FALSE;
-
-				NewNode->next=FP_executionPipeline_ADD;
-
-				FP_executionPipeline_ADD=NewNode;
-
-				
-
-			}
-
-
-
-			/*make last (new) stage point to NULL*/
-
-			temp=FP_executionPipeline_ADD;
-
-			for (i=1;i<lengthADD;i++){
-
-				temp=temp->next;
-
-			}
-
-			temp->next=NULL;
-
-	
-
-	
-
-	
+	/*advance ADD pipeline one stage forward*/
+	memset(last,0,sizeof(FP_PipelineStage)); //TODO check if WORK!
+	last->busy = FALSE;
+	last->next = FP_executionPipeline_ADD;
+	FP_executionPipeline_ADD = last;
+	prevLast->next = NULL;
 
 }
 

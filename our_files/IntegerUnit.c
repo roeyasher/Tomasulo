@@ -83,7 +83,7 @@ BOOL InsertToReservationStation(){
 	int i = 0;
 
 	/*find available Line in Reservation station*/
-	while (iter->next != NULL){
+	while (iter != NULL){
 
 		/*if not busy then assign to available*/
 		if (iter->busy == FALSE){
@@ -157,7 +157,7 @@ void ReservationStationToALU(){
 	int length=Configuration->int_nr_reservation;		/*how many Lines in reservation station*/
 	IntReservationStation_Line *line=IntReservationStation;
 
-	while (line->next != NULL){
+	while (line != NULL){
 
 		/*check if a reservation has it's 2 operands. if so pass to ALU*/
 		if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
@@ -189,7 +189,7 @@ void EvictFromIntReservationStation(){
 	int length=Configuration->int_nr_reservation;
 	IntReservationStation_Line *line=IntReservationStation;
 
-	while (line->next != NULL){
+	while (line != NULL){
 
 		if (line->done == TRUE){
 
@@ -226,7 +226,6 @@ void AdvanceIntPipeline(){
 	}
 
 	if (last->busy == TRUE) {			/*check if stage has an instruction or a bubble that went on*/
-
 		/*calculate result of operation. in reality it's done in stages but here it's done in one stage and we decide to do it int last stage*/
 		switch(last->OPCODE){
 
@@ -252,43 +251,33 @@ void AdvanceIntPipeline(){
 		}
 
 		/*opearate as CDB and update waiting stations and registers*/
-
 		/*update Integer Reservation satation*/
 
-		while (line->next != NULL){
+		while (line != NULL){
 
 			if (!strcmp(line->Qj,last->LabelOfSupplier)){
-
 				line->Vj = last->result;			/*update waiting value*/
 				memset((void*)line->Qj,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
 				line->NumOfRightOperands++;		/*update number of ready operands*/
-
 			}
 
 			if (!strcmp(line->Qk,last->LabelOfSupplier)){
-
 				line->Vk=last->result;			/*update waiting value*/
 				memset((void*)line->Qk,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
 				line->NumOfRightOperands++;		/*update number of ready operands*/
-
 			}
 
 			/*we set reservation station state as done for this instruction*/
 			if ( (!strcmp(last->LabelOfSupplier,line->label)) && (line->inExecution == TRUE) ){
-
 				line->done = TRUE;
-
 				for (j=0;j<TRACE_SIZE;j++){
-
 					if (trace[j].issued == line->issued){
 						trace[j].CDB=cycle-1;
 						break;
 					}
 				}
 			}
-
 			line=line->next;
-
 		}
 
 		/*update registers*/
