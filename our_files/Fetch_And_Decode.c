@@ -476,8 +476,6 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 
 				// simulate more clock cycles
 
-				
-
 				if (instr_reservation==TRUE){
 
 					FillTheFields(temp);
@@ -493,30 +491,6 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 					
 
 				}	
-
-				break;
-
-			case BEQ:			
-
-				CheckTheConditionAndReturnPc(temp);	
-
-				
-
-				break;
-
-			case BNE:			
-
-				CheckTheConditionAndReturnPc(temp);
-
-				
-
-				break;
-
-			case JUMP:			
-
-				CheckTheConditionAndReturnPc(temp);
-
-				
 
 				break;
 

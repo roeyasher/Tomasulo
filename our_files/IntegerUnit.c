@@ -108,34 +108,22 @@ BOOL InsertToReservationStation(){
 	int i = 0;
 
 	/*find available Line in Reservation station*/
-
-	for (i = 0; i < length; i++){
-
+	while (iter->next != NULL){
+		
 		/*if not busy then assign to available*/
-
 		if (iter->busy == FALSE){
 			available = iter;
 			break;
 		}
+
 		iter = iter->next;
 	}
 
-
-
 	/*if available is still NULL then no available station thus return FALSE*/
-
-	if (available == NULL){
-
+	if (available == NULL)
 		return FALSE;
 
-	}
-
-
-
 	/*check if instruction is mine and update instruction type. otherwise report nothing happend by retuning FALSE*/
-
-	
-
 	switch(instr.OPCODE){
 
 	case ADD:
