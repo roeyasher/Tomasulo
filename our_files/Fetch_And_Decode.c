@@ -164,6 +164,7 @@ Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
 
 		src1= CharToInteger(instruction_line[3]);
 
+
 		if ((imm = CharToInteger(instruction_line[4])) >=8)
 
 		{
