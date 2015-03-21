@@ -153,5 +153,15 @@ void InitializeConfiguration(char *ConfigFile){
 
 }
 
-
+FILE * FileOpen(char *input_path_file, const char* flags)
+{
+	FILE* file_to_open = NULL;
+	printf("FileOpen:%s\n", input_path_file);
+	file_to_open = fopen(input_path_file, flags); // warning: deprecated 
+	if (NULL == file_to_open)
+	{
+		printf("The function FileOpen failed\n");
+	}
+	return (file_to_open);
+}
 

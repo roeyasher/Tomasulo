@@ -95,7 +95,7 @@ void PrintTrace();
 
 /*read memin file and initialize memory*/
 
-void InitializeMemory(char * memfile);
+void InitializeMemory(FILE *memin);
 
 /*initialize trace structure*/
 
@@ -115,8 +115,8 @@ int detectEnd();
 
 int main(int argc,char* argv[]){
 
-	FILE *memin_txt=fopen(argv[2],"rt");
-
+	//FILE *memin_txt=fopen(argv[2],"rt");
+	FILE *memin_txt = FileOpen(argv[2], "rt");
 
 
 	int i=0;
@@ -144,7 +144,7 @@ int main(int argc,char* argv[]){
 
 	IntializeMemPipline();
 
-	InitializeMemory(argv[2]);
+	InitializeMemory(memin_txt);
 
 	
 
@@ -416,7 +416,7 @@ void MemoryLog(){
 
 
 
-void InitializeMemory(char * memfile){
+void InitializeMemory(FILE *memin){
 
 	char memData[512];
 
@@ -424,7 +424,7 @@ void InitializeMemory(char * memfile){
 
 	int val=0;
 
-	FILE *memin=fopen(memfile,"rt");
+	//FILE *memin=fopen(memfile,"rt");
 
 	while(i<MEMORY_SIZE){
 

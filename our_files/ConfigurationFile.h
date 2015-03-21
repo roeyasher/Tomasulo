@@ -31,7 +31,7 @@ struct Configuration_Data {
 
 
 void InitializeConfiguration(char *ConfigFile);
-
+FILE * FileOpen(char *input_path_file, const char* flags);
 
 
 #endif
