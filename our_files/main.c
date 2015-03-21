@@ -1,30 +1,6 @@
-#include "common.h"
-#include "Fetch_And_Decode.h"
-#include "ConfigurationFile.h"
-#include "IntegerUnit.h"
-#include "FpUnit.h"
-#include "MemoryUnit.h"
+#include "shared.h"
 
 
-
-
-
-#define SIZE_OF_CHAR 512
-
-#define TRUE 1
-
-#define FALSE 0
-
-#define NUM_OF_INT_REGISTERS 16
-
-#define LABEL_SIZE 10
-
-#define BUFFER_SIZE 512
-
-#define TRACE_SIZE 1000000
-
-
-typedef int BOOL;
 
 /*Defining global variables*/
 
@@ -139,7 +115,6 @@ int main(int argc,char* argv[]){
 
 
 	int i=0;
-
 
 
 	instr.OPCODE=-1;
@@ -438,57 +413,22 @@ void InitializeMemory(char * memfile){
 
 	char memData[512];
 
-	int i=0,j=0;
+	int i=0;
 
-	INT64 num=0;
-
-	INT64 x=0;
-
-	INT64 sum=0;
-
-	INT64 a=0;
-
-	int sum2=0;
+	int val=0;
 
 	FILE *memin=fopen(memfile,"rt");
 
+	while(i<MEMORY_SIZE){
 
-
-	while(j<MEMORY_SIZE){
-
-		
-
-		
 
 		fscanf(memin,"%s",memData);
 
-		sum=0;
+		val = (int)strtol(memData, NULL, 16);     //TODO check correctness (ask itay if he see any diffrent).
 
-		for (i=0;i<8;i++){
-
-			
-
-			num=CharToInteger(memData[i]);
-
-			
-
-			a=(pow((double)16,7-i));
-
-			sum=sum+(((double)num)*a);
-
-		}
-
-		sum2=(int)sum;
-
-		PhysicalMemoryArray[j]=*(float*)&(sum2);
-
+		PhysicalMemoryArray[i]=*(float*)&(val);
 	
-
-		j++;
-
-		
-
-
+		i++;
 
 	}
 

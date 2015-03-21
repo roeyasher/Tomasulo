@@ -1,44 +1,11 @@
-
-
-
-
 #ifndef CONFIGURATION_FILE
-
 #define CONFIGURATION_FILE
-
-
 
 #include "common.h"
 
-#include "Fetch_And_Decode.h"
+typedef struct Configuration_Data Configuration_Data;
 
-#include "IntegerUnit.h"
-
-
-
-
-
-#define SIZE_OF_CHAR 512
-
-#define TRUE 1
-
-#define FALSE 0
-
-#define NUM_OF_INT_REGISTERS 16
-
-#define LABEL_SIZE 10
-
-#define BUFFER_SIZE 512
-
-
-
-typedef int BOOL;
-
-
-
-
-
-typedef struct{
+struct Configuration_Data {
 
 	int int_delay;
 
@@ -59,8 +26,7 @@ typedef struct{
 	int mem_nr_load_buffers;
 
 	int mem_nr_store_buffers;
-
-}Configuration_Data;
+};
 
 
 

@@ -1,21 +1,13 @@
-#include "ConfigurationFile.h"
-
-
-
 #ifndef LOAD_BUFFER_H
-
 #define LOAD_BUFFER_H
 
 #include "common.h"
 
 
-#define MEMORY_SIZE 1024
 
+typedef struct LoadBuffer LoadBuffer;
 
-
-typedef struct 
-
-{
+struct LoadBuffer {
 
 	int address;
 
@@ -39,13 +31,12 @@ typedef struct
 
 	struct LoadBuffer *next;
 
-}LoadBuffer;
+};
 
 
+typedef struct StoreBuffer StoreBuffer;
 
-typedef struct
-
-{
+struct StoreBuffer {
 
 	int address;
 
@@ -74,14 +65,13 @@ typedef struct
 	int issued;
 
 	struct StoreBuffer *next;
-
-}StoreBuffer;
-
+};
 
 
-typedef struct
 
-{
+typedef struct Memory_PiplineStage Memory_PiplineStage;
+
+struct Memory_PiplineStage {
 
 	int OPCODE;
 
@@ -95,13 +85,13 @@ typedef struct
 
 	float Data_store;
 
-}Memory_PiplineStage;
+};
 
 
 
-typedef struct
+typedef struct Memory_Pipline Memory_Pipline;
 
-{
+struct Memory_Pipline {
 
 	int OPCODE;
 
@@ -113,17 +103,16 @@ typedef struct
 
 	float Data_store;
 
-}Memory_Pipline;
+};
 
-typedef struct
+typedef struct CdbWriteBack CdbWriteBack;
 
-{
+struct CdbWriteBack {
 
 	float value;
 
 	char label[LABEL_SIZE];
-
-}CdbWriteBack;
+};
 
 
 
@@ -131,11 +120,11 @@ void IntilaizeMemoryArray();
 
 
 
-static LoadBuffer *CreateNewNode();
+LoadBuffer *CreateNewLBNode();
 
 
 
-static StoreBuffer *CreateNewNodeForStore();
+StoreBuffer *CreateNewSBNode();
 
 
 

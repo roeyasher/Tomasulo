@@ -1,60 +1,10 @@
-#include "Fetch_And_Decode.h"
+#include "shared.h"
 
 //oooooo a stucture for a data base link,hands the Queue insruction decode and fetch ooo/////
 
 
 
-/*add global variables*/
 
-extern Configuration_Data *Configuration;
-
-extern Instruction instr;
-
-extern BOOL instr_reservation;
-
-extern BOOL flag;
-
-
-
-/*For Integer Unit*/
-
-extern IntegerRegister Integer_Registers [NUM_OF_INT_REGISTERS];
-
-extern IntReservationStation_Line *IntReservationStation;
-
-extern IntALU_PipelineStage *Integer_ALU_Unit;
-
-/**/
-
-
-
-/*For FP Unit*/
-
-extern FpRegister FP_Registers[NUM_OF_FP_REGISTERS];
-
-extern FpReservationStation_Line *FpReservationStation_ADD;
-
-extern FpReservationStation_Line *FpReservationStation_MUL;
-
-extern FP_PipelineStage *FP_executionPipeline_ADD;
-
-extern FP_PipelineStage *FP_executionPipeline_MUL;
-
-
-
-/*For fetch and decode*/
-
-extern Instruction *instruction_queue_head;
-
-extern int PC;
-
-/**/
-
-
-
-extern int cycle;
-
-extern Trace trace[TRACE_SIZE];
 
 
 

@@ -1,36 +1,8 @@
-#include "MemoryUnit.h"
-
-
-
-extern IntegerRegister Integer_Registers[NUM_OF_INT_REGISTERS];
-
-extern FpRegister FP_Registers[NUM_OF_FP_REGISTERS];
-
-extern FpReservationStation_Line *FpReservationStation_ADD;
-
-extern FpReservationStation_Line *FpReservationStation_MUL;
-
-extern Configuration_Data *Configuration;
-
-extern Memory_PiplineStage *Memory_Unit;
-
-extern LoadBuffer *LoadBufferResarvation;
-
-extern StoreBuffer *StoreBufferResarvation;
-
-extern Instruction instr;
-
-
-
-extern int cycle;
-
-extern Trace trace[TRACE_SIZE];
+#include "shared.h"
 
 
 
 CdbWriteBack CdbToResarvation;
-
-extern float PhysicalMemoryArray[];
 
 Memory_Pipline BufferToMemory;
 
@@ -54,7 +26,7 @@ void IntilaizeMemoryArray()
 
 
 
-static LoadBuffer *CreateNewNode(){
+LoadBuffer *CreateLBNewNode(){
 
 	/*this function create a new node for a linked list, for the load buffer*/
 
@@ -72,7 +44,7 @@ static LoadBuffer *CreateNewNode(){
 
 }
 
-static StoreBuffer *CreateNewNodeForStore(){
+StoreBuffer *CreateNewSBNode(){
 
 	/*this function create a new node for a linked list for the store buffer*/
 
@@ -104,7 +76,7 @@ void IntilaizeLoadBuffer()
 
 	LoadBuffer *new_node = NULL,*head = NULL;
 
-	new_node = CreateNewNode();
+	new_node = CreateLBNewNode();
 
 	sprintf(new_node->Label,"LOAD%d",i+1);
 
@@ -115,14 +87,17 @@ void IntilaizeLoadBuffer()
 	for (i=1;i<Number_of_MemReservation_station;i++)
 
 	{
+		new_node->next = CreateLBNewNode();
 
-		head = CreateNewNode();
+		head = CreateLBNewNode();
 
 		sprintf(head->Label,"LOAD%d",i+1);
 
 		new_node->next = head;
 
-		new_node= new_node->next;
+		new_node = new_node->next;
+
+
 
 	}
 
@@ -140,7 +115,7 @@ void IntilaizeStoreBuffer()
 
 	StoreBuffer *new_node = NULL,*head = NULL;
 
-	new_node = CreateNewNodeForStore();
+	new_node = CreateNewSBNode();
 
 	sprintf(new_node->Label,"STORE%d",i+1);
 
@@ -152,13 +127,14 @@ void IntilaizeStoreBuffer()
 
 	{
 
-		head = CreateNewNodeForStore();
+
+		head = CreateNewSBNode();
 
 		sprintf(head->Label,"STORE%d",i+1);
 
 		new_node->next = head;
 
-		new_node=new_node->next;
+		new_node = new_node->next;
 
 	}
 

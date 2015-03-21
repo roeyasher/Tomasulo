@@ -1,5 +1,4 @@
-#include "FpUnit.h"
-#include "MemoryUnit.h"
+#include "shared.h"
 
 
 
@@ -415,7 +414,6 @@ void FP_ReservationStationToExecution(){
 
 BOOL FP_InsertToReservationStations_ADD(){
 
-	int j;
 
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_ADD;
 
@@ -567,7 +565,6 @@ BOOL FP_InsertToReservationStations_ADD(){
 
 BOOL FP_InsertToReservationStations_MUL(){
 
-	int j;
 
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_MUL;
 

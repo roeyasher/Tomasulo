@@ -1,4 +1,4 @@
-#include "IntegerUnit.h"
+#include "shared.h"
 
 
 
@@ -42,7 +42,7 @@ void Initialize_IntRegisters(){
 
 /*used to create new reservation station line*/
 
-static IntReservationStation_Line *CreateNewNode(){
+IntReservationStation_Line *CreateNewIRSLNode(){
 
 	IntReservationStation_Line *temp = NULL;
 
@@ -78,7 +78,7 @@ void InitializeReservationStation(){
 
 	/*Create first Line and label it as ADD1*/
 
-	head = CreateNewNode();
+	head = CreateNewIRSLNode();
 
 	sprintf(head->label, "ADD%d", i + 1);
 
@@ -92,7 +92,7 @@ void InitializeReservationStation(){
 
 	for (i = 1; i < NumberOFReservationStations; i++){
 
-		head->next = CreateNewNode();
+		head->next = CreateNewIRSLNode();
 
 		head = head->next;
 

@@ -1,42 +1,12 @@
-
-
-#include "ConfigurationFile.h"
-
-
-
 #ifndef FP_UNIT_H
-
 #define FP_UNIT_H
 
 #include "common.h"
 
-
-
-#define SIZE_OF_CHAR 512
-
-#define TRUE 1
-
-#define FALSE 0
-
-#define NUM_OF_FP_REGISTERS 16
-
-#define LABEL_SIZE 10
-
-#define BUFFER_SIZE 512
-
-
-
-
-
-
-
-typedef int BOOL;
-
-
-
 /*FP Registers structure*/
 
-typedef struct{
+typedef struct FpRegister FpRegister;
+struct FpRegister {
 
 	float value;
 
@@ -44,13 +14,14 @@ typedef struct{
 
 	char label[LABEL_SIZE];
 
-}FpRegister;
+};
 
 
 
 /*FP Reservation station line. the reservation station will be a linked list of size according to configuration file*/
 
-typedef struct{
+typedef struct FpReservationStation_Line FpReservationStation_Line;
+struct FpReservationStation_Line{
 
 	int OPCODE;
 
@@ -73,14 +44,14 @@ typedef struct{
 	struct FpReservationStation_Line *next;
 
 	int issued;
-
-}FpReservationStation_Line;
+};
 
 
 
 /*Pipeline stages of FP Unit*/
 
-typedef struct{
+typedef struct FP_PipelineStage FP_PipelineStage;
+struct FP_PipelineStage{
 
 	int OPCODE;
 
@@ -93,10 +64,7 @@ typedef struct{
 	char LabelOfSupplier[LABEL_SIZE];
 
 	struct FP_PipelineStage *next;
-
-	
-
-}FP_PipelineStage;
+};
 
 
 

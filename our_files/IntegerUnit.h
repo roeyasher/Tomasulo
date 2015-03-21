@@ -1,51 +1,21 @@
-#include "Fetch_And_Decode.h"
-
-#include "ConfigurationFile.h"
-
-
-
 #ifndef INT_UNIT_H
-
 #define INT_UNIT_H
 
 #include "common.h"
 
 
 
-#define SIZE_OF_CHAR 512
-
-#define TRUE 1
-
-#define FALSE 0
-
-#define NUM_OF_INT_REGISTERS 16
-
-#define LABEL_SIZE 10
-
-#define BUFFER_SIZE 512
-
-#define TRACE_SIZE 10000
-
-
-
-
-typedef int BOOL;
-
-
-
-
-
 /*Integer registers structure*/
 
-typedef struct{
+typedef struct IntegerRegister IntegerRegister;
+struct IntegerRegister{
 
 	int value;
 
 	BOOL busy;						/*indicating if value is relevant */
 
 	char label[LABEL_SIZE];			/*Which Reservation station is in charge of value in case busy is TRUE*/
-
-}IntegerRegister;
+};
 
 
 
@@ -53,7 +23,8 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct IntReservationStation_Line IntReservationStation_Line;
+struct IntReservationStation_Line{
 
 	int OPCODE;
 
@@ -76,14 +47,14 @@ typedef struct{
 	struct IntReservationStation_Line *next;	/*next line in reservation station*/
 
 	int issued;
-
-}IntReservationStation_Line;
-
+};
 
 
 
 
-typedef struct{
+
+typedef struct IntALU_PipelineStage IntALU_PipelineStage;
+struct IntALU_PipelineStage{
 
 	int OPCODE;
 
@@ -96,12 +67,12 @@ typedef struct{
 	struct IntALU_PipelineStage *next;
 
 	int result;
-
-}IntALU_PipelineStage;
-
+};
 
 
-typedef struct{
+
+typedef struct Trace Trace;
+struct Trace{
 
 	char instruction[16];
 
@@ -113,7 +84,7 @@ typedef struct{
 
 	int valid;
 
-}Trace;
+};
 
 
 

@@ -1,43 +1,10 @@
 #ifndef FETCH_AND_DECODE
-
 #define FETCH_AND_DECODE
-
-
 
 #include "common.h"
 
-#include "ConfigurationFile.h"
-
-#include "IntegerUnit.h"
-
-#include "FpUnit.h"
-
-
-
-
-
-
-
-#define SIZE_OF_CHAR 512
-
-#define TRUE 1
-
-#define FALSE 0
-
-#define NUM_OF_INT_REGISTERS 16
-
-#define LABEL_SIZE 10
-
-#define BUFFER_SIZE 512
-
-
-
-typedef int BOOL;
-
-
-
-
-typedef struct Instruction {
+typedef struct Instruction Instruction;
+struct Instruction {
 
 	int OPCODE;
 
@@ -54,8 +21,7 @@ typedef struct Instruction {
 	struct Instruction *next;
 
 	char name[16];
-
-}Instruction;
+};
 
 
 
