@@ -1,541 +1,247 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-/*extern database of FP Unit, next instruction and configuration file*/
-
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
 
 void Initialize_FpRegisters(){
 
 	int i=0;
 
 	for (i=0;i<NUM_OF_FP_REGISTERS;i++){
-
 		FP_Registers[i].value=(float)i;
-
 		FP_Registers[i].busy=FALSE;
-
 		memset(FP_Registers[i].label,0,LABEL_SIZE);
-
 	}
 
 }
 
+FpReservationStation_Line *CreateNewFPRSNode(){
 
+	FpReservationStation_Line *temp = NULL;
+	temp = (FpReservationStation_Line*) malloc(sizeof(FpReservationStation_Line));
+	memset(temp, 0, sizeof(FpReservationStation_Line));
+	temp->next = NULL;
+	return temp;		/*NULL is returned if failure occured*/
+}
 
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
+FP_PipelineStage *CreateNewFPPLNode(){
 
-
+	FP_PipelineStage *temp = NULL;
+	temp = (FP_PipelineStage*) malloc(sizeof(FP_PipelineStage));
+	memset(temp, 0, sizeof(FP_PipelineStage));
+	temp->next = NULL;
+	return temp;		/*NULL is returned if failure occured*/
+}
 
 void Initialize_FpReservationStations(){
 
 	int lengthAdd=Configuration->add_nr_reservation;
-
 	int lengthMUL=Configuration->mul_nr_reservation;
-
-	int i=0;
-
-	FpReservationStation_Line *NewNode=NULL,*head=NULL;
-
-
-
-	/*Create Reservation stations for ADD unit*/
-
-	head=(FpReservationStation_Line*)malloc(sizeof(FpReservationStation_Line));
-
-	memset(head,0,sizeof(FpReservationStation_Line));
-
-	head->next=NULL;
-
-	sprintf(head->label,"FPADD%d",i+1);
-
-	FpReservationStation_ADD=head;
-
-
-
-	for (i=1;i<lengthAdd;i++){
-
-		NewNode=(FpReservationStation_Line*)malloc(sizeof(FpReservationStation_Line));
-
-		memset(NewNode,0,sizeof(FpReservationStation_Line));
-
-		NewNode->next=NULL;
-
-		head->next=NewNode;
-
-		head=head->next;
-
-		sprintf(head->label,"FPADD%d",i+1);
-
-	}
-
-
-
 	
 
-	/*Create Reservation station for MUL unit*/
+	/*Create Reservation station for ADD unit*/
+	int i=0;
+	FpReservationStation_Line *node=NULL;
+	FpReservationStation_ADD=CreateNewFPRSNode();
+	sprintf(FpReservationStation_ADD->label,"FPADD%d",i+1);
+	node = FpReservationStation_ADD;
 
-	i=0;
-
-	head=(FpReservationStation_Line*)malloc(sizeof(FpReservationStation_Line));
-
-	memset(head,0,sizeof(FpReservationStation_Line));
-
-	head->next=NULL;
-
-	sprintf(head->label,"FPMUL%d",i+1);
-
-	FpReservationStation_MUL=head;
-
-
-
-	for (i=1;i<lengthMUL;i++){
-
-		NewNode=(FpReservationStation_Line*)malloc(sizeof(FpReservationStation_Line));
-
-		memset(NewNode,0,sizeof(FpReservationStation_Line));
-
-		NewNode->next=NULL;
-
-		head->next=NewNode;
-
-		head=head->next;
-
-		sprintf(head->label,"FPMUL%d",i+1);
-
+	for (i=1;i<lengthAdd;i++){
+		node->next = CreateNewFPRSNode();
+		node = node->next;
+		sprintf(node->label,"FPADD%d",i+1);
 	}
 
 
+	/*Create Reservation station for MUL unit*/
+	i=0;
+	FpReservationStation_MUL=CreateNewFPRSNode();
+	sprintf(FpReservationStation_MUL->label,"FPMUL%d",i+1);
+	node = FpReservationStation_MUL;
 
-
-
+	for (i=1;i<lengthMUL;i++){
+		node->next = CreateNewFPRSNode();
+		node = node->next;
+		sprintf(node->label,"FPMUL%d",i+1);
+	}
 }
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
 
 void Initialize_FpPipelines(){
 
 	int lengthADD=Configuration->add_delay;
-
 	int lengthMUL=Configuration->mul_delay;
-
 	int i=0;
 
-	FP_PipelineStage *NewNode=NULL,*head=NULL;
-
-
+	FP_PipelineStage *node = NULL;
 
 	/*Create Pipeline for ADD unit*/
-
-	head=(FP_PipelineStage*)malloc(sizeof(FP_PipelineStage));
-
-	memset(head,0,sizeof(FP_PipelineStage));
-
-	head->next=NULL;
-
-	FP_executionPipeline_ADD=head;
-
-
+	FP_executionPipeline_ADD= CreateNewFPPLNode();
+	node = FP_executionPipeline_ADD;
 
 	for (i=1;i<lengthADD;i++){
-
-		NewNode=(FP_PipelineStage*)malloc(sizeof(FP_PipelineStage));
-
-		memset(NewNode,0,sizeof(FP_PipelineStage));
-
-		NewNode->next=NULL;
-
-		head->next=NewNode;
-
-		head=head->next;
-
+		node->next = CreateNewFPPLNode();
+		node = node->next;
 	}
-
-	
 
 	/*Create Pipeline for MUL unit*/
-
-	head=(FP_PipelineStage*)malloc(sizeof(FP_PipelineStage));
-
-	memset(head,0,sizeof(FP_PipelineStage));
-
-	head->next=NULL;
-
-	FP_executionPipeline_MUL=head;
-
-
+	i=0;
+	FP_executionPipeline_MUL= CreateNewFPPLNode();
+	node = FP_executionPipeline_MUL;
 
 	for (i=1;i<lengthMUL;i++){
-
-		NewNode=(FP_PipelineStage*)malloc(sizeof(FP_PipelineStage));
-
-		memset(NewNode,0,sizeof(FP_PipelineStage));
-
-		NewNode->next=NULL;
-
-		head->next=NewNode;
-
-		head=head->next;
-
+		node->next = CreateNewFPPLNode();
+		node = node->next;
 	}
-
 }
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
 
 void FP_EvictFromReservationStation(){
 
 	int i=0;
-
 	int lengthADD=Configuration->add_nr_reservation;
-
 	int lengthMUL=Configuration->mul_nr_reservation;
 
-	FpReservationStation_Line *Line=NULL;
-
-
+	FpReservationStation_Line *line=FpReservationStation_ADD;
 
 	/*evict for ADD reservation station*/
-
-	Line=FpReservationStation_ADD;
-
-	for (i=0;i<lengthADD;i++){
-
-		if (Line->done == TRUE){
-
-			Line->busy=FALSE;
-
-			Line->done=FALSE;
-
-			Line->inExecution=FALSE;
-
-			Line->NumOfRightOperands=0;
-
-			memset(Line->Qj,0,LABEL_SIZE);
-
-			memset(Line->Qk,0,LABEL_SIZE);
-
+	while (line->next != NULL){
+		if (line->done == TRUE){
+			line->busy=FALSE;
+			line->done=FALSE;
+			line->inExecution=FALSE;
+			line->NumOfRightOperands=0;
+			memset(line->Qj,0,LABEL_SIZE);
+			memset(line->Qk,0,LABEL_SIZE);
 		}
-
-		Line=Line->next;
-
+		line=line->next;
 	}
-
-
 
 	/*evict for MUL reservation station*/
+	line=FpReservationStation_MUL;
 
-	Line=FpReservationStation_MUL;
-
-	for (i=0;i<lengthMUL;i++){
-
-		if (Line->done == TRUE){
-
-			Line->busy=FALSE;
-
-			Line->done=FALSE;
-
-			Line->inExecution=FALSE;
-
-			Line->NumOfRightOperands=0;
-
-			memset(Line->Qj,0,LABEL_SIZE);
-
-			memset(Line->Qk,0,LABEL_SIZE);
-
+	while (line->next != NULL){
+		if (line->done == TRUE){
+			line->busy=FALSE;
+			line->done=FALSE;
+			line->inExecution=FALSE;
+			line->NumOfRightOperands=0;
+			memset(line->Qj,0,LABEL_SIZE);
+			memset(line->Qk,0,LABEL_SIZE);
 		}
-
-		Line=Line->next;
-
+		line=line->next;
 	}
-
-
-
 }
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
 
 void FP_ReservationStationToExecution(){
 
 	int j;
-
 	int i=0;
-
 	int lengthADD=Configuration->add_nr_reservation;
-
 	int lengthMUL=Configuration->mul_nr_reservation;
-
-	FpReservationStation_Line *Line=NULL;
-
-
+	FpReservationStation_Line *line=FpReservationStation_ADD;
 
 	/*send from ADD reservation station to ADD execution unit*/
+	while (line->next != NULL){
 
-	Line=FpReservationStation_ADD;
-
-	for (i=0;i<lengthADD;i++){
-
-		if ((Line->NumOfRightOperands == 2) && (Line->inExecution==FALSE)){
-
+		if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
 			FP_executionPipeline_ADD->busy=TRUE;
-
-			FP_executionPipeline_ADD->OPCODE=Line->OPCODE;
-
-			FP_executionPipeline_ADD->operand1=Line->Vj;
-
-			FP_executionPipeline_ADD->operand2=Line->Vk;
-
-			strcpy(FP_executionPipeline_ADD->LabelOfSupplier,Line->label);
-
-			Line->inExecution=TRUE;
-
-
-
-			
+			FP_executionPipeline_ADD->OPCODE=line->OPCODE;
+			FP_executionPipeline_ADD->operand1=line->Vj;
+			FP_executionPipeline_ADD->operand2=line->Vk;
+			strcpy(FP_executionPipeline_ADD->LabelOfSupplier,line->label);
+			line->inExecution=TRUE;
 
 			for (j=0;j<TRACE_SIZE;j++){
-
-				if (trace[j].issued == Line->issued)
-
+				if (trace[j].issued == line->issued)
 					break;
-
 			}
-
 			trace[j].execution=cycle;
-
-
-
-
-
 			break;
-
 		}
-
-		Line=Line->next;
-
+		line=line->next;
 	}
-
-
 
 	/*send from MUL reservation station to MUL execution unit*/
+		line=FpReservationStation_MUL;
+		while (line->next != NULL){
 
-		Line=FpReservationStation_MUL;
-
-		for (i=0;i<lengthMUL;i++){
-
-			if ((Line->NumOfRightOperands == 2) && (Line->inExecution==FALSE)){
-
+			if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
 				FP_executionPipeline_MUL->busy=TRUE;
-
-				FP_executionPipeline_MUL->OPCODE=Line->OPCODE;
-
-				FP_executionPipeline_MUL->operand1=Line->Vj;
-
-				FP_executionPipeline_MUL->operand2=Line->Vk;
-
-				strcpy(FP_executionPipeline_MUL->LabelOfSupplier,Line->label);
-
-				Line->inExecution=TRUE;
-
-				
+				FP_executionPipeline_MUL->OPCODE=line->OPCODE;
+				FP_executionPipeline_MUL->operand1=line->Vj;
+				FP_executionPipeline_MUL->operand2=line->Vk;
+				strcpy(FP_executionPipeline_MUL->LabelOfSupplier,line->label);
+				line->inExecution=TRUE;
 
 				for (j=0;j<TRACE_SIZE;j++){
-
-					if (trace[j].issued == Line->issued)
-
+					if (trace[j].issued == line->issued)
 					break;
-
 				}
-
 				trace[j].execution=cycle;
-
-
-
 				break;
-
 			}
-
-				Line=Line->next;
-
+				line=line->next;
 	}
-
-
-
-
-
 }
-
-
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
 
 BOOL FP_InsertToReservationStations_ADD(){
 
-
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_ADD;
-
 	int lengthADD=Configuration->add_nr_reservation;
-
 	int i=0;
 
-	
-
-
-
 	/*find an available line in reseravation station*/
-
-	
-
-	for (i=0;i<lengthADD;i++){
+	while (iter->next != NULL){
 
 		if (iter->busy==FALSE){
-
 			available=iter;
-
 			break;
-
 		}
-
 		iter=iter->next;
-
 	}
-
-
 
 	/*case no available lines in reservation station*/
-
-	if (available == NULL){
-
+	if (available == NULL)
 		return FALSE;
 
-	}
-
-
-
 	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
-
-	
-
-	switch (instr.OPCODE){
-
-	case ADDS:
-
-		available->OPCODE=ADDS;
-
-		break;
-
-	case SUBS:
-
-		available->OPCODE=SUBS;
-
-		break;
-
-	default:
-
-		return FALSE;				/*not my responsability*/
-
-		break;
-
-	}
-
-
+	if(instr.OPCODE==9 || instr.OPCODE==10)
+		available->OPCODE = instr.OPCODE;
+	else
+		return FALSE;
 
 	/*operand j*/
-
 	if (FP_Registers[instr.SRC0].busy == FALSE){
-
 		available->Vj = FP_Registers[instr.SRC0].value;
-
 		available->NumOfRightOperands++;			/*operand j is ready*/
-
 	}
-
 	else{
-
 		strcpy(available->Qj,FP_Registers[instr.SRC0].label);	/*copy label of supplier if register is busy*/
-
 	}
-
-
 
 	/*operand k. in FP ops there are no immediate*/
-
 	if (FP_Registers[instr.SRC1].busy == FALSE){
-
 		available->Vk = FP_Registers[instr.SRC1].value;
-
 		available->NumOfRightOperands++;			/*operand j is ready*/
-
 	}
-
 	else{
-
 		strcpy(available->Qk,FP_Registers[instr.SRC1].label);	/*copy label of supplier if register is busy*/
-
 	}
-
-
 
 	/*update destination register*/
-
 	FP_Registers[instr.DST].busy=TRUE;
-
 	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
-
 	strcpy(FP_Registers[instr.DST].label,available->label);
 
-
-
 	available->busy=TRUE;
-
 	available->done=FALSE;
-
 	available->inExecution=FALSE;
 
-
-
 	available->issued=cycle;
-
 	trace[cycle].issued=cycle;
-
 	trace[cycle].valid=TRUE;
-
 	strcpy(trace[cycle].instruction,instr.name);
 
-
-
 	return TRUE;
-
-	
-
 }
-
-
-
-
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
 
 BOOL FP_InsertToReservationStations_MUL(){
 
