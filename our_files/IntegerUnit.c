@@ -18,9 +18,6 @@ void Initialize_IntRegisters(){
 }
 
 
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
 /*used to create new reservation station line*/
 
 IntReservationStation_Line *CreateNewIRSLNode(){
@@ -33,15 +30,23 @@ IntReservationStation_Line *CreateNewIRSLNode(){
 
 	temp->next = NULL;
 
-	
-
 	return temp;		/*NULL is returned if failure occured*/
 
 }
 
+IntALU_PipelineStage *CreateNewIPLSNode(){
 
+	IntALU_PipelineStage *temp = NULL;
 
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
+	temp = (IntALU_PipelineStage*) malloc(sizeof(IntALU_PipelineStage));
+
+	memset(temp, 0, sizeof(IntALU_PipelineStage));
+
+	temp->next = NULL;
+
+	return temp;		/*NULL is returned if failure occured*/
+
+}
 
 
 
@@ -51,49 +56,25 @@ void InitializeReservationStation(){
 
 	int i = 0;
 
-	IntReservationStation_Line *NewNode = NULL, *head = NULL;
-
-
-
-
+	IntReservationStation_Line *node = NULL;
 
 	/*Create first Line and label it as ADD1*/
 
-	head = CreateNewIRSLNode();
-
-	sprintf(head->label, "ADD%d", i + 1);
-
-	IntReservationStation = head;
-
-
+	IntReservationStation = CreateNewIRSLNode();
+	sprintf(IntReservationStation->label, "ADD%d", i + 1);
+	node = IntReservationStation;
 
 	/*Create other Lines and label them ADD2,ADD3 and so on*/
 
-
-
 	for (i = 1; i < NumberOFReservationStations; i++){
 
-		head->next = CreateNewIRSLNode();
-
-		head = head->next;
-
-		sprintf(head->label, "ADD%d", i + 1);
+		node->next = CreateNewIRSLNode();
+		node = node->next;
+		sprintf(node->label, "ADD%d", i + 1);
 
 	}
 
 }
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
-
 
 
 
@@ -105,55 +86,18 @@ void InitializeIntegerALU(){
 
 	int i=0;
 
-	IntALU_PipelineStage *NewNode=NULL,*head=NULL;
-
-
-
-	head=(IntALU_PipelineStage*)malloc(sizeof(IntALU_PipelineStage));		/*first pipeline stage*/
-
-	memset(head,0,sizeof(IntALU_PipelineStage));
-
-	head->next=NULL;
-
-	Integer_ALU_Unit=head;
-
-
+	IntALU_PipelineStage *node=NULL;
+	Integer_ALU_Unit = CreateNewIPLSNode(); /*first pipeline stage*/
+	node = Integer_ALU_Unit;
 
 	for (i=1;i<length;i++){
 
-		head=Integer_ALU_Unit;
-
-		while (head->next != NULL){
-
-			head=head->next;
-
-		}
-
-
-
-		NewNode=(IntALU_PipelineStage*)malloc(sizeof(IntALU_PipelineStage));
-
-		memset(NewNode,0,sizeof(IntALU_PipelineStage));
-
-		
-
-		NewNode->next=NULL;
-
-		head->next=NewNode;
-
-		
+		node->next = CreateNewIPLSNode();
+		node = node->next;
 
 	}
 
-		
-
 }
-
-
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
 
 
 
