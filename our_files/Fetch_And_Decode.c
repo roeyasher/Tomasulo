@@ -140,9 +140,7 @@ int CharToInteger (char schar)
 
 
 
-Instruction *LinkInstQueue (char instruction_line[],int pc_counter)
-
-{
+Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
 
 	int opcode,dst,src0,src1;
 
@@ -462,7 +460,7 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 
 	//instr_reservation = TRUE;
 
-	temp = SearchTheElementInstByPc(instruction_queue_head,PC);
+	temp = SearchTheElementInstByPc(instruction_queue_head);
 
 	//printf("instruction adress is %p\n",temp);
 

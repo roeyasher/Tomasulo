@@ -18,6 +18,10 @@ Trace trace[TRACE_SIZE];
 
 
 
+/*For Rob*/
+
+robLine *robLines=NULL;/*load buffer/load reservation*/
+/**/
 
 
 /*For Integer Unit*/
@@ -130,6 +134,8 @@ int main(int argc,char* argv[]){
 		
 
 	/*Memory reservation stations and execution units*/
+
+	IntilaizeRob();
 
 	IntilaizeLoadBuffer();
 

@@ -34,6 +34,8 @@ void IntilaizeRob()
 
 	sprintf(new_node->label,"ROB%d",i+1);
 
+	robLines = new_node;
+
 
 	for (i=1;i<Number_of_Rob_Lines;i++)
 

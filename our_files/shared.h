@@ -19,6 +19,12 @@ extern BOOL instr_reservation;
 extern BOOL flag;
 
 
+/*For Rob*/
+
+extern robLine *robLines;
+
+/**/
+
 
 /*For Integer Unit*/
 

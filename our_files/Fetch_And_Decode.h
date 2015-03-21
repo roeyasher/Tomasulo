@@ -29,11 +29,11 @@ struct Instruction {
 
 int CharToInteger (char schar);
 
-Instruction *LinkInstQueue (char instruction_line[]);
+Instruction *LinkInstQueue (char instruction_line[],int pc_counter);
 
 void CheckTheConditionAndReturnPc();
 
-Instruction *SearchTheElementInstByPc(Instruction *instr_queue,int pc);
+Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head);
 
 void FillTheFields(Instruction *instr_queue);
 
