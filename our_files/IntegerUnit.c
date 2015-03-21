@@ -397,235 +397,111 @@ void EvictFromIntReservationStation(){
 void AdvanceIntPipeline(){
 
 	int i=0,j=0;
-
 	int length=Configuration->int_delay;		/*how long is the pipeline*/
 
-	IntALU_PipelineStage *last=Integer_ALU_Unit,*NewNode=NULL,*temp=NULL;
-
-	IntReservationStation_Line *Line=IntReservationStation;
-
+	IntALU_PipelineStage *last=Integer_ALU_Unit, *prevLast=NULL, *NewNode=NULL,*temp=NULL;
+	IntReservationStation_Line *line = IntReservationStation;
 
 
 	/*get last to point to last stage of pipeline*/
-
-	for (i=1;i<length;i++){
-
+	prevLast = last;
+	while (last->next != NULL) {
+		prevLast = last;
 		last=last->next;
-
 	}
 
-
-
-		if (last->busy == TRUE){			/*check if stage has an instruction or a bubble that went on*/
-
-		
+	if (last->busy == TRUE) {			/*check if stage has an instruction or a bubble that went on*/
 
 		/*calculate result of operation. in reality it's done in stages but here it's done in one stage and we decide to do it int last stage*/
-
 		switch(last->OPCODE){
 
 		case ADD:
-
-			last->result=(last->operand1)+(last->operand2);
-
+			last->result = (last->operand1) + (last->operand2);
 			break;
 
 		case ADDI:
-
-			last->result=(last->operand1)+(last->operand2);
-
+			last->result = (last->operand1) + (last->operand2);
 			break;
 
 		case SUB:
-
-			last->result=(last->operand1)-(last->operand2);
-
+			last->result = (last->operand1) - (last->operand2);
 			break;
 
 		case SUBI:
-
-			last->result=(last->operand1)-(last->operand2);
-
+			last->result = (last->operand1) - (last->operand2);
 			break;
 
 		default:
-
-			//printf("Error: wrong Opcode in ALU unit\n");
-
+			// Opcode not in ALU unit
 			break;
-
 		}
-
-
 
 		/*opearate as CDB and update waiting stations and registers*/
 
-
-
 		/*update Integer Reservation satation*/
 
-		for (i=0;i<Configuration->int_nr_reservation;i++){
+		while (line->next != NULL){
 
-			if (!strcmp(Line->Qj,last->LabelOfSupplier)){
+			if (!strcmp(line->Qj,last->LabelOfSupplier)){
 
-				Line->Vj=last->result;			/*update waiting value*/
-
-				memset((void*)Line->Qj,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
-
-				Line->NumOfRightOperands++;		/*update number of ready operands*/
+				line->Vj = last->result;			/*update waiting value*/
+				memset((void*)line->Qj,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
+				line->NumOfRightOperands++;		/*update number of ready operands*/
 
 			}
 
+			if (!strcmp(line->Qk,last->LabelOfSupplier)){
 
-
-			if (!strcmp(Line->Qk,last->LabelOfSupplier)){
-
-				Line->Vk=last->result;			/*update waiting value*/
-
-				memset((void*)Line->Qk,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
-
-				Line->NumOfRightOperands++;		/*update number of ready operands*/
+				line->Vk=last->result;			/*update waiting value*/
+				memset((void*)line->Qk,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
+				line->NumOfRightOperands++;		/*update number of ready operands*/
 
 			}
 
+			/*we set reservation station state as done for this instruction*/
+			if ( (!strcmp(last->LabelOfSupplier,line->label)) && (line->inExecution == TRUE) ){
 
-
-				/*we set reservation station state as done for this instruction*/
-
-			if ( (!strcmp(last->LabelOfSupplier,Line->label)) && (Line->inExecution == TRUE) ){
-
-				Line->done = TRUE;
+				line->done = TRUE;
 
 				for (j=0;j<TRACE_SIZE;j++){
 
-					if (trace[j].issued == Line->issued){
-
+					if (trace[j].issued == line->issued){
 						trace[j].CDB=cycle-1;
-
 						break;
-
 					}
-
 				}
-
-				
-
 			}
 
-
-
-			Line=Line->next;
+			line=line->next;
 
 		}
 
-
-
 			/*update registers*/
-
 		for (i=0;i<NUM_OF_INT_REGISTERS;i++){
 
 			if ((Integer_Registers[i].busy == TRUE) && (!(strcmp(Integer_Registers[i].label,last->LabelOfSupplier)))){
 
-				
-
 				Integer_Registers[i].value = last->result;			/*update value*/
-
 				Integer_Registers[i].busy = FALSE;					/*no more busy*/
-
-				
-
 				memset(Integer_Registers[i].label,0,LABEL_SIZE);	/*reset label though it is not necessary*/
-
-			}}
-
-
-
+			}
 		}
+	}
 
 	
 
 	/*waiting stations and registers were updated if not a bubble in last stage. Now must advance pipeline one stage foreward*/
 
-	
-
-		
-
 	/*if piepeline length is one then we erase content, set it as not busy and we are done*/
 
-	if (length == 1){
-
-		memset(last,0,sizeof(IntALU_PipelineStage));
-
-		last->busy = FALSE;
-
-		last->next=NULL;
-
-	}
-
 	
-
-	/*if length is greater than 1 then we free last node, create a new one and make it first so that it's the same as advancing each node*/
-
-	
-
-	else {
-
-		free(last);				/*last stage finished executing and updated everybody thus we release it*/
-
-		NewNode=(IntALU_PipelineStage*)malloc(sizeof(IntALU_PipelineStage));
-
-		
-
-		
-
-		memset(NewNode,0,sizeof(IntALU_PipelineStage));
-
-		NewNode->busy=FALSE;			/*first stage not in use right now*/
-
-		NewNode->next=Integer_ALU_Unit;			/*point first node to old first stage of pipeline*/
-
-				
-
-		/*now begining of ALU is the NewNode*/
-
-		
-
-		Integer_ALU_Unit=NewNode;
-
-		
-
-		
-
-	}
-
-			/*we want last stage of pipeline to point to NULL as next stage*/
-
-	temp=Integer_ALU_Unit;				/*point to begining*/
-
-	/*advance till pointing to new last stage (as old last was released) */
-
-	for (i=1;i<length;i++){
-
-		temp=temp->next;		
-
-	}
-
-	temp->next=NULL;
-
-
-
-	
+	memset(last,0,sizeof(IntALU_PipelineStage)); //TODO check if WORK!
+	last->busy = FALSE;
+	last->next = Integer_ALU_Unit;
+	Integer_ALU_Unit = last;
+	prevLast->next = NULL;
 
 }
-
-
-
-	
-
-
-
-/*OoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOoOo*/
-
 
 
 BOOL SimulateClockCycle_IntUnit(){
