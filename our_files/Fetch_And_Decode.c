@@ -618,7 +618,7 @@ void InitializeFetchAndDecode (FILE *memin_txt)
 
 	{
 
-		//printf("%d %d %d %d %d %d\n",node->OPCODE,node->DST,node->SRC0,node->SRC1,node->IMM,node->PC);
+		printf("%d %d %d %d %d %d\n",node->OPCODE,node->DST,node->SRC0,node->SRC1,node->IMM,node->PC);
 
 		node= node->next;
 

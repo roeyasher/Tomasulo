@@ -362,7 +362,8 @@ void RegisterLog(){
 
 
 
-	output=fopen("regint.txt","wt");
+
+	output = FileOpen("regint.txt", "wt");
 
 	for (i=0;i<NUM_OF_INT_REGISTERS;i++){
 
@@ -374,7 +375,7 @@ void RegisterLog(){
 
 	fclose(output);
 
-	output=fopen("regout.txt","wt");
+	output = FileOpen("regout.txt", "wt");
 
 	for (i=0;i<NUM_OF_INT_REGISTERS;i++){
 
@@ -396,7 +397,7 @@ void MemoryLog(){
 
 
 
-	output=fopen("memout.txt","wt+");
+	output = FileOpen("memout.txt", "wt+");
 
 	for (i=0;i<MEMORY_SIZE;i++){
 
@@ -424,7 +425,7 @@ void InitializeMemory(FILE *memin){
 
 	int val=0;
 
-	//FILE *memin=fopen(memfile,"rt");
+	//FILE *memin=FileOpen(memfile,"rt");
 
 	while(i<MEMORY_SIZE){
 
@@ -517,7 +518,7 @@ void PrintTrace(){
 
 	int i=0;
 
-	FILE *dest=fopen("trace.txt","wt");
+	FILE *dest = FileOpen("trace.txt", "wt");
 
 
 

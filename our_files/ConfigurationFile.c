@@ -14,7 +14,7 @@ void InitializeConfiguration(char *ConfigFile){
 
 
 
-	file=fopen(ConfigFile,"rt");
+	file = FileOpen(ConfigFile, "rt");
 
 
 
