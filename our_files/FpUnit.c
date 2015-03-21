@@ -1,5 +1,5 @@
 #include "shared.h"
-
+#define _CRT_SECURE_NO_DEPRECATE
 
 
 /*extern database of FP Unit, next instruction and configuration file*/

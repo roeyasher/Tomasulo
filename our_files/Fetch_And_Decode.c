@@ -1,5 +1,5 @@
 #include "shared.h"
-
+#define _CRT_SECURE_NO_DEPRECATE
 //oooooo a stucture for a data base link,hands the Queue insruction decode and fetch ooo/////
 
 
