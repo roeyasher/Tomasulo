@@ -3,43 +3,23 @@
 
 
 CdbWriteBack CdbToResarvation;
-
 Memory_Pipline BufferToMemory;
-
-
 
 void IntilaizeMemoryArray()
 
 {
-
 	int i=0;
-
 	for(i=0;i<MEMORY_SIZE;i++)
-
-	{
-
 		PhysicalMemoryArray[i]=0;
-
-	}
-
 }
-
-
 
 LoadBuffer *CreateLBNewNode(){
 
 	/*this function create a new node for a linked list, for the load buffer*/
-
 	LoadBuffer *temp = NULL;
-
 	temp = (LoadBuffer*) malloc(sizeof(LoadBuffer));
-
 	memset(temp, 0, sizeof(LoadBuffer));
-
 	temp->next = NULL;
-
-	
-
 	return temp;		/*NULL is returned if failure occured*/
 
 }
@@ -47,157 +27,83 @@ LoadBuffer *CreateLBNewNode(){
 StoreBuffer *CreateNewSBNode(){
 
 	/*this function create a new node for a linked list for the store buffer*/
-
 	StoreBuffer *temp = NULL;
-
 	temp = (StoreBuffer*) malloc(sizeof(StoreBuffer));
-
 	memset(temp, 0, sizeof(StoreBuffer));
-
 	temp->next = NULL;
-
-	
-
 	return temp;		/*NULL is returned if failure occured*/
 
 }
 
-
+Memory_PiplineStage *CreateNewMPLNode(){
+	
+	/*this function create a new node for a linked list for the store buffer*/
+	Memory_PiplineStage *temp = NULL;
+	temp = (Memory_PiplineStage*) malloc(sizeof(Memory_PiplineStage));
+	memset(temp, 0, sizeof(Memory_PiplineStage));
+	temp->next = NULL;
+	temp->OPCODE=-1;
+	return temp;		/*NULL is returned if failure occured*/
+}
 
 void IntilaizeLoadBuffer()
 
 {
-
 	/*this function intilaize the load buffer/reservation station*/
 
 	int Number_of_MemReservation_station = Configuration->mem_nr_load_buffers;
-
 	int i=0;
 
-	LoadBuffer *new_node = NULL,*head = NULL;
+	LoadBuffer *node = NULL;
+	LoadBufferResarvation = CreateLBNewNode();
+	sprintf(LoadBufferResarvation->Label,"LOAD%d",i+1);
+	node = LoadBufferResarvation;
 
-	new_node = CreateLBNewNode();
+	for (i=1;i<Number_of_MemReservation_station;i++){
 
-	sprintf(new_node->Label,"LOAD%d",i+1);
-
-	LoadBufferResarvation = new_node;
-
-
-
-	for (i=1;i<Number_of_MemReservation_station;i++)
-
-	{
-		new_node->next = CreateLBNewNode();
-
-		head = CreateLBNewNode();
-
-		sprintf(head->Label,"LOAD%d",i+1);
-
-		new_node->next = head;
-
-		new_node = new_node->next;
-
-
-
+		node->next = CreateLBNewNode();
+		node = node->next;
+		sprintf(node->Label, "LOAD%d", i + 1);
 	}
-
 }
 
 void IntilaizeStoreBuffer()
 
 {
-
 	/*this function intilaize the store buffer/reservation station*/
-
 	int Number_of_MemReservation_station = Configuration->mem_nr_store_buffers;
-
 	int i=0;
 
-	StoreBuffer *new_node = NULL,*head = NULL;
+	StoreBuffer *node = NULL;
+	StoreBufferResarvation = CreateNewSBNode();
+	sprintf(StoreBufferResarvation->Label,"STORE%d",i+1);
+	node = StoreBufferResarvation;
 
-	new_node = CreateNewSBNode();
-
-	sprintf(new_node->Label,"STORE%d",i+1);
-
-	StoreBufferResarvation= new_node;
-
-
-
-	for(i=1;i<Number_of_MemReservation_station;i++)
-
-	{
-
-
-		head = CreateNewSBNode();
-
-		sprintf(head->Label,"STORE%d",i+1);
-
-		new_node->next = head;
-
-		new_node = new_node->next;
-
+	for(i=1;i<Number_of_MemReservation_station;i++){
+		node->next = CreateNewSBNode();
+		node = node->next;
+		sprintf(node->Label,"STORE%d",i+1);
 	}
-
-
-
 }
 
-void IntializeMemPipline()
-
-{
+void IntializeMemPipline(){
 
 	/*this function intilaize the execute memory unit*/
-
 	int length = Configuration->mem_delay;
-
 	int i=0;
 
-	Memory_PiplineStage *new_node = NULL,*head =NULL;
+	Memory_PiplineStage *node = NULL;
+	Memory_Unit = CreateNewMPLNode();
+	node = Memory_Unit;
 
-	head=(Memory_PiplineStage*)malloc(sizeof(Memory_PiplineStage));
-
-	memset(head,0,sizeof(Memory_PiplineStage));
-
-	head->next = NULL;
-
-	head->OPCODE=-1;
-
-	Memory_Unit = head;
-
-	for(i=1;i<length;i++)
-
-	{
-
-		head=Memory_Unit;
-
-		while (head->next != NULL){
-
-			head=head->next;
-
-		}
-
-		new_node = (Memory_PiplineStage*)malloc(sizeof(Memory_PiplineStage));
-
-		memset(new_node,0,sizeof(Memory_PiplineStage));
-
-		new_node->OPCODE=-1;
-
-		new_node->next = NULL;
-
-		head->next = new_node;
-
+	for(i=1;i<length;i++){
+		node->next = CreateNewMPLNode();
+		node = node->next;
 	}
-
 }
 
-
-
-BOOL InsertNewLoadInstr(int count)
-
-{	
-
+BOOL InsertNewLoadInstr(int count){	
 	LoadBuffer *available = NULL, *iter = LoadBufferResarvation;
-
 	int length = Configuration->mem_nr_load_buffers;
 
 	int i=0;

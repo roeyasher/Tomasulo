@@ -39,7 +39,6 @@ IntALU_PipelineStage *CreateNewIPLSNode(){
 void InitializeReservationStation(){
 
 	int NumberOFReservationStations = Configuration->int_nr_reservation;		/*how many nodes to create*/
-
 	int i = 0;
 
 	IntReservationStation_Line *node = NULL;
