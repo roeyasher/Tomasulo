@@ -57,10 +57,7 @@ void InitializeReservationStation(){
 	int i = 0;
 
 	IntReservationStation_Line *node = NULL;
-
-	/*Create first Line and label it as ADD1*/
-
-	IntReservationStation = CreateNewIRSLNode();
+	IntReservationStation = CreateNewIRSLNode();  /*Create first Line and label it as ADD1*/
 	sprintf(IntReservationStation->label, "ADD%d", i + 1);
 	node = IntReservationStation;
 
@@ -106,12 +103,8 @@ void InitializeIntegerALU(){
 BOOL InsertToReservationStation(){
 
 	IntReservationStation_Line *available = NULL, *iter = IntReservationStation;
-
 	int length=Configuration->int_nr_reservation;
-
 	int i = 0;
-
-
 
 	/*find available Line in Reservation station*/
 
@@ -120,15 +113,10 @@ BOOL InsertToReservationStation(){
 		/*if not busy then assign to available*/
 
 		if (iter->busy == FALSE){
-
 			available = iter;
-
 			break;
-
 		}
-
 		iter = iter->next;
-
 	}
 
 
