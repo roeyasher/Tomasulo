@@ -30,29 +30,71 @@ void IntilaizeRob() {
 		node->next = CreateRLNewNode();
 		node = node->next;
 		sprintf(node->label,"ROB%d",i+1);
+		node->busy = FALSE;
 	}
 }
 
-//void emptyRob(){
-//
-//	robLine *succ = robLines, *prev = robLines;
-//	
-//	while(succ != NULL) {
-//		prev = succ;
-//		succ = succ->next;
-//		memset(prev, 0, sizeof(robLine));
-//	} 
-//}
-//
-//void insertRob(){
-//	robLine *node = robLines;
-//	while(node != NULL){
-//		
-//	}
-//
-//}
-//
-//void commit(){
-//
-//}
+void emptyRob(){
+
+	robLine *succ = robLines, *prev = robLines;
+	char label[LABEL_SIZE];
+
+	while(succ != NULL) {
+		prev = succ;
+		succ = succ->next;
+		strncpy(label, prev->label, LABEL_SIZE);
+		memset(prev, 0, sizeof(robLine));
+		strncpy(prev->label, label, LABEL_SIZE);
+	} 
+}
+
+// Try to inster the global instruction to the rob line.
+BOOL insertRob(){
+
+	robLine *iter = robLines, *availableRobLine = NULL;
+	
+	while (iter != NULL){
+
+		if (iter->busy == FALSE){
+			availableRobLine = iter;
+			break;
+		}
+		iter = iter->next;
+	}
+
+	if (availableRobLine == NULL)
+		return FALSE;
+
+	availableRobLine->OPCODE = instr.OPCODE;
+	availableRobLine->dest = instr.DST;
+	availableRobLine->inExecution = FALSE;
+	availableRobLine->done = FALSE;
+	availableRobLine->busy = TRUE;
+	availableRobLine->state = 2; // issue
+
+}
+
+// commit if the first insruction that done
+BOOL commit(){
+	
+	robLine *node = robLines, *last = robLines;
+	char label[LABEL_SIZE];
+
+	if (node->done == TRUE){
+		robLines = node->next;
+		strncpy(label, node->label, LABEL_SIZE);
+		memset(node, 0, sizeof(robLine));
+		strncpy(node->label, label, LABEL_SIZE);
+	}
+	else{
+		return FALSE;
+	}
+
+	// get the last node
+	while (last->next != NULL)
+		last = last->next;
+
+	last->next = node;
+	node->next = NULL;
+}
 

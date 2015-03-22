@@ -31,8 +31,6 @@ struct FpReservationStation_Line{
 
 	char Qj[LABEL_SIZE],Qk[LABEL_SIZE];
 
-
-
 	int NumOfRightOperands;
 
 	BOOL busy;
@@ -54,15 +52,10 @@ typedef struct FP_PipelineStage FP_PipelineStage;
 struct FP_PipelineStage{
 
 	int OPCODE;
-
 	BOOL busy;
-
 	float operand1,operand2;
-
 	float result;
-
 	char LabelOfSupplier[LABEL_SIZE];
-
 	struct FP_PipelineStage *next;
 };
 

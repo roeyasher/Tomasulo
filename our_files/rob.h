@@ -14,7 +14,6 @@ struct robLine{
 	BOOL busy;								/*is this line in use*/
 	BOOL done;								/*did this line finish execution and can be evicted from Reservation Station*/
 	BOOL inExecution;
-	
 
 	struct robLine *next;	/*next line in reservation station*/
 };
