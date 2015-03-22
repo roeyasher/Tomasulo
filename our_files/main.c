@@ -118,7 +118,7 @@ int main(int argc,char* argv[]){
 	//FILE *memin_txt=fopen(argv[2],"rt");
 	//FILE *memin_txt = FileOpen(argv[2], "rt");
 	char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
-	char *adressMainMemory = &MainMemoryArray;
+	char *adressMainMemory = MainMemoryArray[0];
 	int i=0,pc_counter=0,instruction_queue_counter=0;
 	BOOL reservation_stations_has_space = TRUE;
 	BOOL rob_has_space = TRUE;
