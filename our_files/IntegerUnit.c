@@ -61,10 +61,12 @@ void InitializeReservationStation(){
 void InitializeIntegerALU(){
 
 	/*How long is the pipeline*/
-	int length=Configuration->int_delay;
-	int i=0;
+	IntALU_PipelineStage *node = NULL;
+	int i = 0, length=0;
+	length=Configuration->int_delay;
+	
 
-	IntALU_PipelineStage *node=NULL;
+	
 	Integer_ALU_Unit = CreateNewIPLSNode(); /*first pipeline stage*/
 	node = Integer_ALU_Unit;
 
