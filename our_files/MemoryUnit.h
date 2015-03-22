@@ -179,10 +179,9 @@ void ExecuteMemoryAndWriteToCdb();
 void CdbReturnValue();
 
 
-
+void readLine(FILE *file, char *my_string);
 void EvictFromLoadAndStoreBuffer();
 
-
-
+void MemInToMainMemory(char *memory[], char *memin_txt);
 #endif
 

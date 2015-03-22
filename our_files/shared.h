@@ -5,7 +5,7 @@
 #include "IntegerUnit.h"
 #include "MemoryUnit.h"
 #include "rob.h"  
-
+#include "common.h"
 
 
 /*add global variables*/
@@ -74,6 +74,7 @@ extern int cycle;
 extern Trace trace[TRACE_SIZE];
 
 extern float PhysicalMemoryArray[];
+
 
 
 

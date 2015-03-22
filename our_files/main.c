@@ -114,14 +114,15 @@ int detectEnd();
 
 
 int main(int argc,char* argv[]){
-
+	
 	//FILE *memin_txt=fopen(argv[2],"rt");
-	FILE *memin_txt = FileOpen(argv[2], "rt");
-
-
-	int i=0;
-
-
+	//FILE *memin_txt = FileOpen(argv[2], "rt");
+	char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
+	char *adressMainMemory = &MainMemoryArray;
+	int i=0,pc_counter=0,instruction_queue_counter=0;
+	BOOL reservation_stations_has_space = TRUE;
+	BOOL rob_has_space = TRUE;
+	BOOL no_more_instruction = FALSE;
 	instr.OPCODE=-1;
 
 	/*intialize all*/
@@ -144,8 +145,8 @@ int main(int argc,char* argv[]){
 
 	IntializeMemPipline();
 
-	InitializeMemory(memin_txt);
-
+	//InitializeMemory(memin_txt);
+	MemInToMainMemory(adressMainMemory, argv[2]);
 	
 
 	/*INT reservation stations and execution units*/
@@ -169,8 +170,7 @@ int main(int argc,char* argv[]){
 
 
 	/*fetch and decode unit to insert the instructions to the instructions queue DB*/
-
-	InitializeFetchAndDecode(memin_txt);
+	
 
 
 
@@ -190,8 +190,13 @@ int main(int argc,char* argv[]){
 
 	/*this loop simulate one cycle by calling the simulateclockcycle function of each unit*/
 
-	while (TRUE){
-
+	while (TRUE)
+	{
+		// We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
+		while ((reservation_stations_has_space == TRUE) && (rob_has_space == TRUE) && (no_more_instruction == FALSE) && (instruction_queue_counter<16))
+		{
+			no_more_instruction = InitializeFetchAndDecode(adressMainMemory, &pc_counter, &instruction_queue_counter);
+		}
 	
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
@@ -250,12 +255,8 @@ int main(int argc,char* argv[]){
 
 				
 
-	
-
-		
-
 		cycle++;
-
+		instruction_queue_counter--;
 
 
 		/*the last fix just to get a trace in the forth test*/
@@ -335,7 +336,7 @@ int main(int argc,char* argv[]){
 
 	/*close all files*/
 
-	fclose(memin_txt);
+	
 
 	_fcloseall();	/*just in case*/
 
@@ -488,10 +489,6 @@ void InitializeMemory(FILE *memin){
 
 }*/
 
-
-
-
-
 void InitializeTrace(){
 
 	int i=0;
@@ -518,7 +515,7 @@ void PrintTrace(){
 
 	int i=0;
 
-	FILE *dest = FileOpen("trace.txt", "wt");
+	FILE *dest=FileOpen("trace.txt","wt");
 
 
 

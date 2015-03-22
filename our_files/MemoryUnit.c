@@ -639,3 +639,78 @@ BOOL SimulateClockCycle_LoadUnit(int count,int flag){
 	EvictFromLoadAndStoreBuffer();
 	return isInstructionTakenByUnit;	
 }
+
+void readLine(FILE *file, char *my_string) {
+	int count = 0;
+	
+	if (file == NULL) {
+		printf("Error: file pointer is null.");
+		exit(1);
+	}
+
+	int maximumLineLength = 128;
+	char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
+
+	if (lineBuffer == NULL) {
+		printf("Error allocating memory for line buffer.");
+		exit(1);
+	}
+
+	char ch = getc(file);
+	if (ch == EOF)
+	{
+		return ;
+	}
+
+	while ((ch != '\n') && (ch != EOF)) {
+		if (count == maximumLineLength) {
+			maximumLineLength += 128;
+			lineBuffer = realloc(lineBuffer, maximumLineLength);
+			if (lineBuffer == NULL) {
+				printf("Error reallocating space for line buffer.");
+				exit(1);
+			}
+		}
+		lineBuffer[count] = ch;
+		count++;
+
+		ch = getc(file);
+	}
+
+	lineBuffer[count] = '\0';
+	
+	strncpy(my_string, lineBuffer, (count + 1));
+	free(lineBuffer);
+	
+	return;
+}
+
+
+void MemInToMainMemory(char *memory[],char *memin_txt)
+{
+	
+	//rewind(memin_txt);
+	char memoryline[BUFFER_SIZE];
+	FILE *file = FileOpen(memin_txt,"rt");
+	
+	Instruction *node = NULL;
+
+	int pc_conter = 0;
+	int i = 0;
+	//MainMemory[i] = "goni";
+	
+	//while(fread(instruction_line,sizeof(char),8,memin_txt) != EOF)
+//	memset(memory[i][0], 0, BUFFER_SIZE);
+	//fscanf(file, "%s", MainMemory[i]);
+	while (i<MEMORY_SIZE) 
+	{
+		readLine(file, memoryline);
+		strcpy(memory, memoryline);
+		
+		memory=memory + (512/4);
+		i++;
+		//memset(memory[i], 0, BUFFER_SIZE);
+	}
+	fclose(memin_txt);
+
+}

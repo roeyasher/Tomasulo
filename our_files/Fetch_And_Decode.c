@@ -123,7 +123,7 @@ int CharToInteger (char schar)
 
 
 
-Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
+Instruction *LinkInstQueue (char instruction_line[],int *pc_counter) {
 
 	int opcode,dst,src0,src1;
 
@@ -139,16 +139,16 @@ Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
 
 
 
-		opcode = CharToInteger(instruction_line[0]);
+		new_node->OPCODE = CharToInteger(instruction_line[0]);
 
-		dst = CharToInteger(instruction_line[1]);
+		new_node->DST = CharToInteger(instruction_line[1]);
 
-		src0 = CharToInteger(instruction_line[2]);
+		new_node->SRC0 = CharToInteger(instruction_line[2]);
 
-		src1= CharToInteger(instruction_line[3]);
+		new_node->SRC1 = CharToInteger(instruction_line[3]);
 
 
-		if ((imm = CharToInteger(instruction_line[4])) >=8)
+		if ((imm = CharToInteger(instruction_line[4])) >= 8)
 
 		{
 
@@ -162,15 +162,7 @@ Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
 
 		imm=imm + CharToInteger(instruction_line[5])*16*16 + CharToInteger(instruction_line[6])*16 +  CharToInteger(instruction_line[7]);	/*decoding immediate*/
 
-		new_node->OPCODE = opcode;
-
-		new_node->DST = dst;
-
-		new_node->SRC0 = src0;
-
-		new_node->SRC1 = src1;
-
-		if ((opcode==BEQ) || (opcode==BNE) || (opcode==JUMP)){
+		if ((new_node->OPCODE == BEQ) || (new_node->OPCODE == BNE) || (new_node->OPCODE == JUMP)){
 
 		new_node->IMM = imm*4;
 
@@ -180,7 +172,7 @@ Instruction *LinkInstQueue (char instruction_line[],int pc_counter) {
 
 		}
 
-		new_node->PC = pc_counter;
+		new_node->PC = *pc_counter;
 
 		new_node->next = NULL;
 
@@ -532,9 +524,7 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 
 }
 
-
-
-void InitializeFetchAndDecode (FILE *memin_txt)
+BOOL InitializeFetchAndDecode(char *memory[], int *pc_conter, int * instruction_queue_counter)
 
 {
 
@@ -542,90 +532,43 @@ void InitializeFetchAndDecode (FILE *memin_txt)
 
 	Instruction *node = NULL; 
 
-	int pc_conter=0;
-
-	int i=0;
-
-	//printf("roie\n");
-
-	memset(instruction_line,0,SIZE_OF_CHAR);
-
-	//while(fread(instruction_line,sizeof(char),8,memin_txt) != EOF)
-
-		while ((fscanf(memin_txt,"%s",instruction_line)) != EOF)
-
-	{
-
-	/*	for(i=0;i<8;i++)
-
-		{
-
-			instruction_line[i]=instruction_line[i+1];
-
-		}*/
-
-		//printf("roie\n");
-
+	//int pc_conter=0;
+	int i = 0, counterdivide = 0, place_in_array=0,j=0;
+	counterdivide = (*pc_conter) / 4;
+	place_in_array = (counterdivide*(512 / 4));
+	
 		node = instruction_queue_head;
 
 		if (instruction_queue_head	== NULL)
 
 		{
 
-			instruction_queue_head = LinkInstQueue(instruction_line,pc_conter);
+			instruction_queue_head = LinkInstQueue(memory , pc_conter);
 
 		}
 
 		else 
 
 		{
-
 			while(node->next !=NULL)
-
 			{
-
 				node =(Instruction*) node->next;
-
 			}
-
-			node->next = LinkInstQueue(instruction_line,pc_conter);
-
+			node->next = LinkInstQueue((memory + place_in_array), pc_conter);
+			if (FALSE==strcmp(node->next->name,"00000000"))
+			{
+				return TRUE;
+			}
 		}
-
-		pc_conter+=4;
-
-	//	printf("%c\n",instruction_line[0]);
-
-		if (instruction_line[0] == 'c'){
-
-			rewind(memin_txt);
-
-			break;
-
-		}
-
-		memset(instruction_line,0,SIZE_OF_CHAR);
-
-		//fseek(memin_txt,1,SEEK_CUR);
-
-		
-
-	}
-
-	node = instruction_queue_head;
-
+		(*pc_conter) += 4;
+		node = instruction_queue_head;
 	while(node !=NULL)
-
 	{
-
-		printf("%d %d %d %d %d %d\n",node->OPCODE,node->DST,node->SRC0,node->SRC1,node->IMM,node->PC);
-
+		//printf("%d %d %d %d %d %d\n",node->OPCODE,node->DST,node->SRC0,node->SRC1,node->IMM,node->PC);
 		node= node->next;
-
 	}
-
-	
-
+	(*instruction_queue_counter) ++ ;
+	return FALSE;
 }
 
 

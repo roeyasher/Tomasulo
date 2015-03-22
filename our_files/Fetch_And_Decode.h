@@ -29,7 +29,7 @@ struct Instruction {
 
 int CharToInteger (char schar);
 
-Instruction *LinkInstQueue (char instruction_line[],int pc_counter);
+Instruction *LinkInstQueue(char instruction_line[], int *pc_counter);
 
 void CheckTheConditionAndReturnPc();
 
@@ -41,7 +41,7 @@ Instruction *DeleteTheInstrcutionsDistributor();
 
 int DecodeAndDistributor(Instruction *instruction_queue_head);
 
-void InitializeFetchAndDecode(FILE *memin_txt);
+BOOL InitializeFetchAndDecode(char *memory[], int *pc_conter, int * instruction_queue_counter);
 
 void simulateclockFetchAndDecode();
 
