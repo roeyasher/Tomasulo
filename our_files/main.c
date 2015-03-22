@@ -197,7 +197,6 @@ int main(int argc,char* argv[]){
 		{
 			no_more_instruction = InitializeFetchAndDecode(adressMainMemory, &pc_counter, &instruction_queue_counter);
 		}
-	
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
 

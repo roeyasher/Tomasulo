@@ -64,7 +64,6 @@ int CharToInteger (char schar)
 }
 
 
-
 Instruction *LinkInstQueue (char instruction_line[],int *pc_counter) {
 	int opcode,dst,src0,src1;
 	int imm;
@@ -171,7 +170,6 @@ void CheckTheConditionAndReturnPc(Instruction *temp)
 }
 
 Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head)
-
 {
 
 	/*a help function the do the fetch and decode main function*/
@@ -296,5 +294,21 @@ void simulateclockFetchAndDecode()
 	DecodeAndDistributor(instruction_queue_head);
 }
 
+void EmptyInsturcionQueue(int *counter)
+
+{
+	Instruction *node = NULL;
+	Instruction *node_last = NULL;
+	node = instruction_queue_head;
+	node_last = instruction_queue_head;
+	while (node->next != NULL)
+	{
+		node = (Instruction*)node->next;
+		free(node_last);
+		node_last = (Instruction*)node;
+	}
+	(*counter) -= 16;
+	instruction_queue_head=NULL;
+}
 
 

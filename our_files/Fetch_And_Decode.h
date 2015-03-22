@@ -45,6 +45,7 @@ BOOL InitializeFetchAndDecode(char *memory[], int *pc_conter, int * instruction_
 
 void simulateclockFetchAndDecode();
 
+void EmptyInsturcionQueue();
 
 
 #endif
