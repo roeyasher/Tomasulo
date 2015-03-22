@@ -133,7 +133,7 @@ int main(int argc,char* argv[]){
 
 	InitializeConfiguration(argv[1]);
 
-		
+	void IntilaizeInstructionQueue();
 
 	/*Memory reservation stations and execution units*/
 
@@ -263,10 +263,6 @@ int main(int argc,char* argv[]){
 		if(cycle == 200000)
 
 			break;
-
-		
-
-			
 
 	}
 
