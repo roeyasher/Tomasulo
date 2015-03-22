@@ -14,10 +14,7 @@ robLine *CreateRLNewNode(){
 }
 
 
-void IntilaizeRob()
-
-{
-
+void IntilaizeRob() {
 	/*this function intilaize the load buffer/reservation station*/
 
 	int Number_of_Rob_Lines = Configuration->rob_entries;
@@ -34,5 +31,28 @@ void IntilaizeRob()
 		node = node->next;
 		sprintf(node->label,"ROB%d",i+1);
 	}
+}
+
+void emptyRob(){
+
+	robLine *succ = robLines, *prev = robLines;
+	
+	while(succ != NULL) {
+		prev = succ;
+		succ = succ->next;
+		memset(prev, 0, sizeof(robLine));
+	} 
+}
+
+void insertRob(){
+	robLine *node = robLines;
+	while(node != NULL){
+		
+	}
 
 }
+
+void commit(){
+
+}
+
