@@ -144,7 +144,7 @@ int main(int argc,char* argv[]){
 	IntilaizeStoreBuffer();
 
 	IntializeMemPipline();
-
+	//TODO enable me
 	//InitializeMemory(memin_txt);
 	MemInToMainMemory(adressMainMemory, argv[2]);
 	
@@ -192,7 +192,7 @@ int main(int argc,char* argv[]){
 
 	while (TRUE)
 	{
-		// We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
+		//TODO We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
 		while ((reservation_stations_has_space == TRUE) && (rob_has_space == TRUE) && (no_more_instruction == FALSE) && (instruction_queue_counter<16))
 		{
 			no_more_instruction = InitializeFetchAndDecode(adressMainMemory, &pc_counter, &instruction_queue_counter);
