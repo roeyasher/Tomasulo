@@ -7,20 +7,18 @@ typedef struct Instruction Instruction;
 struct Instruction {
 
 	int OPCODE;
-
 	int DST;
-
 	int SRC0;
-
 	int SRC1;
-
 	int IMM;
 
 	int PC;
+	char label[LABEL_SIZE];
+	char name[16];
 
 	struct Instruction *next;
 
-	char name[16];
+	
 };
 
 

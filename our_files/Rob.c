@@ -33,26 +33,26 @@ void IntilaizeRob() {
 	}
 }
 
-void emptyRob(){
-
-	robLine *succ = robLines, *prev = robLines;
-	
-	while(succ != NULL) {
-		prev = succ;
-		succ = succ->next;
-		memset(prev, 0, sizeof(robLine));
-	} 
-}
-
-void insertRob(){
-	robLine *node = robLines;
-	while(node != NULL){
-		
-	}
-
-}
-
-void commit(){
-
-}
+//void emptyRob(){
+//
+//	robLine *succ = robLines, *prev = robLines;
+//	
+//	while(succ != NULL) {
+//		prev = succ;
+//		succ = succ->next;
+//		memset(prev, 0, sizeof(robLine));
+//	} 
+//}
+//
+//void insertRob(){
+//	robLine *node = robLines;
+//	while(node != NULL){
+//		
+//	}
+//
+//}
+//
+//void commit(){
+//
+//}
 
