@@ -9,11 +9,12 @@ struct IntCDB{
 	int OPCODE;
 	BOOL busy;
 	int operand1, operand2;
-	char LabelOfSupplier[LABEL_SIZE];
-	struct IntCDB *next;
+	int numOfRobSupplier;
+	struct IntALU_PipelineStage *next;
 	int result;
 	BOOL valid;
 };
+
 
 typedef struct FPCDB FPCDB;
 struct FPCDB{
@@ -21,8 +22,8 @@ struct FPCDB{
 	int OPCODE;
 	BOOL busy;
 	int operand1, operand2;
-	char LabelOfSupplier[LABEL_SIZE];
-	struct FPCDB *next;
+	int numOfRobSupplier;
+	struct IntALU_PipelineStage *next;
 	int result;
 	BOOL valid;
 };
@@ -33,8 +34,8 @@ struct LoadCDB{
 	int OPCODE;
 	BOOL busy;
 	int operand1, operand2;
-	char LabelOfSupplier[LABEL_SIZE];
-	struct LoadCDB *next;
+	int numOfRobSupplier;
+	struct IntALU_PipelineStage *next;
 	int result;
 	BOOL valid;
 };
