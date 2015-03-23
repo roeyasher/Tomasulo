@@ -85,7 +85,7 @@ BOOL commit(){
 
 	if (node->done == TRUE){
 
-		/// TODO write to memory!.
+		/// TODO write to regs!.
 
 		robLines = node->next;
 		strncpy(label, node->label, LABEL_SIZE);

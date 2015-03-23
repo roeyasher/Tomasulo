@@ -130,30 +130,91 @@ int main(int argc, char* argv[]){
 
 		// check if the rob have free line -> check if relevant RS have free line ->  interst to rob and the relevat RS  
 
+		if (!isRobFull()) {
+			switch (instr.OPCODE){
+
+			case LD:
+				if (!isST_Buff_FULL()){
+
+				}
+					break;
+
+			case ST:
+				if (!isLD_Buff_FULL()){
+
+				}
+
+				break;
+
+			case ADD:
+				if (!isADD_Buff_FULL()){
+
+				}
+
+				break;
+
+			case ADDI:
+				if (!isADD_Buff_FULL()){
+
+				}
+
+				break;
+
+			case SUB:
+				if (!isST_Buff_FULL()){
+
+				}
+
+				break;
+
+			case SUBI:
+				if (!isST_Buff_FULL()){
+
+				}
+
+				break;
+
+			case ADDS:
+				if (!isST_Buff_FULL()){
+
+				}
+
+				break;
+
+			case SUBS:
+				if (!isST_Buff_FULL()){
+
+				}
+
+				break;
+
+			case MULTS:
+				if (!isST_Buff_FULL()){
+
+				}
+
+				break;
+
+			default:
+				// Opcode not in ALU unit
+				break;
+			}
+		}
 
 		/*simulate till HALT is issued*/
 		if (instr.OPCODE == HALT)
 			break;
 
 		/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
-		if (SimulateClockCycle_IntUnit()){
-			instr_reservation = TRUE;
-		}
+		instr_reservation = SimulateClockCycle_IntUnit();
 
-		if (simulateClockCycle_FpUnit()){
-			instr_reservation = TRUE;
-		}
+		instr_reservation = simulateClockCycle_FpUnit();
 
-		if (SimulateClockCycle_LoadUnit(cycle, 0)){
-			instr_reservation = TRUE;
-		}
+		instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
 
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
-		if ((flag == TRUE) || (instr_reservation == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
-			instr_reservation = TRUE; //TODO: remove the blbla condition (meutar).
-		}
-		else{
-			instr_reservation = FALSE;
+		if ((flag == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
+			instr_reservation = TRUE;
 		}
 
 		cycle++;
