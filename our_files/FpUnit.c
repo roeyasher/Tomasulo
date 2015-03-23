@@ -540,13 +540,19 @@ BOOL isFP_RS_MULL_FULL(){
 	return (FP_RS_MULL_Cnt == Configuration->mul_nr_reservation);
 }
 
+BOOL UpdateResultInRS(){
+
+	
+}
+
 BOOL simulateClockCycle_FpUnit(){
 
 	BOOL isInstructionTakenByUnit=FALSE;
-
+	UpdateResultInRS();
+	FP_ReservationStationToExecution();
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
-	FP_ReservationStationToExecution();
+	
 	FP_EvictFromReservationStation();
 
 	if (isFP_RS_ADD_FULL){
