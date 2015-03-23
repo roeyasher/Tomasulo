@@ -64,35 +64,7 @@ int CharToInteger (char schar)
 }
 
 
-Instruction *LinkInstQueue (char instruction_line[],int *pc_counter) {
-	int opcode,dst,src0,src1;
-	int imm;
-	/*the function that creates the instruction queue*/
-	Instruction *new_node = (Instruction *)malloc(1*sizeof(Instruction));
-	if (new_node != NULL)
-	{
-		new_node->OPCODE = CharToInteger(instruction_line[0]);
-		new_node->DST = CharToInteger(instruction_line[1]);
-		new_node->SRC0 = CharToInteger(instruction_line[2]);
-		new_node->SRC1 = CharToInteger(instruction_line[3]);
-		if ((imm = CharToInteger(instruction_line[4])) >= 8)
-		{
-			imm-=16;
-		}
-		imm=imm*16*16*16;
-		imm=imm + CharToInteger(instruction_line[5])*16*16 + CharToInteger(instruction_line[6])*16 +  CharToInteger(instruction_line[7]);	/*decoding immediate*/
-		if ((new_node->OPCODE == BEQ) || (new_node->OPCODE == BNE) || (new_node->OPCODE == JUMP)){
-		new_node->IMM = imm*4;
-		}else{
-			new_node->IMM = imm;
-		}
-		new_node->PC = *pc_counter;
-		new_node->next = NULL;
-		strcpy(new_node->name,instruction_line);
-		return new_node;
-	}
-	return NULL;
-}
+
 
 void CheckTheConditionAndReturnPc(Instruction *temp)
 
@@ -251,42 +223,88 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 	}
 	return TRUE;
 }
+BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter) {
+	/* Fethch new instruction from memory to queue*/
+	int opcode, dst, src0, src1;
+	int imm;
+	Instruction *node = NULL;
+	node = instruction_queue_head;
+	// check whether we have more instruction in main memory
+	if (strcmp(instruction_line,"00000000")==0)
+	{
+		return TRUE;
+	}
+	//find place in instruction queue	
+	while ((strcmp(node->name, "00000000")!=0 ) && (NULL != node))
+	{
+		node = (Instruction*)node->next;
+	}
+			if (NULL != node)
+			{
+				(*instruction_queue_counter)++;
+				strcpy(node->name, instruction_line);
+				node->OPCODE = CharToInteger(instruction_line[0]);
+				node->DST = CharToInteger(instruction_line[1]);
+				node->SRC0 = CharToInteger(instruction_line[2]);
+				node->SRC1 = CharToInteger(instruction_line[3]);
+				if ((imm = CharToInteger(instruction_line[4])) >= 8)
+				{
+					imm -= 16;
+				}
+				imm = imm * 16 * 16 * 16;
+				imm = imm + CharToInteger(instruction_line[5]) * 16 * 16 + CharToInteger(instruction_line[6]) * 16 + CharToInteger(instruction_line[7]);	/*decoding immediate*/
+				if ((node->OPCODE == BEQ) || (node->OPCODE == BNE) || (node->OPCODE == JUMP)){
+					node->IMM = imm * 4;
+				}
+				else{
+					node->IMM = imm;
+				}
+			}
+			return FALSE;
+		}
 
-BOOL InitializeFetchAndDecode(char *memory[], int *pc_conter, int * instruction_queue_counter)
+BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
 {
 	char instruction_line[SIZE_OF_CHAR];
 	Instruction *node = NULL; 
 	int i = 0, counterdivide = 0, place_in_array=0,j=0;
-	counterdivide = (*pc_conter) / 4;
-	place_in_array = (counterdivide*(512 / 4));
-		node = instruction_queue_head;
-		if (instruction_queue_head	== NULL)
-		{
-			instruction_queue_head = LinkInstQueue(memory , pc_conter);
-		}
-		else 
-		{
-			while(node->next !=NULL)
-			{
-				node =(Instruction*) node->next;
-			}
-			node->next = LinkInstQueue((memory + place_in_array), pc_conter);
-			if (FALSE==strcmp(node->next->name,"00000000"))
-			{
-				return TRUE;
-			}
-		}
-		(*pc_conter) += 4;
-		node = instruction_queue_head;
-	while(node !=NULL)
+	BOOL is_it_end_of_instruction_in_memory = FALSE;
+
+	place_in_array = ((*pc_conter_to_fetch)*(512 / 4));
+	node = instruction_queue_head;
+	is_it_end_of_instruction_in_memory = LinkInstQueue((memory + place_in_array), instruction_queue_counter);
+	if (TRUE == is_it_end_of_instruction_in_memory)
 	{
-		//printf("%d %d %d %d %d %d\n",node->OPCODE,node->DST,node->SRC0,node->SRC1,node->IMM,node->PC);
-		node= node->next;
+		return TRUE;
 	}
-	(*instruction_queue_counter) ++ ;
 	return FALSE;
 }
 
+VOID * GetInstructionFromQUeue(Instruction *result_instruction)
+{
+	
+	Instruction *hold_head = instruction_queue_head;
+	Instruction *node = instruction_queue_head;
+	result_instruction->DST = instruction_queue_head->DST;
+	result_instruction->IMM = instruction_queue_head->IMM ;
+	strcpy(result_instruction->name,instruction_queue_head->name);
+	result_instruction->next = instruction_queue_head->next;
+	result_instruction->OPCODE = instruction_queue_head->OPCODE;
+	result_instruction->PC = instruction_queue_head->PC;
+	result_instruction->SRC0 = instruction_queue_head->SRC0;
+	result_instruction->SRC1 = instruction_queue_head->SRC1;
+
+	while (NULL != node->next)
+	{
+		node = (Instruction*)node->next;
+	}
+	instruction_queue_head = (Instruction*)instruction_queue_head->next;
+	node->next = (Instruction*)hold_head;
+	node->next->next = NULL;
+	
+	strcpy(node->next->name, "00000000");
+	return;
+}
 void simulateclockFetchAndDecode()
 
 {
@@ -300,6 +318,22 @@ void EmptyInsturcionQueue(int *counter)
 	Instruction *node = NULL;
 	Instruction *node_last = NULL;
 	node = instruction_queue_head;
+	while (node->next != NULL)
+	{
+		strcpy(node->name, "00000000");
+		node = (Instruction*)node->next;
+	}
+	(*counter) -= 16;
+	strcpy(node->name, "00000000");
+	
+}
+
+void freeInsturcionQueue()
+
+{
+	Instruction *node = NULL;
+	Instruction *node_last = NULL;
+	node = instruction_queue_head;
 	node_last = instruction_queue_head;
 	while (node->next != NULL)
 	{
@@ -307,8 +341,26 @@ void EmptyInsturcionQueue(int *counter)
 		free(node_last);
 		node_last = (Instruction*)node;
 	}
-	(*counter) -= 16;
+	
 	instruction_queue_head=NULL;
 }
 
 
+
+void IntilaizeInstructionQueue() {
+	/*this function intilaize the load buffer/reservation station*/
+
+	int i = 0;
+	Instruction *node = NULL;
+	instruction_queue_head = (Instruction *)malloc(1 * sizeof(Instruction));
+	instruction_queue_head->OPCODE = 00000000;
+	strcpy(instruction_queue_head->name, "00000000");
+	node = instruction_queue_head;
+	for (i = 1; i<InstructionQueueSize; i++)	{
+		node->next = (Instruction *)malloc(1 * sizeof(Instruction));
+		node->next->OPCODE=00000000;
+		strcpy(node->next->name , "00000000");
+		node = (Instruction*)node->next;
+	}
+	node->next = NULL;
+}
