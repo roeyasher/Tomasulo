@@ -12,6 +12,11 @@ BOOL flag = FALSE;
 int cycle = 1;
 Trace trace[TRACE_SIZE];
 
+/*For CDB*/
+IntCDB IntUnitCDB;
+FPCDB FPUnitCDB;
+LoadCDB LoadUnitCDB;
+
 /*For Rob*/
 robLine *robLines = NULL;/*load buffer/load reservation*/
 /**/
@@ -57,6 +62,7 @@ void InitializeTrace();
 
 /*check if all reservation stations are empty from instructions - used to know when to terminate program after issue of HALT*/
 int detectEnd();
+
 
 int main(int argc, char* argv[]){
 
