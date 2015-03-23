@@ -69,12 +69,15 @@ int main(int argc, char* argv[]){
 	BOOL rob_has_space = TRUE;
 	BOOL no_more_instruction = FALSE;
 	instr.OPCODE = -1;
-
+	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
+	BOOL reservation_stations_has_space = TRUE;
+	BOOL rob_has_space = TRUE;
+	BOOL no_more_instruction = FALSE;
 	/*intialize all*/
 
 	/*configuration file*/
 	InitializeConfiguration(argv[1]);
-	//IntilaizeInstructionQueue();
+	IntilaizeInstructionQueue();
 
 	/*Memory reservation stations and execution units*/
 	IntilaizeRob();
@@ -112,6 +115,7 @@ int main(int argc, char* argv[]){
 		while ((reservation_stations_has_space == TRUE) && (rob_has_space == TRUE) && (no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
 			no_more_instruction = InitializeFetchAndDecode(adressMainMemory, &pc_counter, &instruction_queue_counter);
+			pc_counter_instruction++;
 		}
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
