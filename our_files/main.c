@@ -69,10 +69,7 @@ int main(int argc, char* argv[]){
 	BOOL rob_has_space = TRUE;
 	BOOL no_more_instruction = FALSE;
 	instr.OPCODE = -1;
-	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
-	BOOL reservation_stations_has_space = TRUE;
-	BOOL rob_has_space = TRUE;
-	BOOL no_more_instruction = FALSE;
+	
 	/*intialize all*/
 
 	/*configuration file*/
