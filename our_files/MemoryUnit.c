@@ -13,24 +13,26 @@ void IntilaizeMemoryArray()
 		PhysicalMemoryArray[i]=0;
 }
 
-LoadBuffer *CreateLBNewNode(){
+LoadBuffer *CreateLBNewNode(int index){
 
 	/*this function create a new node for a linked list, for the load buffer*/
 	LoadBuffer *temp = NULL;
 	temp = (LoadBuffer*) malloc(sizeof(LoadBuffer));
 	memset(temp, 0, sizeof(LoadBuffer));
 	temp->next = NULL;
+	temp->buffNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 
 }
 
-StoreBuffer *CreateNewSBNode(){
+StoreBuffer *CreateNewSBNode(int index){
 
 	/*this function create a new node for a linked list for the store buffer*/
 	StoreBuffer *temp = NULL;
 	temp = (StoreBuffer*) malloc(sizeof(StoreBuffer));
 	memset(temp, 0, sizeof(StoreBuffer));
 	temp->next = NULL;
+	temp->buffNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 
 }
@@ -46,24 +48,20 @@ Memory_PiplineStage *CreateNewMPLNode(){
 	return temp;		/*NULL is returned if failure occured*/
 }
 
-void IntilaizeLoadBuffer()
+void IntilaizeLoadBuffer(){
 
-{
 	/*this function intilaize the load buffer/reservation station*/
-
 	int Number_of_MemReservation_station = Configuration->mem_nr_load_buffers;
 	int i=0;
 
 	LoadBuffer *node = NULL;
-	LoadBufferResarvation = CreateLBNewNode();
-	sprintf(LoadBufferResarvation->Label,"LOAD%d",i+1);
+	LoadBufferResarvation = CreateLBNewNode(0);
 	node = LoadBufferResarvation;
 
 	for (i=1;i<Number_of_MemReservation_station;i++){
 
-		node->next = CreateLBNewNode();
+		node->next = CreateLBNewNode(i);
 		node = node->next;
-		sprintf(node->Label, "LOAD%d", i + 1);
 	}
 
 	LD_Buff_Cnt = 0;
@@ -77,14 +75,12 @@ void IntilaizeStoreBuffer()
 	int i=0;
 
 	StoreBuffer *node = NULL;
-	StoreBufferResarvation = CreateNewSBNode();
-	sprintf(StoreBufferResarvation->Label,"STORE%d",i+1);
+	StoreBufferResarvation = CreateNewSBNode(0);
 	node = StoreBufferResarvation;
 
 	for(i=1;i<Number_of_MemReservation_station;i++){
-		node->next = CreateNewSBNode();
+		node->next = CreateNewSBNode(i);
 		node = node->next;
-		sprintf(node->Label,"STORE%d",i+1);
 	}
 
 	ST_Buff_Cnt = 0;
@@ -158,8 +154,7 @@ BOOL InsertNewLoadInstr(int count){
 
 	/*insert the label to the destination register*/
 	FP_Registers[instr.DST].busy = TRUE;
-	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
-	strcpy(FP_Registers[instr.DST].label,available->Label);
+	FP_Registers[instr.DST].robNum = instr.numRob;
 
 	LD_Buff_Cnt++;
 	return TRUE;
@@ -643,13 +638,13 @@ BOOL SimulateClockCycle_LoadUnit(int count,int flag){
 	BufferToMemoryExecution(count);
 	AddTheInstrToExecute();
 
-	if (isLD_Buff_FULL()) {
+	if (!isLD_Buff_FULL() && !isRobFull()) {
 		if (InsertNewLoadInstr(count)){
 			isInstructionTakenByUnit = TRUE;
 		}
 	}
 
-	if (isST_Buff_FULL()) {
+	if (!isST_Buff_FULL() && !isRobFull()) {
 		if (InsertNewStoreInstr(count)){
 			isInstructionTakenByUnit = TRUE;
 		}

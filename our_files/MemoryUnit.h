@@ -14,7 +14,7 @@ struct LoadBuffer {
 	BOOL done;
 	int count;
 	int checkforexecute;
-	char Label[LABEL_SIZE];
+	int buffNum;
 	char name[16];
 	int issued;
 	struct LoadBuffer *next;
@@ -30,9 +30,9 @@ struct StoreBuffer {
 	int count;
 	int checkforexecute;
 	float vj;
-	char Qj[LABEL_SIZE];
+	int numRob; //Qj
 	int NumOfRightOperands;
-	char Label[LABEL_SIZE];
+	int buffNum;
 	char name[16];
 	int issued;
 	struct StoreBuffer *next;
@@ -42,7 +42,7 @@ typedef struct Memory_PiplineStage Memory_PiplineStage;
 struct Memory_PiplineStage {
 	int OPCODE;
 	int address;
-	char labelofsupplier[LABEL_SIZE];
+	int numOfRobSupplier;
 	struct Memory_PiplineStage *next;
 	float Data_load;
 	float Data_store;
@@ -52,7 +52,7 @@ typedef struct Memory_Pipline Memory_Pipline;
 struct Memory_Pipline {
 	int OPCODE;
 	int address;
-	char labelofsupplier[LABEL_SIZE];
+	int numOfRobSupplier;
 	float Data_load;
 	float Data_store;
 };
