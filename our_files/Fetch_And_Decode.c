@@ -187,10 +187,8 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 	temp = SearchTheElementInstByPc(instruction_queue_head);
 	//printf("instruction adress is %p\n",temp);
 		if(temp== NULL)
-	{	
-	//	printf("well well finish all the instruction queue\n");
-		return FALSE;
-	}
+			return FALSE;
+
 		/*if instr_reservation is FALSE then do nothing otherwise old instruction is erased*/
 		if ((instr_reservation == TRUE)/*||(temp->OPCODE==BEQ)||(temp->OPCODE==BNE)||(temp->OPCODE==JUMP)*/){
 			FillTheFields(temp);
@@ -223,7 +221,7 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 	}
 	return TRUE;
 }
-BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter) {
+BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int pc) {
 	/* Fethch new instruction from memory to queue*/
 	int opcode, dst, src0, src1;
 	int imm;
@@ -247,6 +245,7 @@ BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter) {
 				node->DST = CharToInteger(instruction_line[1]);
 				node->SRC0 = CharToInteger(instruction_line[2]);
 				node->SRC1 = CharToInteger(instruction_line[3]);
+				node->PC = 4*pc;
 				if ((imm = CharToInteger(instruction_line[4])) >= 8)
 				{
 					imm -= 16;
@@ -272,7 +271,7 @@ BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_q
 
 	place_in_array = ((*pc_conter_to_fetch)*(512 / 4));
 	node = instruction_queue_head;
-	is_it_end_of_instruction_in_memory = LinkInstQueue((memory + place_in_array), instruction_queue_counter);
+	is_it_end_of_instruction_in_memory = LinkInstQueue((memory + place_in_array), instruction_queue_counter, *pc_conter_to_fetch);
 	if (TRUE == is_it_end_of_instruction_in_memory)
 	{
 		return TRUE;

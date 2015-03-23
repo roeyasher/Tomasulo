@@ -726,6 +726,7 @@ void MemInToMainMemory(char *memory[],char *memin_txt)
 		
 		memory=memory + (512/4);
 		i++;
+		
 		//memset(memory[i], 0, BUFFER_SIZE);
 	}
 	fclose(memin_txt);

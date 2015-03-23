@@ -113,8 +113,9 @@ int main(int argc, char* argv[]){
 
 	while (TRUE)
 	{
+		// Bring instruction from the main memory to the instruction queue
 		//TODO We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
-		while ((reservation_stations_has_space == TRUE) && (rob_has_space == TRUE) && (no_more_instruction == FALSE) && (instruction_queue_counter < 16))
+		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
 			no_more_instruction = FetchAndDecode(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
 			pc_counter_instruction++;
@@ -125,6 +126,10 @@ int main(int argc, char* argv[]){
 
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
+
+
+		// check if the rob have free line -> check if relevant RS have free line ->  interst to rob and the relevat RS  
+
 
 		/*simulate till HALT is issued*/
 		if (instr.OPCODE == HALT)
