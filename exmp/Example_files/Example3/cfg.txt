@@ -1,0 +1,10 @@
+int_delay = 1
+add_delay = 3
+mul_delay = 5
+mem_delay = 10
+rob_entries = 10
+add_nr_reservation = 3
+mul_nr_reservation = 2
+int_nr_reservation = 3
+mem_nr_load_buffers = 3
+mem_nr_store_buffers = 3

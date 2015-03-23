@@ -1,0 +1,53 @@
+multiplication of two float arrays stored in memory. then add constant to the result.
+
+ADDI 		R1, R0, 0  		# initialize counter.
+ADDI		R4, R0, 15		# arrays length.
+ADDI		R2, R0, 		# first array address.
+ADDI 		R3, R2, 15		# second array address.
+LD			F15, 15(R3)		# load constant.
+ADDI  		R6, R3, 16		# result array address.	
+LOOP1:
+LD 			F2, 0(R2)
+LD			F4, 0(R3)
+MUL.S		F6, F2, F4
+ADDI		R1, R1, 1
+ADDI		R2, R2, 1
+ADDI		R3, R3, 1
+ADDI		R6, R6, 1
+ST			F6, 0(R6)
+BNE			R1, R4, LOOP1
+SUB			R1, R4,	R1
+SUB			R6, R6,	R1
+LOOP2:
+LD			F6, 0(R6)
+ADD.S		F6, F6, F15
+ADDI		R1, R1, 1
+ADDI		R6, R6, 1
+ST			F6, 0(R6)
+BNE			R1, R4, LOOP2
+HALT
+
+61000001
+6400000f
+6200
+6320000f
+0f30000f
+63000010
+02200000
+04300000
+b6240000
+61100001
+62200001
+63300001
+66600001
+10660000
+4014fff8
+71410000
+76610000
+06600001
+966f0000
+61100001
+66600001
+10660000
+4014fffb
+C0000000
