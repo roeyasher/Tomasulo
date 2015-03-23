@@ -84,6 +84,9 @@ BOOL commit(){
 	char label[LABEL_SIZE];
 
 	if (node->done == TRUE){
+
+		/// TODO write to memory!.
+
 		robLines = node->next;
 		strncpy(label, node->label, LABEL_SIZE);
 		memset(node, 0, sizeof(robLine));
