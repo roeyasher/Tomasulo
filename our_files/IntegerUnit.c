@@ -290,13 +290,16 @@ BOOL isINT_RS_FULL(){
 
 BOOL SimulateClockCycle_IntUnit(){
 
-	BOOL isInstructionTakenByUnit=FALSE;
+	BOOL isInstructionTakenByUnit = FALSE;
+
 	AdvanceIntPipeline();					/*advance piepline*/
 	ReservationStationToALU();				/*send new instruction for execution*/
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
 
-	if (InsertToReservationStation())			/*insert new instruction to reservation station*/
-		isInstructionTakenByUnit=TRUE;
+	if (isINT_RS_FULL) {
+		if (InsertToReservationStation())			/*insert new instruction to reservation station*/
+			isInstructionTakenByUnit = TRUE;
+	}
 
 	return isInstructionTakenByUnit;
 

@@ -128,32 +128,26 @@ int main(int argc, char* argv[]){
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
 
-		/*simulate till HALT is issued*/
-		if (instr.OPCODE == HALT)
-			break;
+
 
 		// check if the rob have free line -> check if relevant RS have free line ->  interst to rob and the relevat RS  
 
 		if (!isRobFull()) {
-
+			/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
 			instr_reservation = SimulateClockCycle_IntUnit();
 			instr_reservation = simulateClockCycle_FpUnit();
 			instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
 		}
 
-
-
-		/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
-		instr_reservation = SimulateClockCycle_IntUnit();
-
-		instr_reservation = simulateClockCycle_FpUnit();
-
-		instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
-
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
 		if ((flag == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
 			instr_reservation = TRUE;
 		}
+
+		/*simulate till HALT is issued*/
+		if (instr.OPCODE == HALT)
+			break;
+
 
 		cycle++;
 		//instruction_queue_counter--;

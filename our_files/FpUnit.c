@@ -543,16 +543,21 @@ BOOL isFP_RS_MULL_FULL(){
 BOOL simulateClockCycle_FpUnit(){
 
 	BOOL isInstructionTakenByUnit=FALSE;
+
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
 	FP_ReservationStationToExecution();
 	FP_EvictFromReservationStation();
 
-	if (FP_InsertToReservationStations_ADD())
-		isInstructionTakenByUnit=TRUE;
+	if (isFP_RS_ADD_FULL){
+		if (FP_InsertToReservationStations_ADD())
+			isInstructionTakenByUnit = TRUE;
+	}
 
-	if(FP_InsertToReservationStations_MUL())
-		isInstructionTakenByUnit=TRUE;
+	if (isFP_RS_MULL_FULL){
+		if (FP_InsertToReservationStations_MUL())
+			isInstructionTakenByUnit = TRUE;
+	}
 
 	return isInstructionTakenByUnit;
 }
