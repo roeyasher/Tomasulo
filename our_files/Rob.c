@@ -2,12 +2,13 @@
 #include "shared.h"
 
 
-robLine *CreateRLNewNode(){
+robLine *CreateRLNewNode(int index){
 
 	/*this function create a new node for a linked list, for the load buffer*/
 	robLine *temp = NULL;
 	temp = (robLine*) malloc(sizeof(robLine));
 	memset(temp, 0, sizeof(robLine));
+	temp->numRob = index;
 	temp->next = NULL;
 	return temp;		/*NULL is returned if failure occured*/
 
@@ -22,15 +23,13 @@ void IntilaizeRob() {
 	robCnt = 0;
 
 	robLine *node = NULL;
-	robLines = CreateRLNewNode();
-	sprintf(robLines->label,"ROB%d",i+1);
+	robLines = CreateRLNewNode(0);
 	node = robLines;
 
 	for (i=1;i<Number_of_Rob_Lines;i++)	{
 
-		node->next = CreateRLNewNode();
+		node->next = CreateRLNewNode(i);
 		node = node->next;
-		sprintf(node->label,"ROB%d",i+1);
 		node->busy = FALSE;
 	}
 }
@@ -38,14 +37,14 @@ void IntilaizeRob() {
 void emptyRob(){
 
 	robLine *succ = robLines, *prev = robLines;
-	char label[LABEL_SIZE];
+	int tmp;
 
 	while(succ != NULL) {
 		prev = succ;
 		succ = succ->next;
-		strncpy(label, prev->label, LABEL_SIZE);
+		tmp = prev->numRob;
 		memset(prev, 0, sizeof(robLine));
-		strncpy(prev->label, label, LABEL_SIZE);
+		prev->numRob = tmp;
 	} 
 	robCnt = 0;
 }
@@ -73,6 +72,7 @@ BOOL insertRob(){
 	availableRobLine->done = FALSE;
 	availableRobLine->busy = TRUE;
 	availableRobLine->state = 2; // issue
+	instr.numRob = availableRobLine->numRob;
 	robCnt++;
 
 }
@@ -82,27 +82,44 @@ BOOL commit(){
 	
 	robLine *node = robLines, *last = robLines;
 	char label[LABEL_SIZE];
+	int i = 0;
+	int tmp;
 
 	if (node->done == TRUE){
 
-		/// TODO write to regs!.
+		/// write to regs!.
+
+		/*update registers*/
+		for (i = 0; i<NUM_OF_INT_REGISTERS; i++){
+
+			if ((Integer_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob){
+
+				Integer_Registers[i].value = node->intValue;			/*update value*/
+				Integer_Registers[i].busy = FALSE;					/*no more busy*/
+				Integer_Registers[i].robNum = -1;	/*reset label though it is not necessary*/
+			}
+		}
+
+		/*update registers*/
+		for (i = 0; i<NUM_OF_FP_REGISTERS; i++){
+			if ((FP_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob){
+				FP_Registers[i].value = last->fpValue;
+				FP_Registers[i].busy = FALSE;
+				Integer_Registers[i].robNum = -1;
+			}
+		}
 
 		robLines = node->next;
-		strncpy(label, node->label, LABEL_SIZE);
+		tmp = node->numRob;
 		memset(node, 0, sizeof(robLine));
-		strncpy(node->label, label, LABEL_SIZE);
+		node->numRob = tmp;
+		robCnt--;
+		return TRUE;
 	}
 	else{
 		return FALSE;
 	}
 
-	// get the last node
-	while (last->next != NULL)
-		last = last->next;
-
-	last->next = node;
-	node->next = NULL;
-	robCnt--;
 }
 
 BOOL isRobFull(){
