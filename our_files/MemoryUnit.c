@@ -65,6 +65,8 @@ void IntilaizeLoadBuffer()
 		node = node->next;
 		sprintf(node->Label, "LOAD%d", i + 1);
 	}
+
+	LD_Buff_Cnt = 0;
 }
 
 void IntilaizeStoreBuffer()
@@ -84,6 +86,8 @@ void IntilaizeStoreBuffer()
 		node = node->next;
 		sprintf(node->Label,"STORE%d",i+1);
 	}
+
+	ST_Buff_Cnt = 0;
 }
 
 void IntializeMemPipline(){
@@ -157,11 +161,10 @@ BOOL InsertNewLoadInstr(int count){
 	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
 	strcpy(FP_Registers[instr.DST].label,available->Label);
 
+	LD_Buff_Cnt++;
 	return TRUE;
-
+	
 }
-
-
 
 BOOL InsertNewStoreInstr(int count){
 
@@ -229,6 +232,7 @@ BOOL InsertNewStoreInstr(int count){
 	trace[cycle].valid=TRUE;
 	strcpy(trace[cycle].instruction,instr.name);
 
+	ST_Buff_Cnt++;
 	return TRUE;
 }
 
@@ -338,15 +342,13 @@ BOOL BufferToMemoryExecution(int counter){
 	int length_store = Configuration->mem_nr_store_buffers;
 
 	/*intialize from the last time , every time checking again and clean all*/
-	for(i=0;i<length_load;i++){
-		if(load!=NULL){
+	while(load != NULL){
 			load->checkforexecute = 0;
-			load=load->next;}
+			load=load->next;
 	}
-	for(i=0;i<length_store;i++){
-		if(store!=NULL){
+	while(store != NULL){
 			store->checkforexecute = 0;
-			store=store->next;}
+			store=store->next;
 	}
 	/**/
 	/* the logic for the pre execute level*/
@@ -498,7 +500,7 @@ void ExecuteMemoryAndWriteToCdb()
 		strcpy(CdbToResarvation.label,execute->labelofsupplier);
 	}
 	else{
-		strcpy(CdbToResarvation.label,"roie");
+		strcpy(CdbToResarvation.label,"Empty");
 	}
 
 	memset(execute,0,sizeof(Memory_PiplineStage)); //TODO check if WORK!
@@ -600,6 +602,7 @@ void EvictFromLoadAndStoreBuffer(){
 			load->count=0;
 			load->checkforexecute=0;
 			load->address=-1;
+			LD_Buff_Cnt--;
 		}
 		load=load->next;
 	}
@@ -614,9 +617,18 @@ void EvictFromLoadAndStoreBuffer(){
 			store->checkforexecute=0;
 			memset(store->Qj,0,LABEL_SIZE);
 			store->NumOfRightOperands=0;
+			ST_Buff_Cnt--;
 		}
 		store=store->next;
 	}
+}
+
+BOOL isST_Buff_FULL(){
+	return (ST_Buff_Cnt == Configuration->mem_nr_store_buffers);
+}
+
+BOOL isLD_Buff_FULL(){
+	return (LD_Buff_Cnt == Configuration->mem_nr_load_buffers);
 }
 
 BOOL SimulateClockCycle_LoadUnit(int count,int flag){

@@ -40,7 +40,8 @@ struct FP_PipelineStage{
 	struct FP_PipelineStage *next;
 };
 
-
+int FP_RS_ADD_Cnt;
+int FP_RS_MULL_Cnt;
 
 /*Initialize FP registers*/
 void Initialize_FpRegisters();

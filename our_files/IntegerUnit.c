@@ -13,9 +13,7 @@ void Initialize_IntRegisters(){
 	}
 }
 
-
 /*used to create new reservation station line*/
-
 IntReservationStation_Line *CreateNewIRSLNode(){
 
 	IntReservationStation_Line *temp = NULL;
@@ -51,9 +49,9 @@ void InitializeReservationStation(){
 		node->next = CreateNewIRSLNode();
 		node = node->next;
 		sprintf(node->label, "ADD%d", i + 1);
-
 	}
 
+	Int_RS_Cnt = 0;
 }
 
 
@@ -64,9 +62,7 @@ void InitializeIntegerALU(){
 	IntALU_PipelineStage *node = NULL;
 	int i = 0, length=0;
 	length=Configuration->int_delay;
-	
 
-	
 	Integer_ALU_Unit = CreateNewIPLSNode(); /*first pipeline stage*/
 	node = Integer_ALU_Unit;
 
@@ -148,6 +144,7 @@ BOOL InsertToReservationStation(){
 	trace[cycle].valid=TRUE;
 	strcpy(trace[cycle].instruction,instr.name);
 
+	Int_RS_Cnt++;
 	return TRUE;								 /*means the instruction has been written to reservation station*/
 
 }
@@ -204,6 +201,7 @@ void EvictFromIntReservationStation(){
 			line->Vj=0;
 			line->Vk=0;
 			line->OPCODE=-1;
+			Int_RS_Cnt--;
 		}
 		line=line->next;
 	}
@@ -308,6 +306,9 @@ void AdvanceIntPipeline(){
 
 }
 
+BOOL isINT_RS_FULL(){
+	return (Int_RS_Cnt == Configuration->int_nr_reservation);
+}
 
 BOOL SimulateClockCycle_IntUnit(){
 

@@ -36,7 +36,6 @@ void Initialize_FpReservationStations(){
 
 	int lengthAdd=Configuration->add_nr_reservation;
 	int lengthMUL=Configuration->mul_nr_reservation;
-	
 
 	/*Create Reservation station for ADD unit*/
 	int i=0;
@@ -50,7 +49,7 @@ void Initialize_FpReservationStations(){
 		node = node->next;
 		sprintf(node->label,"FPADD%d",i+1);
 	}
-
+	FP_RS_ADD_Cnt = 0;
 
 	/*Create Reservation station for MUL unit*/
 	i=0;
@@ -63,6 +62,7 @@ void Initialize_FpReservationStations(){
 		node = node->next;
 		sprintf(node->label,"FPMUL%d",i+1);
 	}
+	FP_RS_MULL_Cnt = 0;
 }
 
 void Initialize_FpPipelines(){
@@ -110,9 +110,11 @@ void FP_EvictFromReservationStation(){
 			line->NumOfRightOperands=0;
 			memset(line->Qj,0,LABEL_SIZE);
 			memset(line->Qk,0,LABEL_SIZE);
+			FP_RS_ADD_Cnt--;
 		}
 		line=line->next;
 	}
+	
 
 	/*evict for MUL reservation station*/
 	line=FpReservationStation_MUL;
@@ -125,9 +127,11 @@ void FP_EvictFromReservationStation(){
 			line->NumOfRightOperands=0;
 			memset(line->Qj,0,LABEL_SIZE);
 			memset(line->Qk,0,LABEL_SIZE);
+			FP_RS_MULL_Cnt--;
 		}
 		line=line->next;
 	}
+	
 }
 
 void FP_ReservationStationToExecution(){
@@ -240,6 +244,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 	trace[cycle].valid=TRUE;
 	strcpy(trace[cycle].instruction,instr.name);
 
+	FP_RS_ADD_Cnt++;
 	return TRUE;
 }
 
@@ -303,6 +308,7 @@ BOOL FP_InsertToReservationStations_MUL(){
 	trace[cycle].valid=TRUE;
 	strcpy(trace[cycle].instruction,instr.name);
 
+	FP_RS_MULL_Cnt++;
 	return TRUE;
 
 }
@@ -538,6 +544,14 @@ void FP_AdvanceFpPipeline_MUL(){
 	prevLast->next = NULL;
 
 	}
+
+BOOL isFP_RS_ADD_FULL(){
+	return (FP_RS_ADD_Cnt == Configuration->add_nr_reservation);
+}
+
+BOOL isFP_RS_MULL_FULL(){
+	return (FP_RS_MULL_Cnt == Configuration->mul_nr_reservation);
+}
 
 BOOL simulateClockCycle_FpUnit(){
 

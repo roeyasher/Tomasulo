@@ -19,6 +19,7 @@ void IntilaizeRob() {
 
 	int Number_of_Rob_Lines = Configuration->rob_entries;
 	int i=0;
+	robCnt = 0;
 
 	robLine *node = NULL;
 	robLines = CreateRLNewNode();
@@ -46,6 +47,7 @@ void emptyRob(){
 		memset(prev, 0, sizeof(robLine));
 		strncpy(prev->label, label, LABEL_SIZE);
 	} 
+	robCnt = 0;
 }
 
 // Try to inster the global instruction to the rob line.
@@ -71,6 +73,7 @@ BOOL insertRob(){
 	availableRobLine->done = FALSE;
 	availableRobLine->busy = TRUE;
 	availableRobLine->state = 2; // issue
+	robCnt++;
 
 }
 
@@ -96,5 +99,10 @@ BOOL commit(){
 
 	last->next = node;
 	node->next = NULL;
+	robCnt--;
+}
+
+BOOL isRobFull(){
+	return (robCnt == Configuration->rob_entries);
 }
 

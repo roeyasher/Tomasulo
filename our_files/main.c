@@ -130,61 +130,34 @@ int main(int argc,char* argv[]){
 
 
 	/*configuration file*/
-
 	InitializeConfiguration(argv[1]);
-
-	void IntilaizeInstructionQueue();
+	//IntilaizeInstructionQueue();
 
 	/*Memory reservation stations and execution units*/
-
 	IntilaizeRob();
-
 	IntilaizeLoadBuffer();
-
 	IntilaizeStoreBuffer();
-
 	IntializeMemPipline();
 	//TODO enable me
 	//InitializeMemory(memin_txt);
 	MemInToMainMemory(adressMainMemory, argv[2]);
-	
 
 	/*INT reservation stations and execution units*/
-
 	InitializeIntegerALU();			
-
 	Initialize_IntRegisters();
-
 	InitializeReservationStation();
 
-
-
 	/*FP reservation stations and execution units*/
-
 	Initialize_FpRegisters();
-
 	Initialize_FpReservationStations();
-
 	Initialize_FpPipelines();
 
-
-
 	/*fetch and decode unit to insert the instructions to the instructions queue DB*/
-	
-
-
 
 	/*initialize structure for trace file*/
-
 	InitializeTrace();
-
-
-
 	/**/
-
 	strcpy(CdbToResarvation.label,"Init");
-
-		
 
 	printf("Starting simulator with files <%s> <%s>\n",argv[1],argv[2]);
 
@@ -199,71 +172,42 @@ int main(int argc,char* argv[]){
 		}
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
-
 		simulateclockFetchAndDecode();
 
 		/*init as instruction not taken by any unit*/
-
 		instr_reservation=FALSE;	
 
 		/*simulate till HALT is issued*/
-
 		if (instr.OPCODE == HALT)
-
 			break;
 
-
-
 		/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
-
 		if ( SimulateClockCycle_IntUnit() ){
-
 			instr_reservation=TRUE;
-
 		}
 
 		if ( simulateClockCycle_FpUnit() ){
-
 			instr_reservation=TRUE;
-
 		}
 
 		if ( SimulateClockCycle_LoadUnit(cycle,0) ){
-
 			instr_reservation=TRUE;
-
 		}
-
-		
 
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
-
-		
-
 		if ((flag == TRUE) || (instr_reservation == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
-								//TODO: remove the blbla condition (meutar).
-				instr_reservation=TRUE;
-
+				instr_reservation=TRUE; //TODO: remove the blbla condition (meutar).
 		}
-
 		else{
-
 				instr_reservation=FALSE;
-
 		}
-
-				
 
 		cycle++;
 		instruction_queue_counter--;
 
-
 		/*the last fix just to get a trace in the forth test*/
-
 		if(cycle == 200000)
-
 			break;
-
 	}
 
 

@@ -18,6 +18,9 @@ struct robLine{
 	struct robLine *next;	/*next line in reservation station*/
 };
 
+int robCnt;
+
+// Function Decleration
 robLine *CreateRLNewNode();
 void IntilaizeRob();
 
