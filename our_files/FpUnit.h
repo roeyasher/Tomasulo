@@ -10,14 +10,14 @@ struct FpRegister {
 
 	float value;
 	BOOL busy;
-	char label[LABEL_SIZE];
+	int robNum;
 };
 
 /*FP Reservation station line. the reservation station will be a linked list of size according to configuration file*/
 typedef struct FpReservationStation_Line FpReservationStation_Line;
 struct FpReservationStation_Line{
 	int OPCODE;
-	char label[LABEL_SIZE];
+	int robNum;
 	float Vj,Vk;
 	char Qj[LABEL_SIZE],Qk[LABEL_SIZE];
 	int NumOfRightOperands;
@@ -36,7 +36,7 @@ struct FP_PipelineStage{
 	BOOL busy;
 	float operand1,operand2;
 	float result;
-	char LabelOfSupplier[LABEL_SIZE];
+	int numOfSupplier;
 	struct FP_PipelineStage *next;
 };
 

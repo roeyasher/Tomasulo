@@ -12,6 +12,7 @@ struct Instruction {
 	int SRC1;
 	int IMM;
 	int PC;
+	int numRob;
 	char name[16];
 	struct Instruction *next;
 };

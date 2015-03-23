@@ -513,6 +513,7 @@ void FP_AdvanceFpPipeline_MUL(){
 				storeLine=storeLine->next;
 			}
 
+			//DELETE!!!!!
 			/*update registers*/
 			for (i=0;i<NUM_OF_FP_REGISTERS;i++){
 				if ((FP_Registers[i].busy==TRUE) && (!(strcmp(FP_Registers[i].label,last->LabelOfSupplier)))){
@@ -555,12 +556,12 @@ BOOL simulateClockCycle_FpUnit(){
 	
 	FP_EvictFromReservationStation();
 
-	if (isFP_RS_ADD_FULL){
+	if (!isFP_RS_ADD_FULL && !isRobFull()){
 		if (FP_InsertToReservationStations_ADD())
 			isInstructionTakenByUnit = TRUE;
 	}
 
-	if (isFP_RS_MULL_FULL){
+	if (!isFP_RS_MULL_FULL && !isRobFull()){
 		if (FP_InsertToReservationStations_MUL())
 			isInstructionTakenByUnit = TRUE;
 	}
