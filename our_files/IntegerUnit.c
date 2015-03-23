@@ -291,13 +291,8 @@ void AdvanceIntPipeline(){
 		}
 	}
 
-
-
 	/*waiting stations and registers were updated if not a bubble in last stage. Now must advance pipeline one stage foreward*/
-
 	/*if piepeline length is one then we erase content, set it as not busy and we are done*/
-
-
 	memset(last,0,sizeof(IntALU_PipelineStage)); //TODO check if WORK!
 	last->busy = FALSE;
 	last->next = Integer_ALU_Unit;
@@ -321,7 +316,5 @@ BOOL SimulateClockCycle_IntUnit(){
 		isInstructionTakenByUnit=TRUE;
 
 	return isInstructionTakenByUnit;
-
-
 
 }
