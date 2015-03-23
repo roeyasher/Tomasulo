@@ -64,20 +64,29 @@ int main(int argc, char* argv[]){
 	//FILE *memin_txt = FileOpen(argv[2], "rt");
 	char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 	char *adressMainMemory = MainMemoryArray[0];
-	int i = 0, pc_counter = 0, instruction_queue_counter = 0;
+
+	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
 	BOOL reservation_stations_has_space = TRUE;
 	BOOL rob_has_space = TRUE;
 	BOOL no_more_instruction = FALSE;
 	instr.OPCODE = -1;
-	
-	/*intialize all*/
 
-	/*configuration file*/
-	InitializeConfiguration(argv[1]);
-	IntilaizeInstructionQueue();
 
-	/*Memory reservation stations and execution units*/
-	IntilaizeRob();
+
+
+		/*intialize all*/
+
+		/*configuration file*/
+		InitializeConfiguration(argv[1]);
+
+		//IntilaizeInstructionQueue();
+
+
+		IntilaizeInstructionQueue();
+
+
+		/*Memory reservation stations and execution units*/
+		IntilaizeRob();
 	IntilaizeLoadBuffer();
 	IntilaizeStoreBuffer();
 	IntializeMemPipline();
@@ -111,7 +120,7 @@ int main(int argc, char* argv[]){
 		//TODO We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
 		while ((reservation_stations_has_space == TRUE) && (rob_has_space == TRUE) && (no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
-			no_more_instruction = InitializeFetchAndDecode(adressMainMemory, &pc_counter, &instruction_queue_counter);
+			no_more_instruction = FetchAndDecode(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
 			pc_counter_instruction++;
 		}
 
@@ -147,7 +156,7 @@ int main(int argc, char* argv[]){
 		}
 
 		cycle++;
-		instruction_queue_counter--;
+		//instruction_queue_counter--;
 
 		/*the last fix just to get a trace in the forth test*/
 		if (cycle == 200000)
@@ -195,8 +204,13 @@ int main(int argc, char* argv[]){
 	/*close all files*/
 	_fcloseall();	/*just in case*/
 
+
+		printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
+
+		freeInsturcionQueue();
 	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
-	getchar();
+
+		getchar();
 	return  0;
 }
 
