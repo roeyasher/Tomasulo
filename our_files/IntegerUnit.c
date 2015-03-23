@@ -1,18 +1,6 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-
-void Initialize_IntRegisters(){
-
-	int i=0;
-
-	for (i=0;i<NUM_OF_INT_REGISTERS;i++){
-		Integer_Registers[i].value=0;
-		Integer_Registers[i].busy=FALSE;
-		memset(Integer_Registers[i].label,0,LABEL_SIZE);
-	}
-}
-
 /*used to create new reservation station line*/
 IntReservationStation_Line *CreateNewIRSLNode(){
 

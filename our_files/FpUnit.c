@@ -1,19 +1,6 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-
-void Initialize_FpRegisters(){
-
-	int i=0;
-
-	for (i=0;i<NUM_OF_FP_REGISTERS;i++){
-		FP_Registers[i].value=(float)i;
-		FP_Registers[i].busy=FALSE;
-		memset(FP_Registers[i].label,0,LABEL_SIZE);
-	}
-
-}
-
 FpReservationStation_Line *CreateNewFPRSNode(){
 
 	FpReservationStation_Line *temp = NULL;
