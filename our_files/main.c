@@ -64,7 +64,6 @@ int main(int argc, char* argv[]){
 	//FILE *memin_txt = FileOpen(argv[2], "rt");
 	char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 	char *adressMainMemory = MainMemoryArray[0];
-
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
 	BOOL reservation_stations_has_space = TRUE;
 	BOOL rob_has_space = TRUE;
@@ -74,19 +73,16 @@ int main(int argc, char* argv[]){
 
 
 
-		/*intialize all*/
+	/*intialize all*/
 
-		/*configuration file*/
-		InitializeConfiguration(argv[1]);
+	/*configuration file*/
+	InitializeConfiguration(argv[1]);
 
-		//IntilaizeInstructionQueue();
+	//IntilaizeInstructionQueue();
+	IntilaizeInstructionQueue();
 
-
-		IntilaizeInstructionQueue();
-
-
-		/*Memory reservation stations and execution units*/
-		IntilaizeRob();
+	/*Memory reservation stations and execution units*/
+	IntilaizeRob();
 	IntilaizeLoadBuffer();
 	IntilaizeStoreBuffer();
 	IntializeMemPipline();
@@ -214,11 +210,6 @@ int main(int argc, char* argv[]){
 	return  0;
 }
 
-
-
-
-
-
 void MemoryLog(){
 
 	FILE *output = NULL;
@@ -231,33 +222,6 @@ void MemoryLog(){
 	fflush(output);
 	fclose(output);
 }
-
-
-
-void InitializeMemory(FILE *memin){
-
-	char memData[512];
-	int i = 0;
-	int val = 0;
-
-	//FILE *memin=FileOpen(memfile,"rt");
-	while (i < MEMORY_SIZE){
-		fscanf(memin, "%s", memData);
-		val = (int)strtol(memData, NULL, 16);     //TODO check correctness (ask itay if he see any diffrent).
-		PhysicalMemoryArray[i] = *(float*)&(val);
-		i++;
-	}
-
-	fclose(memin);
-}
-
-
-
-
-
-
-
-
 
 
 int detectEnd(){
