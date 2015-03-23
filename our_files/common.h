@@ -27,6 +27,7 @@
 #define FALSE 0
 #define NUM_OF_INT_REGISTERS 16
 #define NUM_OF_FP_REGISTERS 16
+#define InstructionQueueSize 16
 #define LABEL_SIZE 10
 #define BUFFER_SIZE 512
 #define TRACE_SIZE 1000000

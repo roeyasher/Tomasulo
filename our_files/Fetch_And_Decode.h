@@ -7,18 +7,20 @@ typedef struct Instruction Instruction;
 struct Instruction {
 
 	int OPCODE;
+
 	int DST;
+
 	int SRC0;
+
 	int SRC1;
+
 	int IMM;
 
 	int PC;
-	char label[LABEL_SIZE];
-	char name[16];
 
 	struct Instruction *next;
 
-	
+	char name[16];
 };
 
 
@@ -27,7 +29,7 @@ struct Instruction {
 
 int CharToInteger (char schar);
 
-Instruction *LinkInstQueue(char instruction_line[], int *pc_counter);
+BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter);
 
 void CheckTheConditionAndReturnPc();
 
@@ -39,11 +41,21 @@ Instruction *DeleteTheInstrcutionsDistributor();
 
 int DecodeAndDistributor(Instruction *instruction_queue_head);
 
-BOOL InitializeFetchAndDecode(char *memory[], int *pc_conter, int * instruction_queue_counter);
+BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter);
 
 void simulateclockFetchAndDecode();
 
-void EmptyInsturcionQueue();
+void EmptyInsturcionQueue(int *counter);
+
+void freeInsturcionQueue();
+
+
+
+VOID * GetInstructionFromQUeue(Instruction *result_instruction);
+
+
+
+void IntilaizeInstructionQueue();
 
 
 #endif
