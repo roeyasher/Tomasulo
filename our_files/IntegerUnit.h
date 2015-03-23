@@ -7,8 +7,9 @@
 typedef struct IntegerRegister IntegerRegister;
 struct IntegerRegister{
 	int value;
+	int robNum;			/*Which Reservation station is in charge of value in case busy is TRUE*/
 	BOOL busy;						/*indicating if value is relevant */
-	char label[LABEL_SIZE];			/*Which Reservation station is in charge of value in case busy is TRUE*/
+	
 };
 
 /*Integer Reservation Station is a linked list of size 'add_nr_reservation' where each node is an instruction station before being executed*/
@@ -16,11 +17,10 @@ typedef struct IntReservationStation_Line IntReservationStation_Line;
 struct IntReservationStation_Line{
 	int OPCODE;
 	int issued;
-	char label[LABEL_SIZE];					/*this is the label of the line. e.g 'ADD1'*/
+	int robNum;					/*this is the label of the line. e.g 'ADD1'*/
 	int Vj,Vk;								/*those are the values to operate on*/
-	int NumOfRightOperands;					/*we need 2 operands to operate. this must be initialized to 0 and incremented by 1 when
-											getting Vj,Vk so that 2 indicates that all operands are ready and intruction shall be executed*/
-	char Qj[LABEL_SIZE],Qk[LABEL_SIZE];		/*labels in case of for result from another instruction*/
+	int NumOfRightOperands;					/*we need 2 operands to operate. this must be initialized to 0 and incremented by 1 when								getting Vj,Vk so that 2 indicates that all operands are ready and intruction shall be executed*/
+	int Qj,Qk;								/*labels in case of for result from another instruction*/
 	BOOL busy;								/*is this line in use*/
 	BOOL done;								/*did this line finish execution and can be evicted from Reservation Station*/
 	BOOL inExecution;
@@ -35,7 +35,7 @@ struct IntALU_PipelineStage{
 	int OPCODE;
 	BOOL busy;
 	int operand1,operand2;
-	char LabelOfSupplier[LABEL_SIZE];
+	int numOfRobSupplier;
 	struct IntALU_PipelineStage *next;
 	int result;
 };

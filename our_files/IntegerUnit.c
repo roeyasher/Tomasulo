@@ -2,12 +2,13 @@
 #include "shared.h"
 
 /*used to create new reservation station line*/
-IntReservationStation_Line *CreateNewIRSLNode(){
+IntReservationStation_Line *CreateNewIRSLNode(int index){
 
 	IntReservationStation_Line *temp = NULL;
 	temp = (IntReservationStation_Line*) malloc(sizeof(IntReservationStation_Line));
 	memset(temp, 0, sizeof(IntReservationStation_Line));
 	temp->next = NULL;
+	temp->robNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 }
 
@@ -26,15 +27,13 @@ void InitializeReservationStation(){
 	int i = 0;
 
 	IntReservationStation_Line *node = NULL;
-	IntReservationStation = CreateNewIRSLNode();  /*Create first Line and label it as ADD1*/
-	sprintf(IntReservationStation->label, "ADD%d", i + 1);
+	IntReservationStation = CreateNewIRSLNode(0);  /*Create first Line and label it as ADD1*/
 	node = IntReservationStation;
 
 	/*Create other Lines and label them ADD2,ADD3 and so on*/
 	for (i = 1; i < NumberOFReservationStations; i++){
-		node->next = CreateNewIRSLNode();
+		node->next = CreateNewIRSLNode(i);
 		node = node->next;
-		sprintf(node->label, "ADD%d", i + 1);
 	}
 
 	Int_RS_Cnt = 0;
@@ -91,7 +90,7 @@ BOOL InsertToReservationStation(){
 		available->NumOfRightOperands++;				/*operand is ready*/
 	}
 	else{
-		strcpy(available->Qj,Integer_Registers[instr.SRC0].label);		/*copy label if value of register is not relevant*/
+		available->Qj = Integer_Registers[instr.SRC0].robNum;
 	}
 
 	/*opernad k might be immediate or from register. check if ADD or SUB and register is not busy*/
@@ -102,7 +101,8 @@ BOOL InsertToReservationStation(){
 	}
 
 	else if ((instr.OPCODE == ADD) || (instr.OPCODE == SUB)){
-		strcpy(available->Qk, Integer_Registers[instr.SRC1].label);		/*copy label if value of register is not relevant*/
+	/*copy label if value of register is not relevant*/
+		available->Qk = Integer_Registers[instr.SRC1].robNum;
 	}
 
 	/*put immediate if ADDI or SUBI*/
@@ -117,8 +117,7 @@ BOOL InsertToReservationStation(){
 
 	/*update destination register to being busy and update label to know from whom result is given*/
 	Integer_Registers[instr.DST].busy=TRUE;
-	memset(Integer_Registers[instr.DST].label,0,LABEL_SIZE);
-	strcpy(Integer_Registers[instr.DST].label,available->label);
+	Integer_Registers[instr.DST].robNum = available->robNum;
 
 	available->busy = TRUE;
 	available->done = FALSE;
@@ -148,7 +147,7 @@ void ReservationStationToALU(){
 			Integer_ALU_Unit->OPCODE=line->OPCODE;
 			Integer_ALU_Unit->operand1=line->Vj;
 			Integer_ALU_Unit->operand2=line->Vk;
-			strcpy(Integer_ALU_Unit->LabelOfSupplier,line->label);
+			Integer_ALU_Unit->numOfRobSupplier = line->robNum;
 			line->inExecution=TRUE;			/*so it's not sent again to ALU*/
 
 			for (j=0;j<TRACE_SIZE;j++){
@@ -237,20 +236,20 @@ void AdvanceIntPipeline(){
 
 		while (line != NULL){
 
-			if (!strcmp(line->Qj,last->LabelOfSupplier)){
+			if (line->Qj == last->numOfRobSupplier){
 				line->Vj = last->result;			/*update waiting value*/
 				memset((void*)line->Qj,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
 				line->NumOfRightOperands++;		/*update number of ready operands*/
 			}
 
-			if (!strcmp(line->Qk,last->LabelOfSupplier)){
+			if (line->Qk == last->numOfRobSupplier){
 				line->Vk=last->result;			/*update waiting value*/
 				memset((void*)line->Qk,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
 				line->NumOfRightOperands++;		/*update number of ready operands*/
 			}
 
 			/*we set reservation station state as done for this instruction*/
-			if ( (!strcmp(last->LabelOfSupplier,line->label)) && (line->inExecution == TRUE) ){
+			if ( (last->numOfRobSupplier == line->robNum) && (line->inExecution == TRUE) ){
 				line->done = TRUE;
 				for (j=0;j<TRACE_SIZE;j++){
 					if (trace[j].issued == line->issued){
@@ -262,14 +261,15 @@ void AdvanceIntPipeline(){
 			line=line->next;
 		}
 
+		//DELETE!!!!!
 		/*update registers*/
 		for (i=0;i<NUM_OF_INT_REGISTERS;i++){
 
-			if ((Integer_Registers[i].busy == TRUE) && (!(strcmp(Integer_Registers[i].label,last->LabelOfSupplier)))){
+			if ((Integer_Registers[i].busy == TRUE) && (Integer_Registers[i].robNum == last->numOfRobSupplier)){
 
 				Integer_Registers[i].value = last->result;			/*update value*/
 				Integer_Registers[i].busy = FALSE;					/*no more busy*/
-				memset(Integer_Registers[i].label,0,LABEL_SIZE);	/*reset label though it is not necessary*/
+				Integer_Registers[i].robNum = -1;
 			}
 		}
 	}
@@ -296,7 +296,7 @@ BOOL SimulateClockCycle_IntUnit(){
 	ReservationStationToALU();				/*send new instruction for execution*/
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
 
-	if (isINT_RS_FULL) {
+	if (!isINT_RS_FULL && !isRobFull()) {
 		if (InsertToReservationStation())			/*insert new instruction to reservation station*/
 			isInstructionTakenByUnit = TRUE;
 	}
