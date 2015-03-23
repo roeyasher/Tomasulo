@@ -643,12 +643,18 @@ BOOL SimulateClockCycle_LoadUnit(int count,int flag){
 	BufferToMemoryExecution(count);
 	AddTheInstrToExecute();
 
-	if (InsertNewLoadInstr(count)){
-		isInstructionTakenByUnit=TRUE;
+	if (isLD_Buff_FULL()) {
+		if (InsertNewLoadInstr(count)){
+			isInstructionTakenByUnit = TRUE;
+		}
 	}
-	if (InsertNewStoreInstr(count)){
-		isInstructionTakenByUnit = TRUE;
+
+	if (isST_Buff_FULL()) {
+		if (InsertNewStoreInstr(count)){
+			isInstructionTakenByUnit = TRUE;
+		}
 	}
+
 	EvictFromLoadAndStoreBuffer();
 	return isInstructionTakenByUnit;	
 }
@@ -710,10 +716,7 @@ void MemInToMainMemory(char *memory[],char *memin_txt)
 	Instruction *node = NULL;
 	file = FileOpen(memin_txt,"rt");
 	
-	
 
-	
-	
 	//MainMemory[i] = "goni";
 	
 	//while(fread(instruction_line,sizeof(char),8,memin_txt) != EOF)
