@@ -100,7 +100,7 @@ int main(int argc, char* argv[]){
 	/*initialize structure for trace file*/
 	InitializeTrace();
 	/**/
-	strcpy(CdbToResarvation.label, "Init");
+	strcpy(CdbToResarvation.label, "Empty");
 
 	printf("Starting simulator with files <%s> <%s>\n", argv[1], argv[2]);
 

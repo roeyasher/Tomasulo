@@ -20,8 +20,6 @@ IntALU_PipelineStage *CreateNewIPLSNode(){
 	return temp;		/*NULL is returned if failure occured*/
 }
 
-
-
 void InitializeReservationStation(){
 
 	int NumberOFReservationStations = Configuration->int_nr_reservation;		/*how many nodes to create*/
@@ -41,8 +39,6 @@ void InitializeReservationStation(){
 
 	Int_RS_Cnt = 0;
 }
-
-
 
 void InitializeIntegerALU(){
 
@@ -194,7 +190,6 @@ void EvictFromIntReservationStation(){
 		line=line->next;
 	}
 }
-
 
 void AdvanceIntPipeline(){
 

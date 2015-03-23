@@ -568,6 +568,7 @@ void CdbReturnValue(){
 		{
 			load->done=TRUE;
 			for (j=0;j<TRACE_SIZE;j++){
+				//TODO delet Gadi comment a
 				/*if (trace[j].issued == line->issued)*/
 				/*gadi : the first mistake is here its should be the variable*/ 
 				/*load as you can see that we run on it and not the variable name:line*/
