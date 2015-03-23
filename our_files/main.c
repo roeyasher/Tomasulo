@@ -128,83 +128,20 @@ int main(int argc, char* argv[]){
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
 
+		/*simulate till HALT is issued*/
+		if (instr.OPCODE == HALT)
+			break;
 
 		// check if the rob have free line -> check if relevant RS have free line ->  interst to rob and the relevat RS  
 
 		if (!isRobFull()) {
-			switch (instr.OPCODE){
 
-			case LD:
-				if (!isST_Buff_FULL()){
-
-				}
-					break;
-
-			case ST:
-				if (!isLD_Buff_FULL()){
-
-				}
-
-				break;
-
-			case ADD:
-				if (!isADD_Buff_FULL()){
-
-				}
-
-				break;
-
-			case ADDI:
-				if (!isADD_Buff_FULL()){
-
-				}
-
-				break;
-
-			case SUB:
-				if (!isST_Buff_FULL()){
-
-				}
-
-				break;
-
-			case SUBI:
-				if (!isST_Buff_FULL()){
-
-				}
-
-				break;
-
-			case ADDS:
-				if (!isST_Buff_FULL()){
-
-				}
-
-				break;
-
-			case SUBS:
-				if (!isST_Buff_FULL()){
-
-				}
-
-				break;
-
-			case MULTS:
-				if (!isST_Buff_FULL()){
-
-				}
-
-				break;
-
-			default:
-				// Opcode not in ALU unit
-				break;
-			}
+			instr_reservation = SimulateClockCycle_IntUnit();
+			instr_reservation = simulateClockCycle_FpUnit();
+			instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
 		}
 
-		/*simulate till HALT is issued*/
-		if (instr.OPCODE == HALT)
-			break;
+
 
 		/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
 		instr_reservation = SimulateClockCycle_IntUnit();
