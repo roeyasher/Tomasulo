@@ -1,5 +1,5 @@
-#ifndef CDB
-#define CDB
+#ifndef CDBFile
+#define CDBFile
 
 #include "common.h"
 

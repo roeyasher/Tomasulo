@@ -6,7 +6,7 @@
 #include "MemoryUnit.h"
 #include "rob.h"  
 #include "common.h"
-#include "CDB.h"
+#include "CDBFile.h"
 
 
 /*add global variables*/
