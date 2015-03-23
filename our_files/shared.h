@@ -6,6 +6,7 @@
 #include "MemoryUnit.h"
 #include "rob.h"  
 #include "common.h"
+#include "CDB.h"
 
 
 /*add global variables*/
@@ -76,9 +77,11 @@ extern Trace trace[TRACE_SIZE];
 extern float PhysicalMemoryArray[];
 
 
+/*For CDB*/
 
-
-
+extern IntCDB IntUnitCDB;
+extern FPCDB FPUnitCDB;
+extern LoadCDB LoadUnitCDB;
 
 
 
