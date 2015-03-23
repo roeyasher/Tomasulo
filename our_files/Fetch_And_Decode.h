@@ -17,38 +17,17 @@ struct Instruction {
 };
 
 int CharToInteger (char schar);
-
-
-
-void CheckTheConditionAndReturnPc();
-
-Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head);
-
-void FillTheFields(Instruction *instr_queue);
-
-Instruction *DeleteTheInstrcutionsDistributor();
-
 int DecodeAndDistributor(Instruction *instruction_queue_head);
-
-BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter, int PC);
-
-BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter);
-
-void simulateclockFetchAndDecode();
-
+void CheckTheConditionAndReturnPc();
 void EmptyInsturcionQueue(int *counter);
-
 void freeInsturcionQueue();
-
-
-
-VOID * GetInstructionFromQUeue(Instruction *result_instruction);
-
-
-
+void * GetInstructionFromQUeue(Instruction *result_instruction);
 void IntilaizeInstructionQueue();
-
-
+void FillTheFields(Instruction *instr_queue);
+BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter, int PC);
+BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter);
+Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head);
+Instruction *DeleteTheInstrcutionsDistributor();
 #endif
 
 

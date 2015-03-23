@@ -279,7 +279,7 @@ BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_q
 	return FALSE;
 }
 
-VOID * GetInstructionFromQUeue(Instruction *result_instruction)
+void * GetInstructionFromQUeue(Instruction *result_instruction)
 {
 	
 	Instruction *hold_head = instruction_queue_head;
@@ -304,12 +304,7 @@ VOID * GetInstructionFromQUeue(Instruction *result_instruction)
 	strcpy(node->next->name, "00000000");
 	return;
 }
-void simulateclockFetchAndDecode()
 
-{
-	/*A simluate clock cycle for fetch and decode unit*/
-	DecodeAndDistributor(instruction_queue_head);
-}
 
 void EmptyInsturcionQueue(int *counter)
 

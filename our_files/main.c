@@ -122,7 +122,8 @@ int main(int argc, char* argv[]){
 		}
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
-		simulateclockFetchAndDecode();
+		/*A simluate clock cycle for fetch and decode unit*/
+		DecodeAndDistributor(instruction_queue_head);
 
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
