@@ -338,65 +338,10 @@ void FP_AdvanceFpPipeline_ADD(){
 		/*update reservation stations. first ADD*/
 
 		line=FpReservationStation_ADD;
-
-		while (line != NULL){
-
-			/*update ADD reservation station*/
-			if (!strcmp(line->Qj,last->LabelOfSupplier)){
-				line->Vj=last->result;
-				memset((void*)line->Qj,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			if (!strcmp(line->Qk,last->LabelOfSupplier)){
-				line->Vk=last->result;
-				memset((void*)line->Qk,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			/*update instruction in reservation station as done*/
-			if (!strcmp(last->LabelOfSupplier,line->label)){
-				line->done=TRUE;
-					for (j=0;j<TRACE_SIZE;j++){
-				if (trace[j].issued == line->issued)
-					break;
-			}
-				trace[j].CDB=cycle-1;
-			}
-			line=line->next;
-		}
-		/*update MUL reservation station*/
-		line=FpReservationStation_MUL;
-		while (line != NULL){
-
-			/*update ADD reservation station*/
-			if (!strcmp(line->Qj,last->LabelOfSupplier)){
-				line->Vj=last->result;
-				memset((void*)line->Qj,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			if (!strcmp(line->Qk,last->LabelOfSupplier)){
-				line->Vk=last->result;
-				memset((void*)line->Qk,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-			/*impossible for instruction to come from MUL as it's in ADD piepline*/		
-			line=line->next;
-		}
-
-			/*update store buffers*/
-			storeLine=StoreBufferResarvation;
-
-		while (storeLine != NULL){
-
-				if (!strcmp(storeLine->Qj,last->LabelOfSupplier)){
-					storeLine->vj=last->result;
-					memset((void*)storeLine->Qj,0,LABEL_SIZE);
-					storeLine->NumOfRightOperands++;
-				}
-				storeLine=storeLine->next;
-		}
+		// Preapre Values for CDB struct
+		temp_fp.numOfRobSupplier = last->numOfSupplier;
+		temp_fp.result = last->result;
+		
 
 	}
 	/*advance ADD pipeline one stage forward*/
@@ -447,71 +392,14 @@ void FP_AdvanceFpPipeline_MUL(){
 		/*update reservation stations. first ADD then MUL*/
 
 		line=FpReservationStation_ADD;
-		while (line != NULL){
 
-			if (!strcmp(line->Qj,last->LabelOfSupplier)){
-				line->Vj=last->result;
-				memset((void*)line->Qj,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
+		// Preapre Values for CDB struct
+		temp_fp.numOfRobSupplier = last->numOfSupplier;
+		temp_fp.result = last->result;
 
-			if (!strcmp(line->Qk,last->LabelOfSupplier)){
-				line->Vk=last->result;
-				memset((void*)line->Qk,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-			/*impossible for instruction to come from ADD reservation station as it's in MUL pipeline*/			
-			line=line->next;
-		}
-
-		/*update MUL reservation station*/
-		line=FpReservationStation_MUL;
-		while (line != NULL ){
-
-			if (!strcmp(line->Qj,last->LabelOfSupplier)){
-				line->Vj=last->result;
-				memset((void*)line->Qj,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			if (!strcmp(line->Qk,last->LabelOfSupplier)){
-				line->Vk=last->result;
-				memset((void*)line->Qk,0,LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			/*update instruction in reservation station as done*/
-			if (!strcmp(last->LabelOfSupplier,line->label)){
-				line->done=TRUE;
-				for (j=0;j<TRACE_SIZE;j++){
-					if (trace[j].issued == line->issued)
-						break;
-					}
-					trace[j].CDB=cycle-1;
-				}	
-			line=line->next;
-			}
-
-			/*update store buffers*/
-			storeLine=StoreBufferResarvation;
-			for (i=0;i<Configuration->mem_nr_store_buffers;i++){
-				if (!strcmp(storeLine->Qj,last->LabelOfSupplier)){
-					storeLine->vj=last->result;
-					memset((void*)storeLine->Qj,0,LABEL_SIZE);
-					storeLine->NumOfRightOperands++;
-				}
-				storeLine=storeLine->next;
-			}
-
-			//DELETE!!!!!
-			/*update registers*/
-			for (i=0;i<NUM_OF_FP_REGISTERS;i++){
-				if ((FP_Registers[i].busy==TRUE) && (!(strcmp(FP_Registers[i].label,last->LabelOfSupplier)))){
-					FP_Registers[i].value=last->result;
-					FP_Registers[i].busy=FALSE;
-					memset(FP_Registers[i].label,0,LABEL_SIZE);
-				}
-			}
+			
+				
+			
 	}
 
 		/*Now advance MUL pipeline as well*/
@@ -543,7 +431,8 @@ BOOL simulateClockCycle_FpUnit(){
 	FP_ReservationStationToExecution();
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
-	
+	// TODO One Cycle more
+	CDBControlFP(&temp_fp);
 	FP_EvictFromReservationStation();
 
 	if (!isFP_RS_ADD_FULL && !isRobFull()){
@@ -560,6 +449,127 @@ BOOL simulateClockCycle_FpUnit(){
 }
 
 
+/*
+
+while (line != NULL){
+
+if (!strcmp(line->Qj,last->LabelOfSupplier)){
+line->Vj=last->result;
+memset((void*)line->Qj,0,LABEL_SIZE);
+line->NumOfRightOperands++;
+}
+
+if (!strcmp(line->Qk,last->LabelOfSupplier)){
+line->Vk=last->result;
+memset((void*)line->Qk,0,LABEL_SIZE);
+line->NumOfRightOperands++;
+}
+//impossible for instruction to come from ADD reservation station as it's in MUL pipeline
+line = line->next;
+		}
+
+		//update MUL reservation station
+		line = FpReservationStation_MUL;
+		while (line != NULL){
+
+			if (!strcmp(line->Qj, last->LabelOfSupplier)){
+				line->Vj = last->result;
+				memset((void*)line->Qj, 0, LABEL_SIZE);
+				line->NumOfRightOperands++;
+			}
+
+			if (!strcmp(line->Qk, last->LabelOfSupplier)){
+				line->Vk = last->result;
+				memset((void*)line->Qk, 0, LABEL_SIZE);
+				line->NumOfRightOperands++;
+			}
+
+			//update instruction in reservation station as done
+			if (!strcmp(last->LabelOfSupplier, line->label)){
+				line->done = TRUE;
+				for (j = 0; j<TRACE_SIZE; j++){
+					if (trace[j].issued == line->issued)
+						break;
+				}
+				trace[j].CDB = cycle - 1;
+			}
+			line = line->next;
+		}
+
+		//update store buffers
+		storeLine = StoreBufferResarvation;
+		for (i = 0; i<Configuration->mem_nr_store_buffers; i++){
+			if (!strcmp(storeLine->Qj, last->LabelOfSupplier)){
+				storeLine->vj = last->result;
+				memset((void*)storeLine->Qj, 0, LABEL_SIZE);
+				storeLine->NumOfRightOperands++;
+			}
+			storeLine = storeLine->next;
+		}
+
+*/
 
 
+/*
 
+//ADD
+
+while (line != NULL){
+
+//update ADD reservation station
+if (!strcmp(line->Qj, last->LabelOfSupplier)){
+	line->Vj = last->result;
+	memset((void*)line->Qj, 0, LABEL_SIZE);
+	line->NumOfRightOperands++;
+}
+
+if (!strcmp(line->Qk, last->LabelOfSupplier)){
+	line->Vk = last->result;
+	memset((void*)line->Qk, 0, LABEL_SIZE);
+	line->NumOfRightOperands++;
+}
+
+//update instruction in reservation station as done
+if (!strcmp(last->LabelOfSupplier, line->label)){
+	line->done = TRUE;
+	for (j = 0; j<TRACE_SIZE; j++){
+		if (trace[j].issued == line->issued)
+			break;
+	}
+	trace[j].CDB = cycle - 1;
+}
+line = line->next;
+		}
+		//update MUL reservation station
+		line = FpReservationStation_MUL;
+		while (line != NULL){
+
+			//update ADD reservation station
+			if (!strcmp(line->Qj, last->LabelOfSupplier)){
+				line->Vj = last->result;
+				memset((void*)line->Qj, 0, LABEL_SIZE);
+				line->NumOfRightOperands++;
+			}
+
+			if (!strcmp(line->Qk, last->LabelOfSupplier)){
+				line->Vk = last->result;
+				memset((void*)line->Qk, 0, LABEL_SIZE);
+				line->NumOfRightOperands++;
+			}
+			//impossible for instruction to come from MUL as it's in ADD piepline
+			line = line->next;
+		}
+
+		//update store buffers
+		storeLine = StoreBufferResarvation;
+
+		while (storeLine != NULL){
+
+			if (!strcmp(storeLine->Qj, last->LabelOfSupplier)){
+				storeLine->vj = last->result;
+				memset((void*)storeLine->Qj, 0, LABEL_SIZE);
+				storeLine->NumOfRightOperands++;
+			}
+			storeLine = storeLine->next;
+		}
+*/
