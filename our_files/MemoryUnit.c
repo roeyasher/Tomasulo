@@ -23,7 +23,6 @@ LoadBuffer *CreateLBNewNode(){
 	memset(temp, 0, sizeof(LoadBuffer));
 	temp->next = NULL;
 	return temp;		/*NULL is returned if failure occured*/
-
 }
 
 StoreBuffer *CreateNewSBNode(){
@@ -34,7 +33,6 @@ StoreBuffer *CreateNewSBNode(){
 	memset(temp, 0, sizeof(StoreBuffer));
 	temp->next = NULL;
 	return temp;		/*NULL is returned if failure occured*/
-
 }
 
 Memory_PiplineStage *CreateNewMPLNode(){
@@ -108,10 +106,6 @@ BOOL InsertNewLoadInstr(int count){
 	int i=0;
 	int address=0;
 
-	/*fine available place in the resarvation station for load */
-	if (instr.OPCODE != LD)
-		return FALSE;
-
 	while(iter != NULL){
 
 		/*if not busy , assign the current place as available*/
@@ -135,6 +129,7 @@ BOOL InsertNewLoadInstr(int count){
 	else
 		return FALSE;
 
+	// TODO move to int unit
 	/*if it is possible - calculating the address*/
 	if(Integer_Registers[instr.SRC0].busy == FALSE){
 		address = Integer_Registers[instr.SRC0].value;
@@ -285,7 +280,7 @@ StoreBuffer *FindTheStoreMinumum(int count)
 	return minstore;
 }
 
-BOOL IsNotTheSameAddress(int address, char Label[],int count){
+BOOL IsNotTheSameAddress(int address, int robNum,int count){
 
 	/*the function is checking if the instr we want to execute is in the right order and can be execute*/
 	StoreBuffer *store = StoreBufferResarvation;
@@ -293,7 +288,7 @@ BOOL IsNotTheSameAddress(int address, char Label[],int count){
 	int i=0;
 	for(i=0;i<length;i++)
 	{
-		if((address == store->address)&&(strcmp(Label,store->Label)!=0)&&(count > store->count)&&(store->inexecution==FALSE)&&(store->busy==TRUE)){
+		if ((address == store->address) && (store->robNum == robNum) && (count > store->count) && (store->inexecution == FALSE) && (store->busy == TRUE)){
 			return FALSE;
 		}
 		store=store->next;
@@ -315,7 +310,7 @@ void AddTheInstrToExecute()
 		/*insert the right instruction*/
 		head->OPCODE=BufferToMemory.OPCODE;
 		head->address=BufferToMemory.address;
-		strcpy(head->labelofsupplier,BufferToMemory.labelofsupplier);
+		head->numOfRobSupplier = BufferToMemory.numOfRobSupplier;
 		head->Data_load=BufferToMemory.Data_load;
 		head->Data_store=BufferToMemory.Data_store;
 	}
@@ -361,7 +356,7 @@ BOOL BufferToMemoryExecution(int counter){
 			minload->inexecution=TRUE;
 			BufferToMemory.OPCODE = minload->OPCODE;
 			BufferToMemory.address = minload->address;
-			strcpy(BufferToMemory.labelofsupplier,minload->Label);
+			BufferToMemory.numOfRobSupplier = minload->robNum;
 			for (j=0;j<TRACE_SIZE;j++){
 				if (trace[j].issued == minload->issued)
 					break;
@@ -376,13 +371,13 @@ BOOL BufferToMemoryExecution(int counter){
 		{
 			if(minstore->NumOfRightOperands ==1)
 			{
-				if(IsNotTheSameAddress(minstore->address,minstore->Label,minstore->count)== TRUE)
+				if(IsNotTheSameAddress(minstore->address,minstore->NumOfRightOperands,minstore->count)== TRUE)
 				{
 					minstore->inexecution=TRUE;
 					BufferToMemory.OPCODE = minstore->OPCODE;
 					BufferToMemory.address = minstore->address;
-					strcpy(BufferToMemory.labelofsupplier,minstore->Label);
-					BufferToMemory.Data_store=minstore->vj;
+					BufferToMemory.numOfRobSupplier = minstore->robNum;
+					BufferToMemory.Data_store=minstore->Vj;
 					for (j=0;j<TRACE_SIZE;j++){
 						if (trace[j].issued == minstore->issued)
 							break;
@@ -401,7 +396,7 @@ BOOL BufferToMemoryExecution(int counter){
 				minload->inexecution=TRUE;
 				BufferToMemory.OPCODE = minload->OPCODE;
 				BufferToMemory.address = minload->address;
-				strcpy(BufferToMemory.labelofsupplier,minload->Label);
+				BufferToMemory.numOfRobSupplier = minload->robNum;
 				for (j=0;j<TRACE_SIZE;j++){
 					if (trace[j].issued == load->issued)
 						break;
@@ -412,12 +407,12 @@ BOOL BufferToMemoryExecution(int counter){
 			}
 			else{
 				if(minstore->NumOfRightOperands ==1){
-					if(IsNotTheSameAddress(minstore->address,minstore->Label,minstore->count)==TRUE){
+					if(IsNotTheSameAddress(minstore->address,minstore->robNum,minstore->count)==TRUE){
 						minstore->inexecution=TRUE;
 						BufferToMemory.OPCODE= minstore->OPCODE;
 						BufferToMemory.address= minstore->address;
-						strcpy(BufferToMemory.labelofsupplier,minstore->Label);
-						BufferToMemory.Data_store=minstore->vj;	
+						BufferToMemory.numOfRobSupplier = minstore->robNum;
+						BufferToMemory.Data_store=minstore->Vj;	
 						for (j=0;j<TRACE_SIZE;j++){
 							if (trace[j].issued == minstore->issued)
 								break;
@@ -429,11 +424,11 @@ BOOL BufferToMemoryExecution(int counter){
 				}
 				minstore->checkforexecute=1;
 			}
-			if(IsNotTheSameAddress(minload->address,minload->Label,minload->count)==TRUE){
+			if(IsNotTheSameAddress(minload->address,minload->robNum,minload->count)==TRUE){
 				minload->inexecution=TRUE;
 				BufferToMemory.OPCODE = minload->OPCODE;
 				BufferToMemory.address = minload->address;
-				strcpy(BufferToMemory.labelofsupplier,minload->Label);
+				BufferToMemory.numOfRobSupplier = minload->robNum;
 				for (j=0;j<TRACE_SIZE;j++){
 					if (trace[j].issued == minload->issued)
 						break;
@@ -486,16 +481,17 @@ void ExecuteMemoryAndWriteToCdb()
 		break;
 	}
 
-	if(execute->OPCODE == LD){
-		strcpy(CdbToResarvation.label,execute->labelofsupplier);
-		CdbToResarvation.value = execute->Data_load;
-	}
-	else if(execute->OPCODE == ST){
-		strcpy(CdbToResarvation.label,execute->labelofsupplier);
-	}
-	else{
-		strcpy(CdbToResarvation.label,"Empty");
-	}
+	// TODO Add CdB code
+	//if(execute->OPCODE == LD){
+	//	strcpy(CdbToResarvation.label,execute->labelofsupplier);
+	//	CdbToResarvation.value = execute->Data_load;
+	//}
+	//else if(execute->OPCODE == ST){
+	//	strcpy(CdbToResarvation.label,execute->labelofsupplier);
+	//}
+	//else{
+	//	strcpy(CdbToResarvation.label,"Empty");
+	//}
 
 	memset(execute,0,sizeof(Memory_PiplineStage)); //TODO check if WORK!
 	execute->next = Memory_Unit;
@@ -549,37 +545,38 @@ void CdbReturnValue(){
 		line=line->next;
 	}
 
-	for(i=0;i<NUM_OF_FP_REGISTERS;i++){
-		if((FP_Registers[i].busy == TRUE)&&(strcmp(FP_Registers[i].label,CdbToResarvation.label)==0)){
-			FP_Registers[i].value = CdbToResarvation.value;
-			FP_Registers[i].busy = FALSE;
-			memset(FP_Registers[i].label,0,LABEL_SIZE);
-		}
-	}
+	// TODO DELET make this in commit
+	//for(i=0;i<NUM_OF_FP_REGISTERS;i++){
+	//	if((FP_Registers[i].busy == TRUE)&&(strcmp(FP_Registers[i].label,CdbToResarvation.label)==0)){
+	//		FP_Registers[i].value = CdbToResarvation.value;
+	//		FP_Registers[i].busy = FALSE;
+	//		memset(FP_Registers[i].label,0,LABEL_SIZE);
+	//	}
+	//}
 
-	for(i=0;i<length_load_buffer;i++){
-		if(strcmp(load->Label,CdbToResarvation.label)==0)
-		{
-			load->done=TRUE;
-			for (j=0;j<TRACE_SIZE;j++){
-				//TODO delet Gadi comment a
-				/*if (trace[j].issued == line->issued)*/
-				/*gadi : the first mistake is here its should be the variable*/ 
-				/*load as you can see that we run on it and not the variable name:line*/
-				if (trace[j].issued == load->issued)
-					break;
-			}
-			trace[j].CDB=cycle-1;
-		}
-		load=load->next;
-	}
+	//for(i=0;i<length_load_buffer;i++){
+	//	if(strcmp(load->Label,CdbToResarvation.label)==0)
+	//	{
+	//		load->done=TRUE;
+	//		for (j=0;j<TRACE_SIZE;j++){
+	//			//TODO delet Gadi comment a
+	//			/*if (trace[j].issued == line->issued)*/
+	//			/*gadi : the first mistake is here its should be the variable*/ 
+	//			/*load as you can see that we run on it and not the variable name:line*/
+	//			if (trace[j].issued == load->issued)
+	//				break;
+	//		}
+	//		trace[j].CDB=cycle-1;
+	//	}
+	//	load=load->next;
+	//}
 
-	for(i=0;i<length_store_buffer;i++){
-		if(strcmp(store->Label,CdbToResarvation.label)==0){	
-			store->done=TRUE;
-		}
-		store=store->next;
-	}
+	//for(i=0;i<length_store_buffer;i++){
+	//	if(strcmp(store->Label,CdbToResarvation.label)==0){	
+	//		store->done=TRUE;
+	//	}
+	//	store=store->next;
+	//}
 }
 
 void EvictFromLoadAndStoreBuffer(){
