@@ -119,12 +119,12 @@ int main(int argc, char* argv[]){
 		if((no_more_instruction = Decode())) { break; };
 		instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
 
-		// insert to the relevant RS 
-		instr_reservation = InsertToRS();
-
 		// update the system from the CDB
 		CDBUpdateRob();
 		CDBUpdateRS();
+
+		// insert to the relevant RS 
+		instr_reservation = InsertToRS();
 
 
 		//***************************************************************************
@@ -154,7 +154,6 @@ int main(int argc, char* argv[]){
 		//1. Commit
 		//***************************************************************************
 
-		//TODO add relevant function
 		commitRob();
 
 		//***************************************************************************
