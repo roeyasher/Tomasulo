@@ -30,6 +30,9 @@ void CDBControlInt(IntCDB *int_to_cdb);
 void CDBControlFPADD(FPCDB *fp_to_cdb);
 void CDBControlFPMULL(FPCDB *fp_to_cdb);
 void CDBControlLoad(LoadCDB *load_to_cdb);
+void CDBUpdateRob();
+void CDBUpdateRS();
+
 
 #endif
 
