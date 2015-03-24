@@ -1,7 +1,8 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-
+/*MainMemory*/
+char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 
 /*Defining global variables*/
 
@@ -72,7 +73,7 @@ int main(int argc, char* argv[]){
 
 	//FILE *memin_txt=fopen(argv[2],"rt");
 	//FILE *memin_txt = FileOpen(argv[2], "rt");
-	char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
+	
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
 	BOOL reservation_stations_has_space = TRUE;
