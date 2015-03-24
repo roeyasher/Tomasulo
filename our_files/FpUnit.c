@@ -28,26 +28,22 @@ void Initialize_FpReservationStations(){
 	int i=0;
 	FpReservationStation_Line *node=NULL;
 	FpReservationStation_ADD=CreateNewFPRSNode();
-	sprintf(FpReservationStation_ADD->label,"FPADD%d",i+1);
 	node = FpReservationStation_ADD;
 
 	for (i=1;i<lengthAdd;i++){
 		node->next = CreateNewFPRSNode();
 		node = node->next;
-		sprintf(node->label,"FPADD%d",i+1);
 	}
 	FP_RS_ADD_Cnt = 0;
 
 	/*Create Reservation station for MUL unit*/
 	i=0;
 	FpReservationStation_MUL=CreateNewFPRSNode();
-	sprintf(FpReservationStation_MUL->label,"FPMUL%d",i+1);
 	node = FpReservationStation_MUL;
 
 	for (i=1;i<lengthMUL;i++){
 		node->next = CreateNewFPRSNode();
 		node = node->next;
-		sprintf(node->label,"FPMUL%d",i+1);
 	}
 	FP_RS_MULL_Cnt = 0;
 }
@@ -95,8 +91,9 @@ void FP_EvictFromReservationStation(){
 			line->done=FALSE;
 			line->inExecution=FALSE;
 			line->NumOfRightOperands=0;
-			memset(line->Qj,0,LABEL_SIZE);
-			memset(line->Qk,0,LABEL_SIZE);
+			line->robNum = 0;
+			line->Qj = 0;
+			line->Qk = 0;
 			FP_RS_ADD_Cnt--;
 		}
 		line=line->next;
@@ -112,8 +109,9 @@ void FP_EvictFromReservationStation(){
 			line->done=FALSE;
 			line->inExecution=FALSE;
 			line->NumOfRightOperands=0;
-			memset(line->Qj,0,LABEL_SIZE);
-			memset(line->Qk,0,LABEL_SIZE);
+			line->robNum = 0;
+			line->Qj = 0;
+			line->Qk = 0;
 			FP_RS_MULL_Cnt--;
 		}
 		line=line->next;
@@ -133,11 +131,11 @@ void FP_ReservationStationToExecution(){
 	while (line != NULL){
 
 		if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
-			FP_executionPipeline_ADD->busy=TRUE;
-			FP_executionPipeline_ADD->OPCODE=line->OPCODE;
-			FP_executionPipeline_ADD->operand1=line->Vj;
-			FP_executionPipeline_ADD->operand2=line->Vk;
-			strcpy(FP_executionPipeline_ADD->LabelOfSupplier,line->label);
+			FP_executionPipeline_ADD->busy = TRUE;
+			FP_executionPipeline_ADD->OPCODE = line->OPCODE;
+			FP_executionPipeline_ADD->operand1 = line->Vj;
+			FP_executionPipeline_ADD->operand2 = line->Vk;
+			FP_executionPipeline_ADD->numOfSupplier = line->robNum;
 			line->inExecution=TRUE;
 
 			for (j=0;j<TRACE_SIZE;j++){
@@ -159,7 +157,7 @@ void FP_ReservationStationToExecution(){
 				FP_executionPipeline_MUL->OPCODE=line->OPCODE;
 				FP_executionPipeline_MUL->operand1=line->Vj;
 				FP_executionPipeline_MUL->operand2=line->Vk;
-				strcpy(FP_executionPipeline_MUL->LabelOfSupplier,line->label);
+				FP_executionPipeline_MUL->numOfSupplier = line->robNum;
 				line->inExecution=TRUE;
 
 				for (j=0;j<TRACE_SIZE;j++){
@@ -205,7 +203,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 		available->NumOfRightOperands++;			/*operand j is ready*/
 	}
 	else{
-		strcpy(available->Qj,FP_Registers[instr.SRC0].label);	/*copy label of supplier if register is busy*/
+		available->Qj = FP_Registers[instr.SRC0].robNum;	/*copy label of supplier if register is busy*/
 	}
 
 	/*operand k. in FP ops there are no immediate*/
@@ -214,14 +212,14 @@ BOOL FP_InsertToReservationStations_ADD(){
 		available->NumOfRightOperands++;			/*operand j is ready*/
 	}
 	else{
-		strcpy(available->Qk,FP_Registers[instr.SRC1].label);	/*copy label of supplier if register is busy*/
+		available->Qk = FP_Registers[instr.SRC1].robNum;/*copy label of supplier if register is busy*/
 	}
 
 	/*update destination register*/
 	FP_Registers[instr.DST].busy=TRUE;
-	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
-	strcpy(FP_Registers[instr.DST].label,available->label);
+	FP_Registers[instr.DST].robNum = instr.numRob;;
 
+	available->robNum = instr.numRob;
 	available->busy=TRUE;
 	available->done=FALSE;
 	available->inExecution=FALSE;
@@ -269,7 +267,7 @@ BOOL FP_InsertToReservationStations_MUL(){
 		available->NumOfRightOperands++;			/*operand j is ready*/
 	}
 	else{
-		strcpy(available->Qj,FP_Registers[instr.SRC0].label);	/*copy label of supplier if register is busy*/
+		available->Qj = FP_Registers[instr.SRC0].robNum;	/*copy label of supplier if register is busy*/
 	}
 
 	/*operand k. in FP ops there are no immediate*/
@@ -278,14 +276,14 @@ BOOL FP_InsertToReservationStations_MUL(){
 		available->NumOfRightOperands++;			/*operand j is ready*/
 	}
 	else{
-		strcpy(available->Qk,FP_Registers[instr.SRC1].label);	/*copy label of supplier if register is busy*/
+		available->Qk = FP_Registers[instr.SRC1].robNum; /*copy label of supplier if register is busy*/
 	}
 
 	/*update destination register*/
 	FP_Registers[instr.DST].busy=TRUE;
-	memset(FP_Registers[instr.DST].label,0,LABEL_SIZE);
-	strcpy(FP_Registers[instr.DST].label,available->label);
+	FP_Registers[instr.DST].robNum = instr.numRob;;
 
+	available->robNum = instr.numRob;
 	available->busy=TRUE;
 	available->done=FALSE;
 	available->inExecution=FALSE;
@@ -400,14 +398,6 @@ void FP_AdvanceFpPipeline_ADD(){
 				storeLine=storeLine->next;
 		}
 
-		/*update registers*/
-		for (i=0;i<NUM_OF_FP_REGISTERS;i++){
-			if ((FP_Registers[i].busy==TRUE) && (!(strcmp(FP_Registers[i].label,last->LabelOfSupplier)))){
-				FP_Registers[i].value=last->result;
-				FP_Registers[i].busy=FALSE;
-				memset(FP_Registers[i].label,0,LABEL_SIZE);
-			}
-		}
 	}
 	/*advance ADD pipeline one stage forward*/
 	memset(last,0,sizeof(FP_PipelineStage)); //TODO check if WORK!
