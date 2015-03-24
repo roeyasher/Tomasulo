@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
 	IntilaizeStoreBuffer();
 	IntializeMemPipline();
 	//TODO enable me
-	//InitializeMemory(memin_txt);
+	IntilaizeMemoryArray();
 	MemInToMainMemory(adressMainMemory, argv[2]);
 
 	/*INT reservation stations and execution units*/

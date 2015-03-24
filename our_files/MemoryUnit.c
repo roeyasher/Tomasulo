@@ -8,9 +8,11 @@ Memory_Pipline BufferToMemory;
 void IntilaizeMemoryArray()
 
 {
-	int i=0;
+	
+	int i=0,j=0;
 	for(i=0;i<MEMORY_SIZE;i++)
-		PhysicalMemoryArray[i]=0;
+		for (j = 0; j<BUFFER_SIZE; j++)
+			MainMemoryArray[i][j] = '0';
 }
 
 LoadBuffer *CreateLBNewNode(){

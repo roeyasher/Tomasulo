@@ -8,6 +8,8 @@
 #include "common.h"
 #include "CDBFile.h"
 
+/*Memory*/
+extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 
 /*add global variables*/
 
