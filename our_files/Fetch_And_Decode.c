@@ -216,7 +216,7 @@ BOOL Decode()
 	if ((my_instruction->OPCODE > -1) && (my_instruction->OPCODE < 2)) { InsType = Memory_INS; }
 	if ((my_instruction->OPCODE > 4) && (my_instruction->OPCODE < 9)) { InsType = INT_INS; }
 	if ((my_instruction->OPCODE > 8) && (my_instruction->OPCODE < 12)) { InsType = INT_INS; }
-	InsertToReservationStation();
+	InsertToReservationStation();// TODO enough for all RS????
 	return FALSE;
 
 }
