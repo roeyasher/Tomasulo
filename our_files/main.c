@@ -69,53 +69,57 @@ void InitializeTrace();
 int detectEnd();
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(int argc, char* argv[]){
 
-	//FILE *memin_txt=fopen(argv[2],"rt");
-	//FILE *memin_txt = FileOpen(argv[2], "rt");
-	
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
-	BOOL reservation_stations_has_space = TRUE;
-	BOOL rob_has_space = TRUE;
-	BOOL no_more_instruction = FALSE;
+	BOOL reservation_stations_has_space = TRUE,rob_has_space = TRUE,no_more_instruction = FALSE;
 	instr.OPCODE = -1;
 
-
-
-
-	/*intialize all*/
-
-	/*configuration file*/
+	//intialize all
 	InitializeConfiguration(argv[1]);
-
 	InitBuffers();
 	MemInToMainMemory(adressMainMemory, argv[2]);
-
 	InitFus();
 	strcpy(CdbToResarvation.label, "Empty");
 
-	printf("Starting simulator with files <%s> <%s>\n", argv[1], argv[2]);
+	//***************************************************************************TODO-delete
+	//General Order:
+	//***************************************************************************
+	//1. Issue
+	// Instruction to main memory
+	// Updae from CDB to RS's
+	// RS
+	//2. Execution
+	// Run Fus
+	//3. CDB
+	//4. Commit
+	//***************************************************************************
+	//***************************************************************************
 
-	/*this loop simulate one cycle by calling the simulateclockcycle function of each unit*/
-
+	// Cycle Simulation
 	while (TRUE)
 	{
-		//***************************************************************************
-		//General Order:
+		
 		//***************************************************************************
 		//1. Issue
-			// Instruction to main memory
-			// Updae from CDB to RS's
-			// RS
-		//2. Execution
-			// Run Fus
-		//3. CDB
-		//4. Commit
 		//***************************************************************************
-
 		// Bring instruction from the main memory to the instruction queue
-		//TODO We should add flags for: the reservation station and the rob whether they are free or not, and also to check the counter I did for the instruction_queue_counter
 		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
 			no_more_instruction = FetchAndDecode(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
