@@ -15,7 +15,7 @@ typedef struct FPCDB FPCDB;
 struct FPCDB{
 
 	int numOfRobSupplier;
-	int result;
+	float result;
 	BOOL valid;
 };
 
