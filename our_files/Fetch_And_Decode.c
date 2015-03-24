@@ -190,12 +190,20 @@ BOOL HaltAndWrongInstruction(){
 	return FALSE;
 }
 
-BOOL Decode(){
+BOOL Decode(int *stop_decode){
 
 	GetInstructionFromQUeue();
+	if (strncmp(instr.name,"00000000",8)==FALSE)
+	{
+		*stop_decode == TRUE; // don't decode more
+	}
 	// TODO Updae RS from CDB with the last execution if CDB is VALID.
 
-	if (TRUE == HaltAndWrongInstruction()) { return TRUE; }
+	if (TRUE == HaltAndWrongInstruction()) 
+	{ 
+		*stop_decode == TRUE; // don't decode more
+		return FALSE; // don't bring more instruction
+	}
 	//branch? we haveto hold branch buffer (Roey)
 	//TODO flush instruction queue
 	
@@ -209,7 +217,7 @@ BOOL Decode(){
 	if ((instr.OPCODE > 8) && (instr.OPCODE < 11)) { InsType = FP_ADD_INS; }
 	if (instr.OPCODE == 11) { InsType = FP_MULL_INS; }
 
-	return FALSE;
+	return TRUE;
 }
 
 BOOL InsertToRS(){
@@ -252,12 +260,17 @@ BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int p
 	/* Fethch new instruction from memory to queue*/
 	int opcode, dst, src0, src1;
 	int imm;
+	
 	Instruction *node = NULL;
+	char *next_instruction = NULL; 
 	node = instruction_queue_head;
+	
+	char check_string[] = "99999999";
+	next_instruction = (instruction_line + 512);
 	// check whether we have more instruction in main memory
 	if (strcmp(instruction_line,"00000000")==0)
 	{
-		return TRUE;
+		return FALSE;
 	}
 	//find place in instruction queue	
 	while ((strcmp(node->name, "00000000")!=0 ) && (NULL != node))
@@ -286,7 +299,12 @@ BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int p
 					node->IMM = imm;
 				}
 			}
-			return FALSE;
+			// if next instruction iz zero stop bring instructions.
+			if ((strcmp("00000000", next_instruction)) == 0)
+			{
+				return FALSE;
+			}
+			return TRUE;
 		}
 
 BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
@@ -299,11 +317,11 @@ BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_coun
 	place_in_array = ((*pc_conter_to_fetch)*(512 / 4));
 	node = instruction_queue_head;
 	is_it_end_of_instruction_in_memory = LinkInstQueue((memory + place_in_array), instruction_queue_counter, *pc_conter_to_fetch);
-	if (TRUE == is_it_end_of_instruction_in_memory)
+	if (FALSE == is_it_end_of_instruction_in_memory)
 	{
-		return TRUE;
+		return FALSE;
 	}
-	return FALSE;
+	return TRUE;
 }
 
 void * GetInstructionFromQUeue()

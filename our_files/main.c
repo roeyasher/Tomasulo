@@ -77,7 +77,7 @@ int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
-	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, no_more_instruction = FALSE;
+	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, more_instruction = TRUE,decode_value=TRUE,stop_decode=FALSE;
 	instr.OPCODE = -1;
 
 
@@ -110,13 +110,16 @@ int main(int argc, char* argv[]){
 		//***************************************************************************
 
 		// Fetch - Instructions from the main memory ----> to the instruction queue
-		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16)){
-			no_more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
+		while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
+			more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
 			pc_counter_instruction++;
 		}
 
-		// Decode and chechk Whether is it the end of the code
-		if((no_more_instruction = Decode())) { break; };
+		// Decode and check Whether is it the end of the code
+		if (FALSE == stop_decode){
+			decode_value = Decode(&stop_decode);
+		}
+		more_instruction = (((int)more_instruction) &((int)decode_value));
 		instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
 
 		// update the system from the CDB
@@ -137,7 +140,7 @@ int main(int argc, char* argv[]){
 		simulateClockCycle_FpUnit();
 
 		// TODO not sure if we need this condition over here (Roey);
-		if (TRUE == no_more_instruction) { break; }
+		if (FALSE == more_instruction) { break; }
 
 		//***************************************************************************
 		//1. CDB
@@ -194,7 +197,7 @@ int main(int argc, char* argv[]){
 
 	/*while(detectEnd()){*/
 
-	while (!detectEnd()){
+	while (!detectEnd()){ // stuck for ever
 		SimulateClockCycle_IntUnit();
 		simulateClockCycle_FpUnit();
 		SimulateClockCycle_LoadUnit(cycle, 1);
