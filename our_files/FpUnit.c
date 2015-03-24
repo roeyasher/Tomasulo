@@ -191,11 +191,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 	if (available == NULL)
 		return FALSE;
 
-	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
-	if(instr.OPCODE==ADDS || instr.OPCODE==SUBS)
-		available->OPCODE = instr.OPCODE;
-	else
-		return FALSE;
+	available->OPCODE = instr.OPCODE;
 
 	/*operand j*/
 	if (FP_Registers[instr.SRC0].busy == FALSE){
@@ -233,7 +229,7 @@ BOOL FP_InsertToReservationStations_ADD(){
 	return TRUE;
 }
 
-BOOL FP_InsertToReservationStations_MUL(){
+BOOL FP_InsertToReservationStations_MULL(){
 
 
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_MUL;
@@ -256,10 +252,7 @@ BOOL FP_InsertToReservationStations_MUL(){
 		return FALSE;
 
 	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
-	if(instr.OPCODE==MULTS)
-		available->OPCODE = instr.OPCODE;
-	else
-		return FALSE;
+	available->OPCODE = instr.OPCODE;
 
 	/*operand j*/
 	if (FP_Registers[instr.SRC0].busy == FALSE){
@@ -339,8 +332,8 @@ void FP_AdvanceFpPipeline_ADD(){
 
 		line=FpReservationStation_ADD;
 		// Preapre Values for CDB struct
-		temp_fp.numOfRobSupplier = last->numOfSupplier;
-		temp_fp.result = last->result;
+		temp_fp_add.numOfRobSupplier = last->numOfSupplier;
+		temp_fp_add.result = last->result;
 		
 
 	}
@@ -389,17 +382,11 @@ void FP_AdvanceFpPipeline_MUL(){
 
 		/*operate as CDB and update reservation station lines waiting for result and FP register file*/
 
-		/*update reservation stations. first ADD then MUL*/
-
-		line=FpReservationStation_ADD;
 
 		// Preapre Values for CDB struct
-		temp_fp.numOfRobSupplier = last->numOfSupplier;
-		temp_fp.result = last->result;
+		temp_fp_mull.numOfRobSupplier = last->numOfSupplier;
+		temp_fp_mull.result = last->result;
 
-			
-				
-			
 	}
 
 		/*Now advance MUL pipeline as well*/
@@ -419,32 +406,13 @@ BOOL isFP_RS_MULL_FULL(){
 	return (FP_RS_MULL_Cnt == Configuration->mul_nr_reservation);
 }
 
-BOOL UpdateResultInRS(){
+void simulateClockCycle_FpUnit(){
 
-	
-}
-
-BOOL simulateClockCycle_FpUnit(){
-
-	BOOL isInstructionTakenByUnit=FALSE;
-	UpdateResultInRS();
 	FP_ReservationStationToExecution();
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
-	CDBControlFP(&temp_fp);
 	FP_EvictFromReservationStation();
-
-	if (!isFP_RS_ADD_FULL && !isRobFull()){
-		if (FP_InsertToReservationStations_ADD())
-			isInstructionTakenByUnit = TRUE;
-	}
-
-	if (!isFP_RS_MULL_FULL && !isRobFull()){
-		if (FP_InsertToReservationStations_MUL())
-			isInstructionTakenByUnit = TRUE;
-	}
-
-	return isInstructionTakenByUnit;
+	return;
 }
 
 

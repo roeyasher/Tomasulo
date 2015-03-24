@@ -8,7 +8,6 @@ void Initialize_IntRegisters(){
 	for (i = 0; i<NUM_OF_INT_REGISTERS; i++){
 		Integer_Registers[i].value = 0;
 		Integer_Registers[i].busy = FALSE;
-		Integer_Registers[i].robNum = -1;
 	}
 }
 
@@ -19,7 +18,6 @@ void Initialize_FpRegisters(){
 	for (i = 0; i<NUM_OF_FP_REGISTERS; i++){
 		FP_Registers[i].value = (float)i;
 		FP_Registers[i].busy = FALSE;
-		Integer_Registers[i].robNum = -1;
 	}
 }
 

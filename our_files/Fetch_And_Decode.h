@@ -22,7 +22,7 @@ int CharToInteger (char schar);
 void BranchAndUpdatePC();
 void EmptyInsturcionQueue(int *counter);
 void freeInsturcionQueue();
-void * GetInstructionFromQUeue(Instruction *result_instruction);
+void * GetInstructionFromQUeue();
 void IntilaizeInstructionQueue();
 void FillTheFields(Instruction *instr_queue);
 BOOL HaltAndWrongInstruction(Instruction *temp);

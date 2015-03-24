@@ -15,8 +15,7 @@ extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 
 extern Configuration_Data *Configuration;
 
- Instruction instr;
- extern Instruction *my_instruction;
+extern Instruction instr;
 extern BOOL instr_reservation;
 extern int InsType;
 extern BOOL flag;
@@ -82,12 +81,14 @@ extern float PhysicalMemoryArray[];
 /*For CDB*/
 
 extern IntCDB IntUnitCDB;
-extern FPCDB FPUnitCDB;
+extern FPCDB FPUnitCDBADD;
+extern FPCDB FPUnitCDBMULL;
 extern LoadCDB LoadUnitCDB;
 
 extern IntCDB temp_int;
-extern IntCDB temp_fp;
-extern IntCDB temp_load;
+extern FPCDB temp_fp_add;
+extern FPCDB temp_fp_mull;
+extern LoadCDB temp_load;
 
 
 

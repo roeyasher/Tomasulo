@@ -99,7 +99,7 @@ void IntializeMemPipline(){
 	}
 }
 
-BOOL InsertNewLoadInstr(int count){	
+BOOL InsertNewLoadInstr(){	
 
 	LoadBuffer *available = NULL, *iter = LoadBufferResarvation;
 	int length = Configuration->mem_nr_load_buffers;
@@ -143,7 +143,6 @@ BOOL InsertNewLoadInstr(int count){
 	/*indicate that it is ok and the instruction was insert into the relevant reservation station*/
 	available->busy = TRUE;
 	available->inexecution = FALSE;
-	available->count = count;
 	available->checkforexecute=0;
 
 	/*insert the label to the destination register*/
@@ -155,7 +154,7 @@ BOOL InsertNewLoadInstr(int count){
 	
 }
 
-BOOL InsertNewStoreInstr(int count){
+BOOL InsertNewStoreInstr(){
 
 	StoreBuffer *available = NULL , *iter = StoreBufferResarvation;
 	int length = Configuration->mem_nr_store_buffers;
@@ -215,7 +214,6 @@ BOOL InsertNewStoreInstr(int count){
 	available->checkforexecute=0;
 	available->busy = TRUE;
 	available->inexecution = FALSE;
-	available->count = count;
 	available->issued=cycle;
 	trace[cycle].issued=cycle;
 	trace[cycle].valid=TRUE;
@@ -316,7 +314,7 @@ void AddTheInstrToExecute()
 	}
 }
 
-BOOL BufferToMemoryExecution(int counter){
+BOOL BufferToMemoryExecution(){
 
 	/*this is the main function witch responsable on the execute instr*/
 	/*the function try to find a possible instr to execute by using some conditions and if it is ok it do so, else it is insert a nop to execute*/
@@ -343,8 +341,9 @@ BOOL BufferToMemoryExecution(int counter){
 	/* the logic for the pre execute level*/
 	for(i=0;i<(length_load+length_store);i++)
 	{
-		minload = FindTheLoadMinumum(counter);
-		minstore = FindTheStoreMinumum(counter);
+		// TODO the first load or store operation (Roey)
+		//minload = FindTheLoadMinumum(counter);
+		//minstore = FindTheStoreMinumum(counter);
 
 		/*if both NULL there is no reason to still searching return a nop*/
 		if((minload == NULL)&&(minstore == NULL)){
@@ -494,6 +493,7 @@ void ExecuteMemoryAndWriteToCdb()
 	//}
 
 	memset(execute,0,sizeof(Memory_PiplineStage)); //TODO check if WORK!
+	execute->OPCODE = -1;
 	execute->next = Memory_Unit;
 	Memory_Unit = execute;
 	prevExecute->next = NULL;
@@ -544,15 +544,6 @@ void CdbReturnValue(){
 		}
 		line=line->next;
 	}
-
-	// TODO DELET make this in commit
-	//for(i=0;i<NUM_OF_FP_REGISTERS;i++){
-	//	if((FP_Registers[i].busy == TRUE)&&(strcmp(FP_Registers[i].label,CdbToResarvation.label)==0)){
-	//		FP_Registers[i].value = CdbToResarvation.value;
-	//		FP_Registers[i].busy = FALSE;
-	//		memset(FP_Registers[i].label,0,LABEL_SIZE);
-	//	}
-	//}
 
 	//for(i=0;i<length_load_buffer;i++){
 	//	if(strcmp(load->Label,CdbToResarvation.label)==0)
@@ -623,31 +614,17 @@ BOOL isLD_Buff_FULL(){
 	return (LD_Buff_Cnt == Configuration->mem_nr_load_buffers);
 }
 
-BOOL SimulateClockCycle_LoadUnit(int count,int flag){
+void SimulateClockCycle_LoadUnit(){
 
 	/*a simulate clock cycle for the memory unit, the function calls the nessearlly function to run the */
 	/*the memory unit properally*/
-	BOOL isInstructionTakenByUnit=FALSE;
 
-	CdbReturnValue();
+	//CdbReturnValue();
 	ExecuteMemoryAndWriteToCdb();
-	BufferToMemoryExecution(count);
+	BufferToMemoryExecution();
 	AddTheInstrToExecute();
-
-	if (!isLD_Buff_FULL() && !isRobFull()) {
-		if (InsertNewLoadInstr(count)){
-			isInstructionTakenByUnit = TRUE;
-		}
-	}
-
-	if (!isST_Buff_FULL() && !isRobFull()) {
-		if (InsertNewStoreInstr(count)){
-			isInstructionTakenByUnit = TRUE;
-		}
-	}
-
 	EvictFromLoadAndStoreBuffer();
-	return isInstructionTakenByUnit;	
+	return;
 }
 
 void readLine(FILE *file, char *my_string) {

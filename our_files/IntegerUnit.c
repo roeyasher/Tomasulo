@@ -56,7 +56,7 @@ void InitializeIntegerALU(){
 
 }
 
-BOOL InsertToReservationStation(){
+BOOL Int_InsertToReservationStation(){
 
 	IntReservationStation_Line *available = NULL, *iter = IntReservationStation;
 	int length=Configuration->int_nr_reservation;
@@ -77,11 +77,7 @@ BOOL InsertToReservationStation(){
 	if (available == NULL)
 		return FALSE;
 
-	/*check if instruction is mine and update instruction type. otherwise report nothing happend by retuning FALSE*/
-	if(instr.OPCODE>4 && instr.OPCODE<9) //Integer ALU instruction
-		available->OPCODE=instr.OPCODE;
-	else
-		return FALSE;
+	available->OPCODE=instr.OPCODE;
 
 	/*operand j is always from register*/
 	if (Integer_Registers[instr.SRC0].busy == FALSE){
@@ -93,25 +89,24 @@ BOOL InsertToReservationStation(){
 		available->Qj = Integer_Registers[instr.SRC0].robNum;
 	}
 
-	/*opernad k might be immediate or from register. check if ADD or SUB and register is not busy*/
-	if ((Integer_Registers[instr.SRC1].busy == FALSE) && ((instr.OPCODE == ADD) || (instr.OPCODE == SUB))){
+	if ((instr.OPCODE == ADD) || (instr.OPCODE == SUB)){
+		/*opernad k might be immediate or from register. check if ADD or SUB and register is not busy*/
+		if (Integer_Registers[instr.SRC1].busy == FALSE){
 
-		available->Vk = Integer_Registers[instr.SRC1].value;
-		available->NumOfRightOperands++;				/*operand is ready*/	
+			available->Vk = Integer_Registers[instr.SRC1].value;
+			available->NumOfRightOperands++;				/*operand is ready*/
+		}
+
+		/*copy label if value of register is not relevant*/
+		else{ available->Qk = Integer_Registers[instr.SRC1].robNum; }
 	}
-
-	else if ((instr.OPCODE == ADD) || (instr.OPCODE == SUB)){
-	/*copy label if value of register is not relevant*/
-		available->Qk = Integer_Registers[instr.SRC1].robNum;
-	}
-
-	/*put immediate if ADDI or SUBI*/
-	if((instr.OPCODE==ADDI) || (instr.OPCODE==SUBI)){
+	else{/*put immediate if ADDI or SUBI*/
 
 		available->Vk=instr.IMM;
-		//memset(available->Qk,0,LABEL_SIZE);//TODO crash - why?
+		available->Qk = 0;
 		available->NumOfRightOperands++;				/*operand is ready*/
 	}
+
 
 	/*it's ADD or SUB and register is busy*/
 
@@ -254,20 +249,12 @@ BOOL isINT_RS_FULL(){
 	return (Int_RS_Cnt == Configuration->int_nr_reservation);
 }
 
-BOOL SimulateClockCycle_IntUnit(){
+void SimulateClockCycle_IntUnit(){
 
-	BOOL isInstructionTakenByUnit = FALSE;
 	ReservationStationToALU();
 	AdvanceIntPipeline();					/*advance piepline*/
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
-	CDBControlInt(&temp_int);
-	if (!isINT_RS_FULL && !isRobFull()) {
-		if (InsertToReservationStation())			/*insert new instruction to reservation station*/
-			isInstructionTakenByUnit = TRUE;
-	}
-
-	return isInstructionTakenByUnit;
-
+	return;
 }
 
 /*while (line != NULL)

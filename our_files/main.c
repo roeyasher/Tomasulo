@@ -5,6 +5,7 @@
 char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 //Decode
 int InsType;
+
 /*Defining global variables*/
 
 Configuration_Data *Configuration = NULL;
@@ -16,12 +17,14 @@ Trace trace[TRACE_SIZE];
 
 /*For CDB*/
 IntCDB IntUnitCDB;
-FPCDB FPUnitCDB;
+FPCDB FPUnitCDBADD;
+FPCDB FPUnitCDBMULL;
 LoadCDB LoadUnitCDB;
 
 IntCDB temp_int;
-IntCDB temp_fp;
-IntCDB temp_load;
+FPCDB temp_fp_add;
+FPCDB temp_fp_mull;
+LoadCDB temp_load;
 
 /*For Rob*/
 robLine *robLines = NULL;/*load buffer/load reservation*/
@@ -70,32 +73,14 @@ void InitializeTrace();
 /*check if all reservation stations are empty from instructions - used to know when to terminate program after issue of HALT*/
 int detectEnd();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
 	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, no_more_instruction = FALSE;
-	BOOL first_cycle = FALSE, second_cycle = FALSE, third_cycle = FALSE, fourth_cycle = FALSE;
 	instr.OPCODE = -1;
 
-	
-	my_instruction = (Instruction *)malloc(1 * sizeof(Instruction));
+
 	//intialize all
 	InitializeConfiguration(argv[1]);
 	InitBuffers();
@@ -118,106 +103,75 @@ int main(int argc, char* argv[]){
 	//***************************************************************************
 
 	// Cycle Simulation
-	while (TRUE)
-	{
+	while (TRUE){
 
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
 
 		// Fetch - Instructions from the main memory ----> to the instruction queue
-		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16))
-		{
+		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16)){
 			no_more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
 			pc_counter_instruction++;
 		}
 
 		// Decode and chechk Whether is it the end of the code
-		no_more_instruction = Decode();
+		if((no_more_instruction = Decode())) { break; };
+		instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
+
+		// insert to the relevant RS 
+		instr_reservation = InsertToRS();;
+
+		// update the system from the CDB
+		CDBUpdateRob();
+		CDBUpdateRS();
+
+
+		//***************************************************************************
+		//1. Execution
+		//***************************************************************************
+		
+		// Simulate all of the FU's
+		SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
+		SimulateClockCycle_IntUnit();
+		simulateClockCycle_FpUnit();
+
+		// TODO not sure if we need this condition over here (Roey);
 		if (TRUE == no_more_instruction) { break; }
-		/*init as instruction not taken by any unit*/
-		instr_reservation = FALSE;
-		//first_cycle = FALSE, second_cycle = FALSE, third_cycle = FALSE;
-		if (TRUE == first_cycle)
-		{
-			
-			//***************************************************************************
-			//1. Execution
-			//***************************************************************************
 
-			switch (InsType){
-			case Memory_INS:
-					instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
-					break;
-			case  INT_INS: 		
-					instr_reservation = SimulateClockCycle_IntUnit();
-					break;
-			case  FP_INS:
-					instr_reservation = simulateClockCycle_FpUnit();
-					break;
-			default:
-					no_more_instruction = TRUE;
-					break;
+		//***************************************************************************
+		//1. CDB
+		//***************************************************************************
 
-			}
-			if (TRUE == no_more_instruction) { break; }
-			
-			if (TRUE == second_cycle)
-			{
-				//***************************************************************************
-				//1. CDB
-				//***************************************************************************
+		//TODO pass the CDB function the right values
 
-				//TODO pass the CDB function the right values
-				switch (InsType){
-				case Memory_INS:
-					//TODo the right values
-					//CDBControlLoad(LoadCDB *load_to_cdb);
-					break;
-				case  INT_INS:
-					CDBControlInt(&temp_int);
-					break;
-				case  FP_INS:
-					CDBControlFP(&temp_fp);
-					break;
-				default:
-					no_more_instruction = TRUE;
-					break;
-				}
+		CDBControlInt(&temp_int);
+		CDBControlFPADD(&temp_fp_add);
+		CDBControlFPMULL(&temp_fp_mull);
+		CDBControlLoad(&temp_load);
 
-				if (TRUE == second_cycle)
-				{
-					//***************************************************************************
-					//1. Commit
-					//***************************************************************************
+		//***************************************************************************
+		//1. Commit
+		//***************************************************************************
 
-					//TODO add relevant function
+		//TODO add relevant function
+		commitRob();
 
+		//***************************************************************************
+		//***************************************************************************
 
-
-					//***************************************************************************
-					//***************************************************************************
-				}
-				third_cycle = TRUE;
-				
-			}
-			second_cycle = TRUE;
-			
-		}
-		first_cycle = TRUE;
 		PC += 4; //Clock
-		InsType = 0;
+		InsType = -1;
+
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
 		if ((flag == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
 			instr_reservation = TRUE;
 		}
-	
-
 
 		cycle++;
 		//instruction_queue_counter--;
 
-		/*the last fix just to get a trace in the forth test*/
+		// are we limited to number of cycle?? mybe need to delet this one (Roey);
 		if (cycle == 200000)
 			break;
 	}
@@ -264,12 +218,12 @@ int main(int argc, char* argv[]){
 	_fcloseall();	/*just in case*/
 
 
-		printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
-
-		freeInsturcionQueue();
 	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
 
-		getchar();
+	freeInsturcionQueue();
+	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
+
+	getchar();
 	return  0;
 }
 

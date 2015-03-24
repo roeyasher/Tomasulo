@@ -10,7 +10,6 @@ struct IntCDB{
 	BOOL valid;
 };
 
-
 typedef struct FPCDB FPCDB;
 struct FPCDB{
 
@@ -26,9 +25,12 @@ struct LoadCDB{
 	int result;
 	BOOL valid;
 };
+
 void CDBControlInt(IntCDB *int_to_cdb);
-void CDBControlFP(FPCDB *fp_to_cdb);
+void CDBControlFPADD(FPCDB *fp_to_cdb);
+void CDBControlFPMULL(FPCDB *fp_to_cdb);
 void CDBControlLoad(LoadCDB *load_to_cdb);
+
 #endif
 
 

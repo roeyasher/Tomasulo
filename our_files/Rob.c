@@ -68,7 +68,6 @@ BOOL insertRob(){
 
 	availableRobLine->OPCODE = instr.OPCODE;
 	availableRobLine->dest = instr.DST;
-	availableRobLine->inExecution = FALSE;
 	availableRobLine->done = FALSE;
 	availableRobLine->busy = TRUE;
 	availableRobLine->state = 2; // issue
@@ -78,7 +77,7 @@ BOOL insertRob(){
 }
 
 // commit if the first insruction that done
-BOOL commit(){
+BOOL commitRob(){
 	
 	robLine *node = robLines, *last = robLines;
 	char label[LABEL_SIZE];
@@ -92,20 +91,20 @@ BOOL commit(){
 		/*update registers*/
 		for (i = 0; i<NUM_OF_INT_REGISTERS; i++){
 
-			if ((Integer_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob){
+			if ((Integer_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob && node->done == TRUE){
 
 				Integer_Registers[i].value = node->intValue;			/*update value*/
 				Integer_Registers[i].busy = FALSE;					/*no more busy*/
-				Integer_Registers[i].robNum = -1;	/*reset label though it is not necessary*/
+				Integer_Registers[i].robNum = 0;	/*reset label though it is not necessary*/
 			}
 		}
 
 		/*update registers*/
 		for (i = 0; i<NUM_OF_FP_REGISTERS; i++){
-			if ((FP_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob){
+			if ((FP_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob  && node->done == TRUE){
 				FP_Registers[i].value = last->fpValue;
 				FP_Registers[i].busy = FALSE;
-				Integer_Registers[i].robNum = -1;
+				Integer_Registers[i].robNum = 0;
 			}
 		}
 

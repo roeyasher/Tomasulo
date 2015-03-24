@@ -7,6 +7,7 @@
 
 int CharToInteger (char schar)
 { 
+	schar = tolower(schar);
 	switch (schar)
 	{
 		case '0':
@@ -66,7 +67,7 @@ int CharToInteger (char schar)
 
 
 
-void BranchAndUpdatePC(Instruction *temp)
+void BranchAndUpdatePC()
 
 {
 	switch(instr.OPCODE)
@@ -76,7 +77,6 @@ void BranchAndUpdatePC(Instruction *temp)
 			if(Integer_Registers[instr.SRC0].value == Integer_Registers[instr.SRC1].value){
 				PC = PC + instr.IMM;
 				flag=TRUE;
-			//	FillTheFields(temp);
 				trace[cycle].valid=TRUE;
 				trace[cycle].issued=cycle;
 				trace[cycle].execution=cycle;
@@ -85,7 +85,6 @@ void BranchAndUpdatePC(Instruction *temp)
 			else{
 				PC=PC+4;
 				flag=TRUE;
-				//FillTheFields(temp);
 				trace[cycle].valid=TRUE;
 				trace[cycle].issued=cycle;
 				trace[cycle].execution=cycle;
@@ -105,7 +104,6 @@ void BranchAndUpdatePC(Instruction *temp)
 			if(Integer_Registers[instr.SRC0].value != Integer_Registers[instr.SRC1].value){
 				PC = PC + instr.IMM;
 				flag=TRUE;
-			//	FillTheFields(temp);
 				trace[cycle].valid=TRUE;
 				trace[cycle].issued=cycle;
 				trace[cycle].execution=cycle;
@@ -114,7 +112,6 @@ void BranchAndUpdatePC(Instruction *temp)
 			else{
 				PC = PC + 4;
 				flag=TRUE;
-			//	FillTheFields(temp);
 				trace[cycle].valid=TRUE;
 				trace[cycle].issued=cycle;
 				trace[cycle].execution=cycle;
@@ -129,7 +126,6 @@ void BranchAndUpdatePC(Instruction *temp)
 	case JUMP:
 			PC = PC + instr.IMM;
 			flag=TRUE;
-		//	FillTheFields(temp);
 			trace[cycle].valid=TRUE;
 			trace[cycle].issued=cycle;
 			trace[cycle].execution=cycle;
@@ -174,19 +170,15 @@ Instruction *DeleteTheInstrcutionsDistributor()
 	return NULL;
 }
 
+// What the hell this function do?? (Roey)
+BOOL HaltAndWrongInstruction(){
 
-BOOL HaltAndWrongInstruction(Instruction *temp)
+	//TODO: IS it right? can we call to function without a insrt init? (Roey)
+	if (instr.OPCODE == -1)	{ return TRUE; }
 
-{		
-	if (temp == NULL)	{ return TRUE; }
-
-	//if instr_reservation is FALSE then do nothing otherwise old instruction is erased //(BEQ,BNE,JUMP)
-	if (instr_reservation == TRUE)	{ FillTheFields(temp); }
-
-	if (HALT == temp->OPCODE){
-		// simulate more clock cycles
+	if (HALT == instr.OPCODE){
+		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
 		if (instr_reservation == TRUE){
-			FillTheFields(temp);
 			trace[cycle].issued = cycle;
 			trace[cycle].valid = 1;
 			trace[cycle].execution = cycle;
@@ -197,29 +189,65 @@ BOOL HaltAndWrongInstruction(Instruction *temp)
 	
 	return FALSE;
 }
-//#define Memory_INS 0
-//#define INT_INS 1
-//#define FP_INS 2
-BOOL Decode()
-{
-	
 
-	GetInstructionFromQUeue(my_instruction);
-	// TODO check if the rob have free line -> check if relevant RS have free line 
+BOOL Decode(){
+
+	GetInstructionFromQUeue();
 	// TODO Updae RS from CDB with the last execution if CDB is VALID.
 
-	if (TRUE == HaltAndWrongInstruction(my_instruction)) { return TRUE; }
-	//branch?
-	BranchAndUpdatePC(my_instruction);
-	if (TRUE == flag){ return FALSE; }
+	if (TRUE == HaltAndWrongInstruction()) { return TRUE; }
+	//branch? we haveto hold branch buffer (Roey)
+	//TODO flush instruction queue
 	
-	if ((my_instruction->OPCODE > -1) && (my_instruction->OPCODE < 2)) { InsType = Memory_INS; }
-	if ((my_instruction->OPCODE > 4) && (my_instruction->OPCODE < 9)) { InsType = INT_INS; }
-	if ((my_instruction->OPCODE > 8) && (my_instruction->OPCODE < 12)) { InsType = INT_INS; }
-	InsertToReservationStation();// TODO enough for all RS????
-	return FALSE;
+	//TODO fix the branch system!! 
+	//BranchAndUpdatePC();
+	//if (TRUE == flag){ return FALSE; }
+	
+	if (instr.OPCODE == 0) { InsType = Memory_LD_INS; }
+	if (instr.OPCODE == 1) { InsType = Memory_ST_INS; }
+	if ((instr.OPCODE > 4) && (instr.OPCODE < 9)) { InsType = INT_INS; }
+	if ((instr.OPCODE > 8) && (instr.OPCODE < 11)) { InsType = FP_ADD_INS; }
+	if (instr.OPCODE == 11) { InsType = FP_MULL_INS; }
 
+	return FALSE;
 }
+
+BOOL InsertToRS(){
+
+	if (!isRobFull()) {
+
+		insertRob();
+		switch (InsType){
+
+		case Memory_LD_INS:
+			return InsertNewLoadInstr();
+			break;
+
+		case Memory_ST_INS:
+			return InsertNewStoreInstr();
+			break;
+
+		case  INT_INS:
+			return Int_InsertToReservationStation();
+			break;
+
+		case  FP_ADD_INS:
+			return FP_InsertToReservationStations_ADD();
+			break;
+
+		case  FP_MULL_INS:
+			return FP_InsertToReservationStations_MULL();
+			break;
+
+		default:
+			return FALSE;
+			break;
+
+		}
+	}
+	return FALSE;
+}
+
 BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int pc) {
 	/* Fethch new instruction from memory to queue*/
 	int opcode, dst, src0, src1;
@@ -278,28 +306,27 @@ BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_coun
 	return FALSE;
 }
 
-void * GetInstructionFromQUeue(Instruction *result_instruction)
+void * GetInstructionFromQUeue()
 {
 	
 	Instruction *hold_head = instruction_queue_head;
 	Instruction *node = instruction_queue_head;
-	result_instruction->DST = instruction_queue_head->DST;
-	result_instruction->IMM = instruction_queue_head->IMM ;
-	strcpy(result_instruction->name,instruction_queue_head->name);
-	result_instruction->next = instruction_queue_head->next;
-	result_instruction->OPCODE = instruction_queue_head->OPCODE;
-	result_instruction->PC = instruction_queue_head->PC;
-	result_instruction->SRC0 = instruction_queue_head->SRC0;
-	result_instruction->SRC1 = instruction_queue_head->SRC1;
+	instr.DST = instruction_queue_head->DST;
+	instr.IMM = instruction_queue_head->IMM;
+	strcpy(instr.name, instruction_queue_head->name);
+	instr.next = instruction_queue_head->next;
+	instr.OPCODE = instruction_queue_head->OPCODE;
+	instr.PC = instruction_queue_head->PC;
+	instr.SRC0 = instruction_queue_head->SRC0;
+	instr.SRC1 = instruction_queue_head->SRC1;
 
 	while (NULL != node->next)
 	{
-		node = (Instruction*)node->next;
+		node = node->next;
 	}
-	instruction_queue_head = (Instruction*)instruction_queue_head->next;
-	node->next = (Instruction*)hold_head;
+	instruction_queue_head = instruction_queue_head->next;
+	node->next = hold_head;
 	node->next->next = NULL;
-	
 	strcpy(node->next->name, "00000000");
 	return;
 }
