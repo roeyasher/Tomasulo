@@ -83,5 +83,8 @@ extern IntCDB IntUnitCDB;
 extern FPCDB FPUnitCDB;
 extern LoadCDB LoadUnitCDB;
 
+extern IntCDB temp_int;
+extern IntCDB temp_fp;
+extern IntCDB temp_load;
 
 

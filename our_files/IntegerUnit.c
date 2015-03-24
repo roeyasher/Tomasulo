@@ -117,7 +117,7 @@ BOOL InsertToReservationStation(){
 
 	/*update destination register to being busy and update label to know from whom result is given*/
 	Integer_Registers[instr.DST].busy=TRUE;
-	Integer_Registers[instr.DST].robNum = available->robNum;
+	Integer_Registers[instr.DST].robNum = instr.numRob;
 
 	available->busy = TRUE;
 	available->done = FALSE;
@@ -194,7 +194,7 @@ void AdvanceIntPipeline(){
 
 	int i=0,j=0;
 	int length=Configuration->int_delay;		/*how long is the pipeline*/
-
+	
 	IntALU_PipelineStage *last=Integer_ALU_Unit, *prevLast=NULL, *NewNode=NULL,*temp=NULL;
 	IntReservationStation_Line *line = IntReservationStation;
 
@@ -205,7 +205,7 @@ void AdvanceIntPipeline(){
 		prevLast = last;
 		last=last->next;
 	}
-
+	
 	if (last->busy == TRUE) {			/*check if stage has an instruction or a bubble that went on*/
 		/*calculate result of operation. in reality it's done in stages but here it's done in one stage and we decide to do it int last stage*/
 		switch(last->OPCODE){
@@ -233,45 +233,10 @@ void AdvanceIntPipeline(){
 
 		/*opearate as CDB and update waiting stations and registers*/
 		/*update Integer Reservation satation*/
-
-		while (line != NULL){
-
-			if (line->Qj == last->numOfRobSupplier){
-				line->Vj = last->result;			/*update waiting value*/
-				memset((void*)line->Qj,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
-				line->NumOfRightOperands++;		/*update number of ready operands*/
-			}
-
-			if (line->Qk == last->numOfRobSupplier){
-				line->Vk=last->result;			/*update waiting value*/
-				memset((void*)line->Qk,0,LABEL_SIZE);	/*reset label so no more unexpected updates occur*/
-				line->NumOfRightOperands++;		/*update number of ready operands*/
-			}
-
-			/*we set reservation station state as done for this instruction*/
-			if ( (last->numOfRobSupplier == line->robNum) && (line->inExecution == TRUE) ){
-				line->done = TRUE;
-				for (j=0;j<TRACE_SIZE;j++){
-					if (trace[j].issued == line->issued){
-						trace[j].CDB=cycle-1;
-						break;
-					}
-				}
-			}
-			line=line->next;
-		}
-
-		//DELETE!!!!!
-		/*update registers*/
-		for (i=0;i<NUM_OF_INT_REGISTERS;i++){
-
-			if ((Integer_Registers[i].busy == TRUE) && (Integer_Registers[i].robNum == last->numOfRobSupplier)){
-
-				Integer_Registers[i].value = last->result;			/*update value*/
-				Integer_Registers[i].busy = FALSE;					/*no more busy*/
-				Integer_Registers[i].robNum = -1;
-			}
-		}
+	
+		// Preapre Values for CDB struct
+		temp_int.numOfRobSupplier = last->numOfRobSupplier;
+		temp_int.result = last->result;
 	}
 
 	/*waiting stations and registers were updated if not a bubble in last stage. Now must advance pipeline one stage foreward*/
@@ -295,7 +260,8 @@ BOOL SimulateClockCycle_IntUnit(){
 	AdvanceIntPipeline();					/*advance piepline*/
 	ReservationStationToALU();				/*send new instruction for execution*/
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
-
+	///////////////TODO one cycle up
+	CDBControlInt(&temp_int);
 	if (!isINT_RS_FULL && !isRobFull()) {
 		if (InsertToReservationStation())			/*insert new instruction to reservation station*/
 			isInstructionTakenByUnit = TRUE;
@@ -304,3 +270,30 @@ BOOL SimulateClockCycle_IntUnit(){
 	return isInstructionTakenByUnit;
 
 }
+
+/*while (line != NULL)
+		{
+
+			if (line->Qj == last->numOfRobSupplier){
+				line->Vj = last->result;			//update waiting value
+line->NumOfRightOperands++;		//update number of ready operands
+			}
+
+			if (line->Qk == last->numOfRobSupplier){
+				line->Vk = last->result;			//update waiting value
+				line->NumOfRightOperands++;		//update number of ready operands
+			}
+
+			//we set reservation station state as done for this instruction
+			if ((last->numOfRobSupplier == line->robNum) && (line->inExecution == TRUE)){
+				line->done = TRUE;
+				for (j = 0; j<TRACE_SIZE; j++){
+					if (trace[j].issued == line->issued){
+						trace[j].CDB = cycle - 1;
+						break;
+					}
+				}
+			}
+			line = line->next;
+		}
+		*/

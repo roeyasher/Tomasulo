@@ -17,6 +17,10 @@ IntCDB IntUnitCDB;
 FPCDB FPUnitCDB;
 LoadCDB LoadUnitCDB;
 
+IntCDB temp_int;
+IntCDB temp_fp;
+IntCDB temp_load;
+
 /*For Rob*/
 robLine *robLines = NULL;/*load buffer/load reservation*/
 /**/
