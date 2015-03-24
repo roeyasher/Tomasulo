@@ -14,7 +14,7 @@ struct LoadBuffer {
 	BOOL done;
 	int count;
 	int checkforexecute;
-	int buffNum;
+	int robNum;
 	char name[16];
 	int issued;
 	struct LoadBuffer *next;
@@ -29,10 +29,10 @@ struct StoreBuffer {
 	BOOL done;
 	int count;
 	int checkforexecute;
-	float vj;
-	int numRob; //Qj
+	float Vj;
+	int Qj; //rob num
 	int NumOfRightOperands;
-	int buffNum;
+	int robNum;
 	char name[16];
 	int issued;
 	struct StoreBuffer *next;

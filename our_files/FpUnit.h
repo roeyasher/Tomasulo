@@ -19,7 +19,7 @@ struct FpReservationStation_Line{
 	int OPCODE;
 	int robNum;
 	float Vj,Vk;
-	char Qj[LABEL_SIZE],Qk[LABEL_SIZE];
+	int Qj,Qk;
 	int NumOfRightOperands;
 	BOOL busy;
 	BOOL done;

@@ -13,26 +13,24 @@ void IntilaizeMemoryArray()
 		PhysicalMemoryArray[i]=0;
 }
 
-LoadBuffer *CreateLBNewNode(int index){
+LoadBuffer *CreateLBNewNode(){
 
 	/*this function create a new node for a linked list, for the load buffer*/
 	LoadBuffer *temp = NULL;
 	temp = (LoadBuffer*) malloc(sizeof(LoadBuffer));
 	memset(temp, 0, sizeof(LoadBuffer));
 	temp->next = NULL;
-	temp->buffNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 
 }
 
-StoreBuffer *CreateNewSBNode(int index){
+StoreBuffer *CreateNewSBNode(){
 
 	/*this function create a new node for a linked list for the store buffer*/
 	StoreBuffer *temp = NULL;
 	temp = (StoreBuffer*) malloc(sizeof(StoreBuffer));
 	memset(temp, 0, sizeof(StoreBuffer));
 	temp->next = NULL;
-	temp->buffNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 
 }
@@ -55,12 +53,11 @@ void IntilaizeLoadBuffer(){
 	int i=0;
 
 	LoadBuffer *node = NULL;
-	LoadBufferResarvation = CreateLBNewNode(0);
+	LoadBufferResarvation = CreateLBNewNode();
 	node = LoadBufferResarvation;
 
 	for (i=1;i<Number_of_MemReservation_station;i++){
-
-		node->next = CreateLBNewNode(i);
+		node->next = CreateLBNewNode();
 		node = node->next;
 	}
 
@@ -75,11 +72,11 @@ void IntilaizeStoreBuffer()
 	int i=0;
 
 	StoreBuffer *node = NULL;
-	StoreBufferResarvation = CreateNewSBNode(0);
+	StoreBufferResarvation = CreateNewSBNode();
 	node = StoreBufferResarvation;
 
 	for(i=1;i<Number_of_MemReservation_station;i++){
-		node->next = CreateNewSBNode(i);
+		node->next = CreateNewSBNode();
 		node = node->next;
 	}
 
@@ -208,12 +205,12 @@ BOOL InsertNewStoreInstr(int count){
 
 	if(FP_Registers[instr.SRC1].busy == FALSE){
 
-		available->vj=FP_Registers[instr.SRC1].value;
+		available->Vj=FP_Registers[instr.SRC1].value;
 		available->NumOfRightOperands++;
 	}
 	else{
 		/*else waiting for the instruction to finish - by waiting to the instruction label*/
-		strcpy(available->Qj,FP_Registers[instr.SRC1].label);
+		available->Qj = FP_Registers[instr.SRC1].robNum;
 	}
 
 	/*insert the new instruction to the store buffer/reservation station and update the relevant fields*/

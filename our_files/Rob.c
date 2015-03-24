@@ -23,10 +23,10 @@ void IntilaizeRob() {
 	robCnt = 0;
 
 	robLine *node = NULL;
-	robLines = CreateRLNewNode(0);
+	robLines = CreateRLNewNode(1);
 	node = robLines;
 
-	for (i=1;i<Number_of_Rob_Lines;i++)	{
+	for (i=2;i<=Number_of_Rob_Lines;i++)	{
 
 		node->next = CreateRLNewNode(i);
 		node = node->next;

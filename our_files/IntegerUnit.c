@@ -119,6 +119,7 @@ BOOL InsertToReservationStation(){
 	Integer_Registers[instr.DST].busy=TRUE;
 	Integer_Registers[instr.DST].robNum = instr.numRob;
 
+	available->robNum = instr.numRob;
 	available->busy = TRUE;
 	available->done = FALSE;
 	available->inExecution=FALSE;
