@@ -182,17 +182,18 @@ int DecodeAndDistributor(Instruction *instruction_queue_head)
 	/*the function checks the next instr can be sent to the units and for branches and jump the function*/
 	/* make a 1 clock cycle delay and brings the next instr depends the branch condition*/
 	//int pc_counter= instruction_queue_head->PC;
-	Instruction *temp = instruction_queue_head;
+
+
+	Instruction *temp = NULL;
 	//instr_reservation = TRUE;
 	temp = SearchTheElementInstByPc(instruction_queue_head);
-	//printf("instruction adress is %p\n",temp);
-		if(temp== NULL)
-			return FALSE;
+	if (temp == NULL)	{ return FALSE; }
 
-		/*if instr_reservation is FALSE then do nothing otherwise old instruction is erased*/
-		if ((instr_reservation == TRUE)/*||(temp->OPCODE==BEQ)||(temp->OPCODE==BNE)||(temp->OPCODE==JUMP)*/){
-			FillTheFields(temp);
-		}
+	//if instr_reservation is FALSE then do nothing otherwise old instruction is erased*/
+	//(BEQ,BNE,JUMP)
+	if (instr_reservation == TRUE)	{ FillTheFields(temp); }
+		
+		
 		switch (temp->OPCODE)
 		{
 			case HALT:

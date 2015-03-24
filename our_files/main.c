@@ -88,7 +88,7 @@ int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
-	BOOL reservation_stations_has_space = TRUE,rob_has_space = TRUE,no_more_instruction = FALSE;
+	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, no_more_instruction = FALSE, bring_new_instruction = FALSE;
 	instr.OPCODE = -1;
 
 	//intialize all
@@ -119,7 +119,8 @@ int main(int argc, char* argv[]){
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
-		// Bring instruction from the main memory to the instruction queue
+
+		// Instructions from the main memory ----> to the instruction queue
 		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
 			no_more_instruction = FetchAndDecode(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
@@ -128,8 +129,8 @@ int main(int argc, char* argv[]){
 
 		/*brings relevant instruction to instr and updates PC if necessary*/
 		/*A simluate clock cycle for fetch and decode unit*/
-		DecodeAndDistributor(instruction_queue_head);
-
+		bring_new_instruction=DecodeAndDistributor(instruction_queue_head);
+		if (FALSE == bring_new_instruction) { break; }
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
 
