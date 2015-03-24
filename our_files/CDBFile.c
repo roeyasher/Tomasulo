@@ -86,6 +86,21 @@ void CDBUpdateRS(){
 
 	IntReservationStation_Line *IntRsLine = NULL;
 	FpReservationStation_Line  *FPRsLine = NULL;
+	LoadBuffer  *LDBuffLine = NULL;
+
+
+	if (LoadUnitCDB.valid == TRUE) {
+
+		LDBuffLine = IntReservationStation;
+		while (LDBuffLine != NULL && LDBuffLine->NumOfRightOperands<1){
+
+			if (LDBuffLine->Qj == IntUnitCDB.numOfRobSupplier){
+				LDBuffLine->Vj = IntUnitCDB.result;
+				LDBuffLine->NumOfRightOperands++;
+			}
+			LDBuffLine = IntRsLine->next;
+		}
+	}
 
 	if (IntUnitCDB.valid == TRUE) {
 

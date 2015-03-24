@@ -220,23 +220,28 @@ BOOL InsertToRS(){
 		switch (InsType){
 
 		case Memory_LD_INS:
-			return InsertNewLoadInstr();
+			if (!isLD_Buff_FULL())
+				return InsertNewLoadInstr();
 			break;
 
 		case Memory_ST_INS:
-			return InsertNewStoreInstr();
+			if (!isST_Buff_FULL())
+				return InsertNewStoreInstr();
 			break;
 
 		case  INT_INS:
-			return Int_InsertToReservationStation();
+			if (!isINT_RS_FULL())
+				return Int_InsertToReservationStation();
 			break;
 
 		case  FP_ADD_INS:
-			return FP_InsertToReservationStations_ADD();
+			if (!isFP_RS_ADD_FULL())
+				return FP_InsertToReservationStations_ADD();
 			break;
 
 		case  FP_MULL_INS:
-			return FP_InsertToReservationStations_MULL();
+			if (!isFP_RS_MULL_FULL())
+				return FP_InsertToReservationStations_MULL();
 			break;
 
 		default:

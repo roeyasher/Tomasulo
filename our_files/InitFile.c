@@ -40,7 +40,7 @@ void MemoryLog(){
 	output = FileOpen("memout.txt", "wt+");
 
 	for (i = 0; i < MEMORY_SIZE; i++)
-		fprintf(output, "%.8x\n", *(int*)&PhysicalMemoryArray[i]);
+		fprintf(output, "%.8x\n", *(int*)&MainMemoryArray[i]);
 
 	fflush(output);
 	fclose(output);

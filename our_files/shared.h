@@ -57,16 +57,12 @@ extern FP_PipelineStage *FP_executionPipeline_MUL;
 /*For fetch and decode*/
 
 extern Instruction *instruction_queue_head;
-
 extern int PC;
 
 /**/
 
-
 extern Memory_PiplineStage *Memory_Unit;
-
 extern LoadBuffer *LoadBufferResarvation;
-
 extern StoreBuffer *StoreBufferResarvation;
 
 
@@ -74,9 +70,6 @@ extern StoreBuffer *StoreBufferResarvation;
 extern int cycle;
 
 extern Trace trace[TRACE_SIZE];
-
-extern float PhysicalMemoryArray[];
-
 
 /*For CDB*/
 

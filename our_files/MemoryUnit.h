@@ -10,12 +10,13 @@ struct LoadBuffer {
 	int address;
 	int OPCODE;
 	BOOL busy;
-	BOOL inexecution;
+	BOOL inExecution;
 	BOOL done;
-	int count;
-	int checkforexecute;
+	BOOL addressReady;
+	int Vj;
+	int Qj; //rob num
+	int NumOfRightOperands;
 	int robNum;
-	char name[16];
 	int issued;
 	struct LoadBuffer *next;
 };
@@ -25,15 +26,13 @@ struct StoreBuffer {
 	int address;
 	int OPCODE;
 	BOOL busy;
-	BOOL inexecution;
+	BOOL inExecution;
 	BOOL done;
-	int count;
-	int checkforexecute;
+	BOOL addressReady;
 	float Vj;
 	int Qj; //rob num
 	int NumOfRightOperands;
 	int robNum;
-	char name[16];
 	int issued;
 	struct StoreBuffer *next;
 };
@@ -46,21 +45,6 @@ struct Memory_PiplineStage {
 	struct Memory_PiplineStage *next;
 	float Data_load;
 	float Data_store;
-};
-
-typedef struct Memory_Pipline Memory_Pipline;
-struct Memory_Pipline {
-	int OPCODE;
-	int address;
-	int numOfRobSupplier;
-	float Data_load;
-	float Data_store;
-};
-
-typedef struct CdbWriteBack CdbWriteBack;
-struct CdbWriteBack {
-	float value;
-	char label[LABEL_SIZE];
 };
 
 int ST_Buff_Cnt;

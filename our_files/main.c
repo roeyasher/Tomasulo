@@ -47,11 +47,8 @@ FP_PipelineStage *FP_executionPipeline_MUL = NULL;/*the FP-MUL pipeline execute 
 /*for Memory Unit*/
 Instruction *my_instruction = NULL;
 LoadBuffer *LoadBufferResarvation = NULL;/*load buffer/load reservation*/
-float PhysicalMemoryArray[MEMORY_SIZE];/*the memory unit*/
 StoreBuffer *StoreBufferResarvation = NULL;/*store buffer/store reservation*/
 Memory_PiplineStage *Memory_Unit = NULL;/*the memory pipeline execute unit*/
-Memory_Pipline BufferToMemory;/*a variable to helps us in the programm runing*/
-CdbWriteBack CdbToResarvation;/*CDB write back*/
 /**/
 
 /*For Fetch and Decode*/
@@ -86,7 +83,6 @@ int main(int argc, char* argv[]){
 	InitBuffers();
 	MemInToMainMemory(adressMainMemory, argv[2]);
 	InitFus();
-	strcpy(CdbToResarvation.label, "Empty");
 
 	//***************************************************************************TODO-delete
 	//General Order:
