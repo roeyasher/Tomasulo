@@ -3,7 +3,8 @@
 
 /*MainMemory*/
 char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
-
+//Decode
+int InsType;
 /*Defining global variables*/
 
 Configuration_Data *Configuration = NULL;
@@ -41,6 +42,7 @@ FP_PipelineStage *FP_executionPipeline_MUL = NULL;/*the FP-MUL pipeline execute 
 /**/
 
 /*for Memory Unit*/
+Instruction *my_instruction = NULL;
 LoadBuffer *LoadBufferResarvation = NULL;/*load buffer/load reservation*/
 float PhysicalMemoryArray[MEMORY_SIZE];/*the memory unit*/
 StoreBuffer *StoreBufferResarvation = NULL;/*store buffer/store reservation*/
@@ -88,9 +90,12 @@ int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
 	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
-	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, no_more_instruction = FALSE, bring_new_instruction = FALSE;
+	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, no_more_instruction = FALSE;
+	BOOL first_cycle = FALSE, second_cycle = FALSE, third_cycle = FALSE, fourth_cycle = FALSE;
 	instr.OPCODE = -1;
 
+	
+	my_instruction = (Instruction *)malloc(1 * sizeof(Instruction));
 	//intialize all
 	InitializeConfiguration(argv[1]);
 	InitBuffers();
@@ -115,42 +120,98 @@ int main(int argc, char* argv[]){
 	// Cycle Simulation
 	while (TRUE)
 	{
-		
+
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
 
-		// Instructions from the main memory ----> to the instruction queue
+		// Fetch - Instructions from the main memory ----> to the instruction queue
 		while ((no_more_instruction == FALSE) && (instruction_queue_counter < 16))
 		{
-			no_more_instruction = FetchAndDecode(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
+			no_more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
 			pc_counter_instruction++;
 		}
 
-		/*brings relevant instruction to instr and updates PC if necessary*/
-		/*A simluate clock cycle for fetch and decode unit*/
-		bring_new_instruction=DecodeAndDistributor(instruction_queue_head);
-		if (FALSE == bring_new_instruction) { break; }
+		// Decode and chechk Whether is it the end of the code
+		no_more_instruction = Decode();
+		if (TRUE == no_more_instruction) { break; }
 		/*init as instruction not taken by any unit*/
 		instr_reservation = FALSE;
+		//first_cycle = FALSE, second_cycle = FALSE, third_cycle = FALSE;
+		if (TRUE == first_cycle)
+		{
+			
+			//***************************************************************************
+			//1. Execution
+			//***************************************************************************
+
+			switch (InsType){
+			case Memory_INS:
+					instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
+					break;
+			case  INT_INS: 		
+					instr_reservation = SimulateClockCycle_IntUnit();
+					break;
+			case  FP_INS:
+					instr_reservation = simulateClockCycle_FpUnit();
+					break;
+			default:
+					no_more_instruction = TRUE;
+					break;
+
+			}
+			if (TRUE == no_more_instruction) { break; }
+			
+			if (TRUE == second_cycle)
+			{
+				//***************************************************************************
+				//1. CDB
+				//***************************************************************************
+
+				//TODO pass the CDB function the right values
+				switch (InsType){
+				case Memory_INS:
+					//TODo the right values
+					//CDBControlLoad(LoadCDB *load_to_cdb);
+					break;
+				case  INT_INS:
+					CDBControlInt(&temp_int);
+					break;
+				case  FP_INS:
+					CDBControlFP(&temp_fp);
+					break;
+				default:
+					no_more_instruction = TRUE;
+					break;
+				}
+
+				if (TRUE == second_cycle)
+				{
+					//***************************************************************************
+					//1. Commit
+					//***************************************************************************
+
+					//TODO add relevant function
 
 
 
-		// check if the rob have free line -> check if relevant RS have free line ->  interst to rob and the relevat RS  
-
-		/*simulat each unit one clock cycle. if a unit issues instr, update instr_reservation to say so (used for Fetch&Decode unit)*/
-		instr_reservation = SimulateClockCycle_IntUnit();
-		instr_reservation = simulateClockCycle_FpUnit();
-		instr_reservation = SimulateClockCycle_LoadUnit(cycle, 0);
-
+					//***************************************************************************
+					//***************************************************************************
+				}
+				third_cycle = TRUE;
+				
+			}
+			second_cycle = TRUE;
+			
+		}
+		first_cycle = TRUE;
+		PC += 4; //Clock
+		InsType = 0;
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
 		if ((flag == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
 			instr_reservation = TRUE;
 		}
-
-		/*simulate till HALT is issued*/
-		if (instr.OPCODE == HALT)
-			break;
+	
 
 
 		cycle++;

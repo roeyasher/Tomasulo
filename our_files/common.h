@@ -21,6 +21,10 @@
 #define MULTS 11 
 #define HALT 12
 
+#define Memory_INS 0
+#define INT_INS 1
+#define FP_INS 2
+
 
 #define SIZE_OF_CHAR 512
 #define TRUE 1

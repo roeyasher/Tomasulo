@@ -109,7 +109,7 @@ BOOL InsertToReservationStation(){
 	if((instr.OPCODE==ADDI) || (instr.OPCODE==SUBI)){
 
 		available->Vk=instr.IMM;
-		memset(available->Qk,0,LABEL_SIZE);
+		//memset(available->Qk,0,LABEL_SIZE);//TODO crash - why?
 		available->NumOfRightOperands++;				/*operand is ready*/
 	}
 
@@ -257,11 +257,9 @@ BOOL isINT_RS_FULL(){
 BOOL SimulateClockCycle_IntUnit(){
 
 	BOOL isInstructionTakenByUnit = FALSE;
-
+	ReservationStationToALU();
 	AdvanceIntPipeline();					/*advance piepline*/
-	ReservationStationToALU();				/*send new instruction for execution*/
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
-	///////////////TODO one cycle up
 	CDBControlInt(&temp_int);
 	if (!isINT_RS_FULL && !isRobFull()) {
 		if (InsertToReservationStation())			/*insert new instruction to reservation station*/

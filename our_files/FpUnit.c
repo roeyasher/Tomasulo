@@ -431,7 +431,6 @@ BOOL simulateClockCycle_FpUnit(){
 	FP_ReservationStationToExecution();
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
-	// TODO One Cycle more
 	CDBControlFP(&temp_fp);
 	FP_EvictFromReservationStation();
 

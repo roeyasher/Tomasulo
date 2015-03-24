@@ -66,7 +66,7 @@ int CharToInteger (char schar)
 
 
 
-void CheckTheConditionAndReturnPc(Instruction *temp)
+void BranchAndUpdatePC(Instruction *temp)
 
 {
 	switch(instr.OPCODE)
@@ -175,52 +175,50 @@ Instruction *DeleteTheInstrcutionsDistributor()
 }
 
 
-int DecodeAndDistributor(Instruction *instruction_queue_head)
+BOOL HaltAndWrongInstruction(Instruction *temp)
 
-{	
-	/*the main function that handle with branches and jump and do the fetch and decode*/
-	/*the function checks the next instr can be sent to the units and for branches and jump the function*/
-	/* make a 1 clock cycle delay and brings the next instr depends the branch condition*/
-	//int pc_counter= instruction_queue_head->PC;
+{		
+	if (temp == NULL)	{ return TRUE; }
 
-
-	Instruction *temp = NULL;
-	//instr_reservation = TRUE;
-	temp = SearchTheElementInstByPc(instruction_queue_head);
-	if (temp == NULL)	{ return FALSE; }
-
-	//if instr_reservation is FALSE then do nothing otherwise old instruction is erased*/
-	//(BEQ,BNE,JUMP)
+	//if instr_reservation is FALSE then do nothing otherwise old instruction is erased //(BEQ,BNE,JUMP)
 	if (instr_reservation == TRUE)	{ FillTheFields(temp); }
-		
-		
-		switch (temp->OPCODE)
-		{
-			case HALT:
-				// simulate more clock cycles
-				if (instr_reservation==TRUE){
-					FillTheFields(temp);
-					trace[cycle].issued=cycle;
-					trace[cycle].valid=1;
-					trace[cycle].execution=cycle;
-					strcpy(trace[cycle].instruction,instr.name);
-				}	
-				break;
-			default:		/*other*/
-				CheckTheConditionAndReturnPc(temp);
-				if(instr_reservation == FALSE)// need to check what to do with this.
-				{	
-					//printf("all the resarvation stations are busy\n");
-					//Sleep(1000);					
-					break;
-				}	
-				else
-				{
-				PC=PC+4;
-				break;		
-				}
+
+	if (HALT == temp->OPCODE){
+		// simulate more clock cycles
+		if (instr_reservation == TRUE){
+			FillTheFields(temp);
+			trace[cycle].issued = cycle;
+			trace[cycle].valid = 1;
+			trace[cycle].execution = cycle;
+			strcpy(trace[cycle].instruction, instr.name);
+		}
+		return TRUE;
 	}
-	return TRUE;
+	
+	return FALSE;
+}
+//#define Memory_INS 0
+//#define INT_INS 1
+//#define FP_INS 2
+BOOL Decode()
+{
+	
+
+	GetInstructionFromQUeue(my_instruction);
+	// TODO check if the rob have free line -> check if relevant RS have free line 
+	// TODO Updae RS from CDB with the last execution if CDB is VALID.
+
+	if (TRUE == HaltAndWrongInstruction(my_instruction)) { return TRUE; }
+	//branch?
+	BranchAndUpdatePC(my_instruction);
+	if (TRUE == flag){ return FALSE; }
+	
+	if ((my_instruction->OPCODE > -1) && (my_instruction->OPCODE < 2)) { InsType = Memory_INS; }
+	if ((my_instruction->OPCODE > 4) && (my_instruction->OPCODE < 9)) { InsType = INT_INS; }
+	if ((my_instruction->OPCODE > 8) && (my_instruction->OPCODE < 12)) { InsType = INT_INS; }
+	InsertToReservationStation();
+	return FALSE;
+
 }
 BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int pc) {
 	/* Fethch new instruction from memory to queue*/
@@ -263,7 +261,7 @@ BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int p
 			return FALSE;
 		}
 
-BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
+BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
 {
 	char instruction_line[SIZE_OF_CHAR];
 	Instruction *node = NULL; 

@@ -15,10 +15,10 @@ extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 
 extern Configuration_Data *Configuration;
 
-extern Instruction instr;
-
+ Instruction instr;
+ extern Instruction *my_instruction;
 extern BOOL instr_reservation;
-
+extern int InsType;
 extern BOOL flag;
 
 
