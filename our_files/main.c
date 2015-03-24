@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
 		instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
 
 		// insert to the relevant RS 
-		instr_reservation = InsertToRS();;
+		instr_reservation = InsertToRS();
 
 		// update the system from the CDB
 		CDBUpdateRob();
