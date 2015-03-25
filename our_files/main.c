@@ -142,7 +142,7 @@ int main(int argc, char* argv[]){
 			//1. Execution
 			//***************************************************************************
 
-			cycle++;
+			//cycle++;
 			// Simulate all of the FU's
 			SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
 			SimulateClockCycle_IntUnit();
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]){
 
 
 			// TODO add way to exit from the while loop. (Roey)
-			cycle++;
+			//cycle++;
 			CDBControlInt(&temp_int);
 			CDBControlFPADD(&temp_fp_add);
 			CDBControlFPMULL(&temp_fp_mull);
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]){
 			instr_reservation = TRUE;
 		}
 
-		cycle++;
+		
 		//instruction_queue_counter--;
 
 		// are we limited to number of cycle?? mybe need to delet this one (Roey);
@@ -193,6 +193,7 @@ int main(int argc, char* argv[]){
 			break;
 		//if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
 		//	break;
+		cycle++;
 	}
 
 

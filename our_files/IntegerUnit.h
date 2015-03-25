@@ -15,6 +15,7 @@ struct IntegerRegister{
 /*Integer Reservation Station is a linked list of size 'add_nr_reservation' where each node is an instruction station before being executed*/
 typedef struct IntReservationStation_Line IntReservationStation_Line;
 struct IntReservationStation_Line{
+	char name[BUFFER_SIZE];
 	int OPCODE;
 	int issued;
 	int robNum;					/*this is the label of the line. e.g 'ADD1'*/
@@ -31,7 +32,7 @@ struct IntReservationStation_Line{
 
 typedef struct IntALU_PipelineStage IntALU_PipelineStage;
 struct IntALU_PipelineStage{
-
+	char name[BUFFER_SIZE];
 	int OPCODE;
 	BOOL busy;
 	int issued;

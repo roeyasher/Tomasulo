@@ -12,19 +12,19 @@ void InitializeConfiguration(char *ConfigFile){
 		memset(buff, 0, BUFFER_SIZE);
 			fscanf(file,"%s",buff);
 	}
-	Config_Pointer->int_delay = atoi(buff) + 1;
+	Config_Pointer->int_delay = atoi(buff);
 
 	for (i=0;i<3;i++){
 			memset(buff,0,BUFFER_SIZE);
 			fscanf(file,"%s",buff);
 	}
-	Config_Pointer->add_delay=atoi(buff)+1;
+	Config_Pointer->add_delay=atoi(buff);
 
 	for (i=0;i<3;i++){
 			memset(buff,0,BUFFER_SIZE);
 			fscanf(file,"%s",buff);
 	}
-	Config_Pointer->mul_delay=atoi(buff)+1;
+	Config_Pointer->mul_delay=atoi(buff);
 
 	for (i=0;i<3;i++){
 			memset(buff,0,BUFFER_SIZE);

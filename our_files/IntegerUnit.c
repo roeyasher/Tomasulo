@@ -119,6 +119,7 @@ BOOL Int_InsertToReservationStation(){
 	available->done = FALSE;
 	available->inExecution=FALSE;
 	available->issued=cycle;
+	strcpy(available->name, instr.name);
 	trace[cycle].issued=cycle;
 	trace[cycle].valid=TRUE;
 	strcpy(trace[cycle].instruction,instr.name);
@@ -145,6 +146,7 @@ void ReservationStationToALU(){
 			Integer_ALU_Unit->operand2=line->Vk;
 			Integer_ALU_Unit->numOfRobSupplier = line->robNum;
 			Integer_ALU_Unit->issued = line->issued;
+			strcpy(Integer_ALU_Unit->name,line->name);
 			line->done = TRUE;
 			line->inExecution=TRUE;			/*so it's not sent again to ALU*/
 			break;
@@ -240,7 +242,7 @@ void AdvanceIntPipeline(){
 
 		for (j = 0; j<TRACE_SIZE; j++){
 			if ((InsType == Memory_LD_INS) || (InsType == Memory_ST_INS) || (InsType == INT_INS)){
-				if ((strcmp(trace[j].instruction, instr.name) == 0)){
+				if ((strcmp(trace[j].instruction, last->name) == 0)){
 					trace[j].execution = cycle;
 					break;
 				}
