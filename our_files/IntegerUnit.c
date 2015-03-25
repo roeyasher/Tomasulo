@@ -1,17 +1,15 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-//used to create new reservation station line
+/*The function create a new node for a linked list*/
 IntReservationStation_Line *CreateNewIRSLNode(){
-
-
 	IntReservationStation_Line *temp = NULL;
 	temp = (IntReservationStation_Line*) malloc(sizeof(IntReservationStation_Line));
 	memset(temp, 0, sizeof(IntReservationStation_Line));
 	temp->next = NULL;
-	return temp;		/*NULL is returned if failure occured*/
+	return temp;
 }
-
+/*The function create a new node for a linked list for the Pip*/
 IntALU_PipelineStage *CreateNewIPLSNode(){
 
 	IntALU_PipelineStage *temp = NULL;
@@ -20,17 +18,16 @@ IntALU_PipelineStage *CreateNewIPLSNode(){
 	temp->next = NULL;
 	return temp;		/*NULL is returned if failure occured*/
 }
-
+/*The function intilaize the INT RS*/
 void InitializeReservationStation(){
 
-	int NumberOFReservationStations = Configuration->int_nr_reservation;		/*how many nodes to create*/
+	int NumberOFReservationStations = Configuration->int_nr_reservation;
 	int i = 0;
 
 	IntReservationStation_Line *node = NULL;
-	IntReservationStation = CreateNewIRSLNode();  /*Create first Line and label it as ADD1*/
+	IntReservationStation = CreateNewIRSLNode();
 	node = IntReservationStation;
 
-	/*Create other Lines and label them ADD2,ADD3 and so on*/
 	for (i = 1; i < NumberOFReservationStations; i++){
 		node->next = CreateNewIRSLNode();
 		node = node->next;
@@ -38,7 +35,7 @@ void InitializeReservationStation(){
 
 	Int_RS_Cnt = 0;
 }
-
+/*this function intilaize the execute memory unit*/
 void InitializeIntegerALU(){
 
 	/*How long is the pipeline*/
@@ -46,14 +43,13 @@ void InitializeIntegerALU(){
 	int i = 0, length=0;
 	length=Configuration->int_delay;
 
-	Integer_ALU_Unit = CreateNewIPLSNode(); /*first pipeline stage*/
+	Integer_ALU_Unit = CreateNewIPLSNode();
 	node = Integer_ALU_Unit;
 
 	for (i=1;i<length;i++){
 		node->next = CreateNewIPLSNode();
 		node = node->next;
 	}
-
 }
 
 BOOL Int_InsertToReservationStation(){
@@ -62,22 +58,18 @@ BOOL Int_InsertToReservationStation(){
 	int length=Configuration->int_nr_reservation;
 	int i = 0;
 
-	/*find available Line in Reservation station*/
+	
 	while (iter != NULL){
-
-		/*if not busy then assign to available*/
+		/*find available node*/
 		if (iter->busy == FALSE){
 			available = iter;
 			break;
 		}
 		iter = iter->next;
 	}
-
-	/*if available is still NULL then no available station thus return FALSE*/
+	/*nothing available */
 	if (available == NULL)
 		return FALSE;
-
-	available->OPCODE=instr.OPCODE;
 
 	/*operand j is always from register*/
 	if (Integer_Registers[instr.SRC0].busy == FALSE){
@@ -115,6 +107,7 @@ BOOL Int_InsertToReservationStation(){
 		available->robNum = instr.numRob;
 	}
 
+	available->OPCODE = instr.OPCODE;
 	available->busy = TRUE;
 	available->done = FALSE;
 	available->inExecution=FALSE;
