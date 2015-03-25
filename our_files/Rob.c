@@ -67,7 +67,7 @@ BOOL insertRob(){
 		return FALSE;
 
 	availableRobLine->OPCODE = instr.OPCODE;
-	availableRobLine->dest = instr.DST;
+	availableRobLine->address = instr.DST;
 	availableRobLine->done = FALSE;
 	availableRobLine->busy = TRUE;
 	availableRobLine->state = 2; // issue
@@ -89,13 +89,15 @@ void updateIntRob(int numRob, int value){
 	return;
 }
 
-void updateFPRob(int numRob, float value){
+void updateFPRob(int numRob, float value, int address){
 
 	robLine *iter = robLines;
 
 	while (iter != NULL){
 		if (iter->numRob == numRob){
 			iter->fpValue = value;
+			iter->address = address;
+			iter->done = TRUE;
 			break;
 		}
 		iter = iter->next;
@@ -130,6 +132,10 @@ BOOL commitRob(){
 				FP_Registers[i].busy = FALSE;
 				Integer_Registers[i].robNum = 0;
 			}
+		}
+
+		if (node->OPCODE == ST){
+			sprintf(MainMemoryArray[node->address], "%08x", (unsigned int)node->fpValue);
 		}
 
 		robLines = node->next;

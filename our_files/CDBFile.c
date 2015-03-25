@@ -97,9 +97,9 @@ void CDBUpdateRS(){
 	if (LoadUnitCDB.valid == TRUE) {
 
 		STBuffLine = StoreBufferResarvation;
-		while ((STBuffLine) != NULL && (STBuffLine->addressReady == FALSE)){
+		while ((STBuffLine) != NULL){
 
-			if (STBuffLine->Qj == LoadUnitCDB.numOfRobSupplier){
+			if (STBuffLine->Qj == LoadUnitCDB.numOfRobSupplier && (STBuffLine->NumOfRightOperands < 1)){
 				STBuffLine->Vj = LoadUnitCDB.result;
 				STBuffLine->NumOfRightOperands++;
 			}

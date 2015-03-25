@@ -23,6 +23,7 @@ typedef struct StoreBuffer StoreBuffer;
 struct StoreBuffer {
 	int address;
 	int OPCODE;
+	int SRC1;
 	BOOL busy;
 	BOOL inExecution;
 	BOOL done;
@@ -40,6 +41,8 @@ struct Memory_PiplineStage {
 	int OPCODE;
 	int address;
 	int issued;
+	int DST;
+	int SRC1;
 	int numOfRobSupplier;
 	struct Memory_PiplineStage *next;
 	float  Data_load;

@@ -261,6 +261,7 @@ void STBufferToMemoryExecution(){
 			Memory_Unit->address = store->address;
 			Memory_Unit->numOfRobSupplier = store->robNum;
 			Memory_Unit->issued = store->issued;
+			Memory_Unit->Data_store = store->Vj;
 			store->done = TRUE;
 			break;
 
@@ -300,8 +301,7 @@ void ExecuteMemoryCmd()
 		break;
 
 	case ST:
-		execute->Data_store = FP_Registers[prevExecute->address].value;
-		updateFPRob(execute->numOfRobSupplier, execute->Data_store);
+		updateFPRob(execute->numOfRobSupplier, execute->Data_store, execute->address);
 		
 		/*store execution*/
 		break;
@@ -349,7 +349,7 @@ void EvictFromLoadAndStoreBuffer(){
 			store->busy=FALSE;
 			store->done=FALSE;
 			store->inExecution = FALSE;
-			load->addressReady = FALSE;
+			store->addressReady = FALSE;
 			store->issued=0;
 			store->Qj = 0;
 			ST_Buff_Cnt--;
