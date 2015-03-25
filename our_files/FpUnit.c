@@ -415,6 +415,31 @@ void simulateClockCycle_FpUnit(){
 	FP_EvictFromReservationStation();
 	return;
 }
+BOOL isFP_RS_ADD_empty(){
+	FpReservationStation_Line  *node = FpReservationStation_ADD;
+	int lengthADD = Configuration->add_nr_reservation;
+	int i = 0;
+
+	for (i = 1; i < lengthADD; i++){
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+}
+		
+
+BOOL isFP_RS_MULL_empty(){
+	FpReservationStation_Line *available = NULL, *node = FpReservationStation_MUL;
+	int lengthADD = Configuration->mul_nr_reservation;
+	int i = 0;
+	for (i = 1; i < lengthADD; i++){
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+}
 
 
 /*

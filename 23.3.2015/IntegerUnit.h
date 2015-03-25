@@ -34,6 +34,7 @@ struct IntALU_PipelineStage{
 
 	int OPCODE;
 	BOOL busy;
+	int issued;
 	int operand1,operand2;
 	int numOfRobSupplier;
 	struct IntALU_PipelineStage *next;
@@ -75,8 +76,9 @@ void AdvanceIntPipeline();
 
 /*pipeline advances one stage thus last stage writes if executing an inst and first stage gets a new instr if there is one available	
 in reservation stations. moreover, reservation station is updated - done instrs are evicted and new one is placed if exists*/
-BOOL SimulateClockCycle_IntUnit();		
+void SimulateClockCycle_IntUnit();		
 
+BOOL isINT_RS_empty();
 
 
 

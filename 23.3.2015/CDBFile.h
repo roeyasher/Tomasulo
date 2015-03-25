@@ -7,9 +7,10 @@ typedef struct IntCDB IntCDB;
 struct IntCDB{
 	int numOfRobSupplier;
 	int result;
+	int issued;
+	BOOL STLDIns;
 	BOOL valid;
 };
-
 
 typedef struct FPCDB FPCDB;
 struct FPCDB{
@@ -23,12 +24,18 @@ typedef struct LoadCDB LoadCDB;
 struct LoadCDB{
 
 	int numOfRobSupplier;
-	int result;
+	float result;
 	BOOL valid;
 };
+
 void CDBControlInt(IntCDB *int_to_cdb);
-void CDBControlFP(FPCDB *fp_to_cdb);
+void CDBControlFPADD(FPCDB *fp_to_cdb);
+void CDBControlFPMULL(FPCDB *fp_to_cdb);
 void CDBControlLoad(LoadCDB *load_to_cdb);
+void CDBUpdateRob();
+void CDBUpdateRS();
+
+
 #endif
 
 

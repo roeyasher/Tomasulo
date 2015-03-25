@@ -7,6 +7,7 @@
 
 int CharToInteger (char schar)
 { 
+	schar = tolower(schar);
 	switch (schar)
 	{
 		case '0':
@@ -66,80 +67,9 @@ int CharToInteger (char schar)
 
 
 
-void CheckTheConditionAndReturnPc(Instruction *temp)
 
-{
-	switch(instr.OPCODE)
-	{
-	case BEQ:
-		if((Integer_Registers[instr.SRC0].busy == FALSE)&&(Integer_Registers[instr.SRC1].busy == FALSE)){
-			if(Integer_Registers[instr.SRC0].value == Integer_Registers[instr.SRC1].value){
-				PC = PC + instr.IMM;
-				flag=TRUE;
-			//	FillTheFields(temp);
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-			else{
-				PC=PC+4;
-				flag=TRUE;
-				//FillTheFields(temp);
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-		}
-		else
-		{
-			//memset(&instr,0,sizeof(Instruction));
-			//instr.OPCODE = -1;
-			//PC=instruction_queue->PC;
-		}
-	
-		break;
-	case BNE:
-		if((Integer_Registers[instr.SRC0].busy == FALSE)&&(Integer_Registers[instr.SRC1].busy == FALSE)){
-			if(Integer_Registers[instr.SRC0].value != Integer_Registers[instr.SRC1].value){
-				PC = PC + instr.IMM;
-				flag=TRUE;
-			//	FillTheFields(temp);
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-			else{
-				PC = PC + 4;
-				flag=TRUE;
-			//	FillTheFields(temp);
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-		}
-		else {
-			//instr.OPCODE = -1;
-			//PC=instruction_queue->PC;
-		}
-		break;
-	case JUMP:
-			PC = PC + instr.IMM;
-			flag=TRUE;
-		//	FillTheFields(temp);
-			trace[cycle].valid=TRUE;
-			trace[cycle].issued=cycle;
-			trace[cycle].execution=cycle;
-			strcpy(trace[cycle].instruction,instr.name);
-			break;
-	default:
-		flag=FALSE;
-		break;
-	}
-}
+
+
 
 Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head)
 {
@@ -174,63 +104,131 @@ Instruction *DeleteTheInstrcutionsDistributor()
 	return NULL;
 }
 
+// What the hell this function do?? (Roey)
+BOOL HaltAndWrongInstruction(){
 
-int DecodeAndDistributor(Instruction *instruction_queue_head)
+	//TODO: IS it right? can we call to function without a insrt init? (Roey)
+	if (instr.OPCODE == -1)	{ return TRUE; }
 
-{	
-	/*the main function that handle with branches and jump and do the fetch and decode*/
-	/*the function checks the next instr can be sent to the units and for branches and jump the function*/
-	/* make a 1 clock cycle delay and brings the next instr depends the branch condition*/
-	//int pc_counter= instruction_queue_head->PC;
-	Instruction *temp = instruction_queue_head;
-	//instr_reservation = TRUE;
-	temp = SearchTheElementInstByPc(instruction_queue_head);
-	//printf("instruction adress is %p\n",temp);
-		if(temp== NULL)
-			return FALSE;
-
-		/*if instr_reservation is FALSE then do nothing otherwise old instruction is erased*/
-		if ((instr_reservation == TRUE)/*||(temp->OPCODE==BEQ)||(temp->OPCODE==BNE)||(temp->OPCODE==JUMP)*/){
-			FillTheFields(temp);
+	if (HALT == instr.OPCODE){
+		halt_flag = TRUE;
+		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
+		if (instr_reservation == TRUE){
+			trace[cycle].issued = cycle;
+			trace[cycle].valid = 1;
+			trace[cycle].execution = cycle;
+			strcpy(trace[cycle].instruction, instr.name);
 		}
-		switch (temp->OPCODE)
-		{
-			case HALT:
-				// simulate more clock cycles
-				if (instr_reservation==TRUE){
-					FillTheFields(temp);
-					trace[cycle].issued=cycle;
-					trace[cycle].valid=1;
-					trace[cycle].execution=cycle;
-					strcpy(trace[cycle].instruction,instr.name);
-				}	
-				break;
-			default:		/*other*/
-				CheckTheConditionAndReturnPc(temp);
-				if(instr_reservation == FALSE)// need to check what to do with this.
-				{	
-					//printf("all the resarvation stations are busy\n");
-					//Sleep(1000);					
-					break;
-				}	
-				else
-				{
-				PC=PC+4;
-				break;		
-				}
+		return TRUE;
 	}
-	return TRUE;
+	
+	return FALSE;
 }
+
+BOOL Decode(int *stop_decode){
+	BOOL branch_list_is_empty = FALSE;
+
+	GetInstructionFromQUeue();
+<<<<<<< HEAD
+	if (strncmp(instr.name,"00000000",8)==0)
+=======
+	if (strncmp(instr.name, "00000000", 8) == FALSE)
+>>>>>>> origin/master
+	{
+		*stop_decode == TRUE; // don't decode more
+	}
+	// TODO Updae RS from CDB with the last execution if CDB is VALID.
+
+	if (TRUE == HaltAndWrongInstruction())
+	{
+		*stop_decode == TRUE; // don't decode more
+		return FALSE; // don't bring more instruction
+	}
+	branch_list_is_empty = (!ThereIsBranchWaiting());
+	if (FALSE == flag)//  branch from history executed
+	{
+		if ((instr.OPCODE > 1) && (instr.OPCODE < 5)) //new instruction is branch
+		{
+			InsType = BRANCHES;
+			if (TRUE == branch_list_is_empty)
+			{
+				if (FALSE == ExecuteBranch())//execute new branch instruction
+				{
+					AppendBranchToList();
+				}
+			}
+			else
+			{
+				AppendBranchToList();
+			}
+		}
+		if (FALSE == flag) {// current branch executed
+			if (instr.OPCODE == 0) { InsType = Memory_LD_INS; }
+			if (instr.OPCODE == 1) { InsType = Memory_ST_INS; }
+			if ((instr.OPCODE > 4) && (instr.OPCODE < 9)) { InsType = INT_INS; }
+			if ((instr.OPCODE > 8) && (instr.OPCODE < 11)) { InsType = FP_ADD_INS; }
+			if (instr.OPCODE == 11) { InsType = FP_MULL_INS; }
+		}
+	}
+		return TRUE;
+}
+
+BOOL InsertToRS(){
+
+	if (!isRobFull()) {
+
+		insertRob();
+		switch (InsType){
+
+		case Memory_LD_INS:
+			if (!isLD_Buff_FULL() && !isINT_RS_FULL())
+				return InsertNewLoadInstr() && Int_InsertToReservationStation();
+			break;
+
+		case Memory_ST_INS:
+			if (!isST_Buff_FULL() && !isINT_RS_FULL())
+				return InsertNewStoreInstr() && Int_InsertToReservationStation();
+			break;
+
+		case  INT_INS:
+			if (!isINT_RS_FULL())
+				return Int_InsertToReservationStation();
+			break;
+
+		case  FP_ADD_INS:
+			if (!isFP_RS_ADD_FULL())
+				return FP_InsertToReservationStations_ADD();
+			break;
+
+		case  FP_MULL_INS:
+			if (!isFP_RS_MULL_FULL())
+				return FP_InsertToReservationStations_MULL();
+			break;
+
+		default:
+			return FALSE;
+			break;
+
+		}
+	}
+	return FALSE;
+}
+
 BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int pc) {
 	/* Fethch new instruction from memory to queue*/
 	int opcode, dst, src0, src1;
 	int imm;
+	
 	Instruction *node = NULL;
+	char *next_instruction = NULL; 
 	node = instruction_queue_head;
+	
+	char check_string[] = "99999999";
+	next_instruction = (instruction_line + 512);
 	// check whether we have more instruction in main memory
 	if (strcmp(instruction_line,"00000000")==0)
 	{
-		return TRUE;
+		return FALSE;
 	}
 	//find place in instruction queue	
 	while ((strcmp(node->name, "00000000")!=0 ) && (NULL != node))
@@ -259,10 +257,15 @@ BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter,int p
 					node->IMM = imm;
 				}
 			}
-			return FALSE;
+			// if next instruction iz zero stop bring instructions.
+			if ((strcmp("00000000", next_instruction)) == 0)
+			{
+				return FALSE;
+			}
+			return TRUE;
 		}
 
-BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
+BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter)
 {
 	char instruction_line[SIZE_OF_CHAR];
 	Instruction *node = NULL; 
@@ -272,35 +275,34 @@ BOOL FetchAndDecode(char *memory[], int *pc_conter_to_fetch, int * instruction_q
 	place_in_array = ((*pc_conter_to_fetch)*(512 / 4));
 	node = instruction_queue_head;
 	is_it_end_of_instruction_in_memory = LinkInstQueue((memory + place_in_array), instruction_queue_counter, *pc_conter_to_fetch);
-	if (TRUE == is_it_end_of_instruction_in_memory)
+	if (FALSE == is_it_end_of_instruction_in_memory)
 	{
-		return TRUE;
+		return FALSE;
 	}
-	return FALSE;
+	return TRUE;
 }
 
-void * GetInstructionFromQUeue(Instruction *result_instruction)
+void * GetInstructionFromQUeue()
 {
 	
 	Instruction *hold_head = instruction_queue_head;
 	Instruction *node = instruction_queue_head;
-	result_instruction->DST = instruction_queue_head->DST;
-	result_instruction->IMM = instruction_queue_head->IMM ;
-	strcpy(result_instruction->name,instruction_queue_head->name);
-	result_instruction->next = instruction_queue_head->next;
-	result_instruction->OPCODE = instruction_queue_head->OPCODE;
-	result_instruction->PC = instruction_queue_head->PC;
-	result_instruction->SRC0 = instruction_queue_head->SRC0;
-	result_instruction->SRC1 = instruction_queue_head->SRC1;
+	instr.DST = instruction_queue_head->DST;
+	instr.IMM = instruction_queue_head->IMM;
+	strcpy(instr.name, instruction_queue_head->name);
+	instr.next = instruction_queue_head->next;
+	instr.OPCODE = instruction_queue_head->OPCODE;
+	instr.PC = instruction_queue_head->PC;
+	instr.SRC0 = instruction_queue_head->SRC0;
+	instr.SRC1 = instruction_queue_head->SRC1;
 
 	while (NULL != node->next)
 	{
-		node = (Instruction*)node->next;
+		node = node->next;
 	}
-	instruction_queue_head = (Instruction*)instruction_queue_head->next;
-	node->next = (Instruction*)hold_head;
+	instruction_queue_head = instruction_queue_head->next;
+	node->next = hold_head;
 	node->next->next = NULL;
-	
 	strcpy(node->next->name, "00000000");
 	return;
 }

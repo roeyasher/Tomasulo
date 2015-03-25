@@ -25,7 +25,8 @@ IntCDB temp_int;
 FPCDB temp_fp_add;
 FPCDB temp_fp_mull;
 LoadCDB temp_load;
-
+/*For Branch*/
+extern Instruction *Branch_List= NULL;
 /*For Rob*/
 robLine *robLines = NULL;/*load buffer/load reservation*/
 /**/
@@ -70,6 +71,7 @@ void InitializeTrace();
 /*check if all reservation stations are empty from instructions - used to know when to terminate program after issue of HALT*/
 int detectEnd();
 
+BOOL halt_flag = FALSE;
 int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
@@ -104,58 +106,85 @@ int main(int argc, char* argv[]){
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
+		if (TRUE != halt_flag){
+			// Fetch - Instructions from the main memory ----> to the instruction queue
+			while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
+				more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
+				pc_counter_instruction++;
+			}
 
-		// Fetch - Instructions from the main memory ----> to the instruction queue
-		while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
-			more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
-			pc_counter_instruction++;
+			// Decode and check Whether is it the end of the code
+			if (FALSE == stop_decode){
+				decode_value = Decode(&stop_decode);
+			}
+			more_instruction = (((int)more_instruction) &((int)decode_value));
+			if (TRUE == flag)
+			{
+				instruction_queue_counter = 0;
+				pc_counter_instruction = (PC / 4) + 1;
+			}
+			else{
+				instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
+			}
 		}
+		if (TRUE != flag)
+		{
+			// update the system from the CDB
+			CDBUpdateRob();
+			CDBUpdateRS();
 
-		// Decode and check Whether is it the end of the code
-		if (FALSE == stop_decode){
-			decode_value = Decode(&stop_decode);
-		}
-		more_instruction = (((int)more_instruction) &((int)decode_value));
-		instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
-
-		// update the system from the CDB
-		CDBUpdateRob();
-		CDBUpdateRS();
-
-		// insert to the relevant RS 
-		instr_reservation = InsertToRS();
+			// insert to the relevant RS 
+			instr_reservation = InsertToRS();
 
 
-		//***************************************************************************
-		//1. Execution
-		//***************************************************************************
-		
-		// Simulate all of the FU's
-		SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
-		SimulateClockCycle_IntUnit();
-		simulateClockCycle_FpUnit();
+			//***************************************************************************
+			//1. Execution
+			//***************************************************************************
 
+<<<<<<< HEAD
 		//***************************************************************************
 		//1. CDB
 		//***************************************************************************
+=======
+			// Simulate all of the FU's
+			SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
+			SimulateClockCycle_IntUnit();
+			simulateClockCycle_FpUnit();
 
-		//TODO pass the CDB function the right values
+			// TODO not sure if we need this condition over here (Roey);
+			if (FALSE == more_instruction) { break; }
+>>>>>>> origin/master
 
-		CDBControlInt(&temp_int);
-		CDBControlFPADD(&temp_fp_add);
-		CDBControlFPMULL(&temp_fp_mull);
-		CDBControlLoad(&temp_load);
+			//***************************************************************************
+			//1. CDB
+			//***************************************************************************
 
+			//TODO pass the CDB function the right values
+
+<<<<<<< HEAD
 		//***************************************************************************
 		//1. Commit
 		//***************************************************************************
 		// TODO add way to exit from the while loop. (Roey)
+=======
+			CDBControlInt(&temp_int);
+			CDBControlFPADD(&temp_fp_add);
+			CDBControlFPMULL(&temp_fp_mull);
+			CDBControlLoad(&temp_load);
+
+			//***************************************************************************
+			//1. Commit
+			//***************************************************************************
+		}
+>>>>>>> origin/master
 		commitRob();
 
 		//***************************************************************************
 		//***************************************************************************
-
+		
+		
 		PC += 4; //Clock
+		
 		InsType = -1;
 
 		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
@@ -168,6 +197,8 @@ int main(int argc, char* argv[]){
 
 		// are we limited to number of cycle?? mybe need to delet this one (Roey);
 		if (cycle == 200000)
+			break;
+		if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
 			break;
 	}
 

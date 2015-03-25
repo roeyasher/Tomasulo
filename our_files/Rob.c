@@ -149,3 +149,14 @@ BOOL isRobFull(){
 	return (robCnt == Configuration->rob_entries);
 }
 
+BOOL IsRobEmpty(){
+	int Number_of_Rob_Lines = Configuration->rob_entries,i=0;
+	robLine *node = NULL;
+	node = robLines;
+	for (i = 2; i <= Number_of_Rob_Lines; i++)	{
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+}

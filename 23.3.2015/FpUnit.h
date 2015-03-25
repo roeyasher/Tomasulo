@@ -68,6 +68,9 @@ void FP_AdvanceFpPipeline_MUL();
 
 /*simulate one clock cycle: advance pipeline, write to CDB if needed, evict done instruction from reservation station and
 put new ones if possible*/
-BOOL simulateClockCycle_FpUnit();
+void simulateClockCycle_FpUnit();
 BOOL UpdateResultInRS();
+// Is the FP reservation station is empty
+BOOL isFP_RS_ADD_empty();
+BOOL isFP_RS_MULL_empty();
 #endif

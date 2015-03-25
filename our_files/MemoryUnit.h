@@ -68,5 +68,7 @@ void CdbReturnValue();
 void readLine(FILE *file, char *my_string);
 void EvictFromLoadAndStoreBuffer();
 void MemInToMainMemory(char *memory[], char *memin_txt);
+BOOL isLD_Buff_emepty();
+BOOL isST_Buff_empety();
 #endif
 

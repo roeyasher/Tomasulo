@@ -19,7 +19,7 @@ struct Instruction {
 
 int CharToInteger (char schar);
 
-void BranchAndUpdatePC();
+
 void EmptyInsturcionQueue(int *counter);
 void freeInsturcionQueue();
 void * GetInstructionFromQUeue();
@@ -32,6 +32,7 @@ BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_coun
 Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head);
 Instruction *DeleteTheInstrcutionsDistributor();
 BOOL InsertToRS();
+
 #endif
 
 

@@ -7,6 +7,7 @@
 #include "rob.h"  
 #include "common.h"
 #include "CDBFile.h"
+#include "Branch.h"
 
 /*Memory*/
 extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
@@ -16,11 +17,10 @@ extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
 extern Configuration_Data *Configuration;
 
 extern Instruction instr;
-
 extern BOOL instr_reservation;
-
+extern int InsType;
 extern BOOL flag;
-
+extern BOOL halt_flag;
 
 /*For Rob*/
 
@@ -37,8 +37,8 @@ extern IntReservationStation_Line *IntReservationStation;
 
 extern IntALU_PipelineStage *Integer_ALU_Unit;
 
-/**/
-
+/*Branch list*/
+extern Instruction *Branch_List;
 
 
 /*For FP Unit*/
@@ -58,16 +58,12 @@ extern FP_PipelineStage *FP_executionPipeline_MUL;
 /*For fetch and decode*/
 
 extern Instruction *instruction_queue_head;
-
 extern int PC;
 
 /**/
 
-
 extern Memory_PiplineStage *Memory_Unit;
-
 extern LoadBuffer *LoadBufferResarvation;
-
 extern StoreBuffer *StoreBufferResarvation;
 
 
@@ -76,17 +72,17 @@ extern int cycle;
 
 extern Trace trace[TRACE_SIZE];
 
-extern float PhysicalMemoryArray[];
-
-
 /*For CDB*/
 
 extern IntCDB IntUnitCDB;
-extern FPCDB FPUnitCDB;
+extern FPCDB FPUnitCDBADD;
+extern FPCDB FPUnitCDBMULL;
 extern LoadCDB LoadUnitCDB;
 
 extern IntCDB temp_int;
-extern IntCDB temp_fp;
-extern IntCDB temp_load;
+extern FPCDB temp_fp_add;
+extern FPCDB temp_fp_mull;
+extern LoadCDB temp_load;
+
 
 

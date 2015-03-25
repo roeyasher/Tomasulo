@@ -70,4 +70,7 @@ void FP_AdvanceFpPipeline_MUL();
 put new ones if possible*/
 void simulateClockCycle_FpUnit();
 BOOL UpdateResultInRS();
+// Is the FP reservation station is empty
+BOOL isFP_RS_ADD_empty();
+BOOL isFP_RS_MULL_empty();
 #endif

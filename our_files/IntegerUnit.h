@@ -78,6 +78,7 @@ void AdvanceIntPipeline();
 in reservation stations. moreover, reservation station is updated - done instrs are evicted and new one is placed if exists*/
 void SimulateClockCycle_IntUnit();		
 
+BOOL isINT_RS_empty();
 
 
 

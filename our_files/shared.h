@@ -7,6 +7,7 @@
 #include "rob.h"  
 #include "common.h"
 #include "CDBFile.h"
+#include "Branch.h"
 
 /*Memory*/
 extern char MainMemoryArray[MEMORY_SIZE][BUFFER_SIZE];
@@ -19,7 +20,7 @@ extern Instruction instr;
 extern BOOL instr_reservation;
 extern int InsType;
 extern BOOL flag;
-
+extern BOOL halt_flag;
 
 /*For Rob*/
 
@@ -36,8 +37,8 @@ extern IntReservationStation_Line *IntReservationStation;
 
 extern IntALU_PipelineStage *Integer_ALU_Unit;
 
-/**/
-
+/*Branch list*/
+extern Instruction *Branch_List;
 
 
 /*For FP Unit*/

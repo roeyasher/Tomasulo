@@ -67,75 +67,9 @@ int CharToInteger (char schar)
 
 
 
-void BranchAndUpdatePC()
 
-{
-	switch(instr.OPCODE)
-	{
-	case BEQ:
-		if((Integer_Registers[instr.SRC0].busy == FALSE)&&(Integer_Registers[instr.SRC1].busy == FALSE)){
-			if(Integer_Registers[instr.SRC0].value == Integer_Registers[instr.SRC1].value){
-				PC = PC + instr.IMM;
-				flag=TRUE;
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-			else{
-				PC=PC+4;
-				flag=TRUE;
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-		}
-		else
-		{
-			//memset(&instr,0,sizeof(Instruction));
-			//instr.OPCODE = -1;
-			//PC=instruction_queue->PC;
-		}
-	
-		break;
-	case BNE:
-		if((Integer_Registers[instr.SRC0].busy == FALSE)&&(Integer_Registers[instr.SRC1].busy == FALSE)){
-			if(Integer_Registers[instr.SRC0].value != Integer_Registers[instr.SRC1].value){
-				PC = PC + instr.IMM;
-				flag=TRUE;
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-			else{
-				PC = PC + 4;
-				flag=TRUE;
-				trace[cycle].valid=TRUE;
-				trace[cycle].issued=cycle;
-				trace[cycle].execution=cycle;
-				strcpy(trace[cycle].instruction,instr.name);
-			}
-		}
-		else {
-			//instr.OPCODE = -1;
-			//PC=instruction_queue->PC;
-		}
-		break;
-	case JUMP:
-			PC = PC + instr.IMM;
-			flag=TRUE;
-			trace[cycle].valid=TRUE;
-			trace[cycle].issued=cycle;
-			trace[cycle].execution=cycle;
-			strcpy(trace[cycle].instruction,instr.name);
-			break;
-	default:
-		flag=FALSE;
-		break;
-	}
-}
+
+
 
 Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head)
 {
@@ -177,6 +111,7 @@ BOOL HaltAndWrongInstruction(){
 	if (instr.OPCODE == -1)	{ return TRUE; }
 
 	if (HALT == instr.OPCODE){
+		halt_flag = TRUE;
 		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
 		if (instr_reservation == TRUE){
 			trace[cycle].issued = cycle;
@@ -191,33 +126,51 @@ BOOL HaltAndWrongInstruction(){
 }
 
 BOOL Decode(int *stop_decode){
+	BOOL branch_list_is_empty = FALSE;
 
 	GetInstructionFromQUeue();
+<<<<<<< HEAD
 	if (strncmp(instr.name,"00000000",8)==0)
+=======
+	if (strncmp(instr.name, "00000000", 8) == FALSE)
+>>>>>>> origin/master
 	{
 		*stop_decode == TRUE; // don't decode more
 	}
 	// TODO Updae RS from CDB with the last execution if CDB is VALID.
 
-	if (TRUE == HaltAndWrongInstruction()) 
-	{ 
+	if (TRUE == HaltAndWrongInstruction())
+	{
 		*stop_decode == TRUE; // don't decode more
 		return FALSE; // don't bring more instruction
 	}
-	//branch? we haveto hold branch buffer (Roey)
-	//TODO flush instruction queue
-	
-	//TODO fix the branch system!! 
-	//BranchAndUpdatePC();
-	//if (TRUE == flag){ return FALSE; }
-	
-	if (instr.OPCODE == 0) { InsType = Memory_LD_INS; }
-	if (instr.OPCODE == 1) { InsType = Memory_ST_INS; }
-	if ((instr.OPCODE > 4) && (instr.OPCODE < 9)) { InsType = INT_INS; }
-	if ((instr.OPCODE > 8) && (instr.OPCODE < 11)) { InsType = FP_ADD_INS; }
-	if (instr.OPCODE == 11) { InsType = FP_MULL_INS; }
-
-	return TRUE;
+	branch_list_is_empty = (!ThereIsBranchWaiting());
+	if (FALSE == flag)//  branch from history executed
+	{
+		if ((instr.OPCODE > 1) && (instr.OPCODE < 5)) //new instruction is branch
+		{
+			InsType = BRANCHES;
+			if (TRUE == branch_list_is_empty)
+			{
+				if (FALSE == ExecuteBranch())//execute new branch instruction
+				{
+					AppendBranchToList();
+				}
+			}
+			else
+			{
+				AppendBranchToList();
+			}
+		}
+		if (FALSE == flag) {// current branch executed
+			if (instr.OPCODE == 0) { InsType = Memory_LD_INS; }
+			if (instr.OPCODE == 1) { InsType = Memory_ST_INS; }
+			if ((instr.OPCODE > 4) && (instr.OPCODE < 9)) { InsType = INT_INS; }
+			if ((instr.OPCODE > 8) && (instr.OPCODE < 11)) { InsType = FP_ADD_INS; }
+			if (instr.OPCODE == 11) { InsType = FP_MULL_INS; }
+		}
+	}
+		return TRUE;
 }
 
 BOOL InsertToRS(){
