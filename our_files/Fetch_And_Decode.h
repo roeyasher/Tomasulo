@@ -7,6 +7,8 @@ typedef struct Instruction Instruction;
 struct Instruction {
 
 	int OPCODE;
+	float operand1, operand2;
+	int numOfSupplier;
 	int DST;
 	int SRC0;
 	int SRC1;
@@ -16,6 +18,7 @@ struct Instruction {
 	int numRob;
 	char name[16];
 	BOOL STLDIns;
+	BOOL busy;
 	float result;
 	int issued;
 	struct Instruction *next;
