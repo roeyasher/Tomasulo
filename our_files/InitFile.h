@@ -7,6 +7,7 @@ void InitBuffers();
 void InitFus();
 int detectEnd();
 void MemoryLog();
+BOOL DoesRobAndRSEmpty();
 #endif
 
 

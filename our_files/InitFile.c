@@ -87,3 +87,10 @@ int detectEnd(){
 	}
 	return 1;
 }
+BOOL DoesRobAndRSEmpty(){
+	if ((FALSE == isINT_RS_empty()) || (FALSE == isFP_RS_ADD_empty()) || (FALSE == isFP_RS_MULL_empty()) || (FALSE == IsRobEmpty()) || (FALSE == isLD_Buff_emepty()) || (FALSE == isST_Buff_empety()))
+	{
+		return FALSE;
+	}
+	return TRUE;
+}

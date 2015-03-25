@@ -185,6 +185,8 @@ int main(int argc, char* argv[]){
 		// are we limited to number of cycle?? mybe need to delet this one (Roey);
 		if (cycle == 200000)
 			break;
+		if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
+			break;
 	}
 
 
