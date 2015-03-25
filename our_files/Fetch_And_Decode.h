@@ -12,8 +12,12 @@ struct Instruction {
 	int SRC1;
 	int IMM;
 	int PC;
+	int numOfRobSupplier;
 	int numRob;
 	char name[16];
+	BOOL STLDIns;
+	float result;
+	int issued;
 	struct Instruction *next;
 };
 

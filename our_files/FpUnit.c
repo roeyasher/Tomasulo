@@ -335,7 +335,7 @@ void FP_AdvanceFpPipeline_ADD(){
 		// Preapre Values for CDB struct
 		temp_fp_add.numOfRobSupplier = last->numOfSupplier;
 		temp_fp_add.result = last->result;
-		
+		strcpy(temp_fp_add.name, last->name);
 
 	}
 	/*advance ADD pipeline one stage forward*/

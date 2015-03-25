@@ -21,10 +21,10 @@ FPCDB FPUnitCDBADD;
 FPCDB FPUnitCDBMULL;
 LoadCDB LoadUnitCDB;
 
-IntCDB temp_int;
-FPCDB temp_fp_add;
-FPCDB temp_fp_mull;
-LoadCDB temp_load;
+Instruction temp_int;
+Instruction temp_fp_add;
+Instruction temp_fp_mull;
+Instruction temp_load;
 /*For Branch*/
 extern Instruction *Branch_List= NULL;
 /*For Rob*/
@@ -136,7 +136,29 @@ int main(int argc, char* argv[]){
 			if (!stop_decode)
 				// insert to the relevant RS 
 				instr_reservation = InsertToRS();
+		}
+			
 
+			//***************************************************************************
+			//1. Commit
+			//***************************************************************************
+			commitRob();
+			if (TRUE != flag)
+			{
+			
+			//***************************************************************************
+			//1. CDB
+			//***************************************************************************
+
+			//TODO pass the CDB function the right values
+
+
+			// TODO add way to exit from the while loop. (Roey)
+
+			CDBControlInt(&temp_int);
+			CDBControlFPADD(&temp_fp_add);
+			CDBControlFPMULL(&temp_fp_mull);
+			CDBControlLoad(&temp_load);
 
 			//***************************************************************************
 			//1. Execution
@@ -148,29 +170,15 @@ int main(int argc, char* argv[]){
 			SimulateClockCycle_IntUnit();
 			simulateClockCycle_FpUnit();
 
+			}
+			
+			cycle++;
 			
 
+			
+		
 
-			//***************************************************************************
-			//1. CDB
-			//***************************************************************************
-
-			//TODO pass the CDB function the right values
-
-
-			// TODO add way to exit from the while loop. (Roey)
-			//cycle++;
-			CDBControlInt(&temp_int);
-			CDBControlFPADD(&temp_fp_add);
-			CDBControlFPMULL(&temp_fp_mull);
-			CDBControlLoad(&temp_load);
-
-			//***************************************************************************
-			//1. Commit
-			//***************************************************************************
-		}
-
-		commitRob();
+		
 
 		//***************************************************************************
 		//***************************************************************************
@@ -193,7 +201,7 @@ int main(int argc, char* argv[]){
 			break;
 		//if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
 		//	break;
-		cycle++;
+	
 	}
 
 

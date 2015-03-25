@@ -2,7 +2,7 @@
 #include "shared.h"
 
 
-void CDBControlInt(IntCDB *int_to_cdb)
+void CDBControlInt(Instruction *int_to_cdb)
 {
 	int j = 0;
 	if (int_to_cdb->numOfRobSupplier || int_to_cdb->STLDIns){
@@ -12,7 +12,7 @@ void CDBControlInt(IntCDB *int_to_cdb)
 		IntUnitCDB.issued = int_to_cdb->issued;
 		IntUnitCDB.valid = TRUE;
 		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+			if ((strcmp(trace[j].instruction, int_to_cdb->name) == 0)){
 				trace[j].CDB = cycle;
 				break;
 			}
@@ -24,7 +24,7 @@ void CDBControlInt(IntCDB *int_to_cdb)
 	return;
 }
 
-void CDBControlFPADD(FPCDB *fp_to_cdb)
+void CDBControlFPADD(Instruction *fp_to_cdb)
 {
 	int j = 0;
 	if (fp_to_cdb->numOfRobSupplier){
@@ -32,7 +32,7 @@ void CDBControlFPADD(FPCDB *fp_to_cdb)
 		FPUnitCDBADD.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBADD.valid = TRUE;
 		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+			if ((strcmp(trace[j].instruction, fp_to_cdb->name) == 0)){
 				trace[j].CDB = cycle;
 				break;
 			}
@@ -44,7 +44,7 @@ void CDBControlFPADD(FPCDB *fp_to_cdb)
 	return;
 }
 
-void CDBControlFPMULL(FPCDB *fp_to_cdb)
+void CDBControlFPMULL(Instruction *fp_to_cdb)
 {
 	int j = 0;
 	if (fp_to_cdb->numOfRobSupplier){
@@ -52,7 +52,7 @@ void CDBControlFPMULL(FPCDB *fp_to_cdb)
 		FPUnitCDBMULL.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBMULL.valid = TRUE;
 		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+			if ((strcmp(trace[j].instruction, fp_to_cdb->name) == 0)){
 				trace[j].CDB = cycle;
 				break;
 			}
@@ -62,7 +62,7 @@ void CDBControlFPMULL(FPCDB *fp_to_cdb)
 		FPUnitCDBADD.valid = FALSE;
 	return;
 }
-void CDBControlLoad(LoadCDB *load_to_cdb)
+void CDBControlLoad(Instruction *load_to_cdb)
 {
 	int j = 0;
 	if (load_to_cdb->numOfRobSupplier){
@@ -70,7 +70,7 @@ void CDBControlLoad(LoadCDB *load_to_cdb)
 		LoadUnitCDB.valid = TRUE;
 		LoadUnitCDB.numOfRobSupplier = load_to_cdb->numOfRobSupplier;
 		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+			if ((strcmp(trace[j].instruction, load_to_cdb->name) == 0)){
 				trace[j].CDB = cycle;
 				break;
 			}

@@ -230,6 +230,7 @@ void AdvanceIntPipeline(){
 			last->result = (last->operand1) + (last->operand2);
 			temp_int.STLDIns = TRUE;
 			temp_int.issued = last->issued;
+			strcpy(temp_int.name, last->name);
 			break;
 
 		default:
@@ -254,6 +255,7 @@ void AdvanceIntPipeline(){
 		// Preapre Values for CDB struct
 		temp_int.numOfRobSupplier = last->numOfRobSupplier;
 		temp_int.result = last->result;
+		strcpy(temp_int.name,last->name);
 	}
 
 	/*waiting stations and registers were updated if not a bubble in last stage. Now must advance pipeline one stage foreward*/

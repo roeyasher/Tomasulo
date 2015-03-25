@@ -28,10 +28,10 @@ struct LoadCDB{
 	BOOL valid;
 };
 
-void CDBControlInt(IntCDB *int_to_cdb);
-void CDBControlFPADD(FPCDB *fp_to_cdb);
-void CDBControlFPMULL(FPCDB *fp_to_cdb);
-void CDBControlLoad(LoadCDB *load_to_cdb);
+void CDBControlInt(Instruction *int_to_cdb);
+void CDBControlFPADD(Instruction *fp_to_cdb);
+void CDBControlFPMULL(Instruction *fp_to_cdb);
+void CDBControlLoad(Instruction *load_to_cdb);
 void CDBUpdateRob();
 void CDBUpdateRS();
 

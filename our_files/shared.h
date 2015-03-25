@@ -79,10 +79,10 @@ extern FPCDB FPUnitCDBADD;
 extern FPCDB FPUnitCDBMULL;
 extern LoadCDB LoadUnitCDB;
 
-extern IntCDB temp_int;
-extern FPCDB temp_fp_add;
-extern FPCDB temp_fp_mull;
-extern LoadCDB temp_load;
+extern Instruction temp_int;
+extern Instruction temp_fp_add;
+extern Instruction temp_fp_mull;
+extern Instruction temp_load;
 
 
 
