@@ -45,7 +45,7 @@ void emptyRob(){
 	robCnt = 0;
 }
 
-// Try to inster the global instruction to the rob line.
+/*Try to inster the global instruction to the rob line*/
 BOOL insertRob(){
 
 	robLine *iter = robLines, *availableRobLine = NULL;
@@ -68,23 +68,11 @@ BOOL insertRob(){
 	availableRobLine->busy = TRUE;
 	availableRobLine->state = 2; // issue
 	instr.numRob = availableRobLine->numRob;
+
 	robCnt++;
 
 }
-void updateIntRob(int numRob, int value){
-
-	robLine *iter = robLines;
-
-	while (iter != NULL){
-		if (iter->numRob == numRob){
-			iter->intValue = value;
-			break;
-		}
-		iter = iter->next;
-	}
-	return;
-}
-
+/*Update Rob entry by ST*/
 void updateFPRob(int numRob, float value, int address){
 
 	robLine *iter = robLines;
@@ -101,7 +89,7 @@ void updateFPRob(int numRob, float value, int address){
 	return;
 }
 
-// commit if the first insruction that done
+/* commit if the first insruction that done*/
 BOOL commitRob(){
 	
 	robLine *node = robLines, *last = robLines;
@@ -114,10 +102,9 @@ BOOL commitRob(){
 		for (i = 0; i<NUM_OF_INT_REGISTERS; i++){
 
 			if ((Integer_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob && node->done == TRUE){
-
-				Integer_Registers[i].value = node->intValue;			/*update value*/
-				Integer_Registers[i].busy = FALSE;					/*no more busy*/
-				Integer_Registers[i].robNum = 0;	/*reset label though it is not necessary*/
+				Integer_Registers[i].value = node->intValue;
+				Integer_Registers[i].busy = FALSE;	
+				Integer_Registers[i].robNum = 0;	
 			}
 		}
 
@@ -129,7 +116,7 @@ BOOL commitRob(){
 				Integer_Registers[i].robNum = 0;
 			}
 		}
-
+		/*update main memory by ST inst*/
 		if (node->OPCODE == ST){
 			sprintf(MainMemoryArray[node->address], "%08x", (unsigned int)node->fpValue);
 		}
@@ -141,16 +128,15 @@ BOOL commitRob(){
 		robCnt--;
 		return TRUE;
 	}
-	else{
+	else
 		return FALSE;
-	}
 
 }
-
+/*Return if the Rob buffer full*/
 BOOL isRobFull(){
 	return (robCnt == Configuration->rob_entries);
 }
-
+/*Return if the Rob empty*/
 BOOL IsRobEmpty(){
 	int Number_of_Rob_Lines = Configuration->rob_entries,i=0;
 	robLine *node = NULL;
