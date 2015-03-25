@@ -34,6 +34,7 @@ struct IntALU_PipelineStage{
 
 	int OPCODE;
 	BOOL busy;
+	int issued;
 	int operand1,operand2;
 	int numOfRobSupplier;
 	struct IntALU_PipelineStage *next;

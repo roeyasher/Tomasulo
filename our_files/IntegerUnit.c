@@ -2,13 +2,12 @@
 #include "shared.h"
 
 /*used to create new reservation station line*/
-IntReservationStation_Line *CreateNewIRSLNode(int index){
+IntReservationStation_Line *CreateNewIRSLNode(){
 
 	IntReservationStation_Line *temp = NULL;
 	temp = (IntReservationStation_Line*) malloc(sizeof(IntReservationStation_Line));
 	memset(temp, 0, sizeof(IntReservationStation_Line));
 	temp->next = NULL;
-	temp->robNum = index;
 	return temp;		/*NULL is returned if failure occured*/
 }
 
@@ -27,12 +26,12 @@ void InitializeReservationStation(){
 	int i = 0;
 
 	IntReservationStation_Line *node = NULL;
-	IntReservationStation = CreateNewIRSLNode(0);  /*Create first Line and label it as ADD1*/
+	IntReservationStation = CreateNewIRSLNode();  /*Create first Line and label it as ADD1*/
 	node = IntReservationStation;
 
 	/*Create other Lines and label them ADD2,ADD3 and so on*/
 	for (i = 1; i < NumberOFReservationStations; i++){
-		node->next = CreateNewIRSLNode(i);
+		node->next = CreateNewIRSLNode();
 		node = node->next;
 	}
 
@@ -81,7 +80,6 @@ BOOL Int_InsertToReservationStation(){
 
 	/*operand j is always from register*/
 	if (Integer_Registers[instr.SRC0].busy == FALSE){
-
 		available->Vj = Integer_Registers[instr.SRC0].value;
 		available->NumOfRightOperands++;				/*operand is ready*/
 	}
@@ -107,14 +105,15 @@ BOOL Int_InsertToReservationStation(){
 		available->NumOfRightOperands++;				/*operand is ready*/
 	}
 
-
 	/*it's ADD or SUB and register is busy*/
 
 	/*update destination register to being busy and update label to know from whom result is given*/
-	Integer_Registers[instr.DST].busy=TRUE;
-	Integer_Registers[instr.DST].robNum = instr.numRob;
+	if (!(instr.OPCODE == ST) && !(instr.OPCODE == LD)){
+		Integer_Registers[instr.DST].busy = TRUE;
+		Integer_Registers[instr.DST].robNum = instr.numRob;
+		available->robNum = instr.numRob;
+	}
 
-	available->robNum = instr.numRob;
 	available->busy = TRUE;
 	available->done = FALSE;
 	available->inExecution=FALSE;
@@ -144,17 +143,20 @@ void ReservationStationToALU(){
 			Integer_ALU_Unit->operand1=line->Vj;
 			Integer_ALU_Unit->operand2=line->Vk;
 			Integer_ALU_Unit->numOfRobSupplier = line->robNum;
+			Integer_ALU_Unit->issued = line->issued;
+			line->done = TRUE;
 			line->inExecution=TRUE;			/*so it's not sent again to ALU*/
+			break;
 
-			for (j=0;j<TRACE_SIZE;j++){
+/*			for (j=0;j<TRACE_SIZE;j++){
 
 				if (trace[j].issued == line->issued){
 
 					trace[j].execution=cycle;
 					break;
 				}
-			}		
-			break;
+			}	*/	
+			
 		}
 		line=line->next;
 	}
@@ -175,8 +177,8 @@ void EvictFromIntReservationStation(){
 			line->done=FALSE;
 			line->inExecution=FALSE;
 			line->NumOfRightOperands=0;
-			memset(line->Qj,0,LABEL_SIZE);
-			memset(line->Qk,0,LABEL_SIZE);
+			line->Qj = 0;
+			line->Qk = 0;
 			line->Vj=0;
 			line->Vk=0;
 			line->OPCODE=-1;
@@ -222,6 +224,18 @@ void AdvanceIntPipeline(){
 			last->result = (last->operand1) - (last->operand2);
 			break;
 
+		case LD:
+			last->result = (last->operand1) + (last->operand2);
+			temp_int.STLDIns = TRUE;
+			temp_int.issued = last->issued;
+			break;
+
+		case ST:
+			last->result = (last->operand1) + (last->operand2);
+			temp_int.STLDIns = TRUE;
+			temp_int.issued = last->issued;
+			break;
+
 		default:
 			// Opcode not in ALU unit
 			break;
@@ -251,8 +265,8 @@ BOOL isINT_RS_FULL(){
 
 void SimulateClockCycle_IntUnit(){
 
-	ReservationStationToALU();
 	AdvanceIntPipeline();					/*advance piepline*/
+	ReservationStationToALU();
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
 	return;
 }

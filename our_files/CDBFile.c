@@ -4,9 +4,11 @@
 
 void CDBControlInt(IntCDB *int_to_cdb)
 {
-	if (int_to_cdb->numOfRobSupplier){
+	if (int_to_cdb->numOfRobSupplier || int_to_cdb->STLDIns){
 		IntUnitCDB.result = int_to_cdb->result;
 		IntUnitCDB.numOfRobSupplier = int_to_cdb->numOfRobSupplier;
+		IntUnitCDB.STLDIns = int_to_cdb->STLDIns;
+		IntUnitCDB.issued = int_to_cdb->issued;
 		IntUnitCDB.valid = TRUE;
 	}
 	else
@@ -60,7 +62,7 @@ void CDBUpdateRob(){
 		
 		if (iter->numRob == LoadUnitCDB.numOfRobSupplier){
 			iter->done = TRUE;
-			iter->intValue = LoadUnitCDB.result;
+			iter->fpValue = LoadUnitCDB.result;
 		}
 
 		if (iter->numRob == IntUnitCDB.numOfRobSupplier){
@@ -70,7 +72,7 @@ void CDBUpdateRob(){
 
 		if (iter->numRob == FPUnitCDBADD.numOfRobSupplier){
 			iter->done = TRUE;
-			iter->intValue = FPUnitCDBADD.result;
+			iter->fpValue = FPUnitCDBADD.result;
 		}
 
 		if (iter->numRob == FPUnitCDBMULL.numOfRobSupplier){
@@ -87,70 +89,178 @@ void CDBUpdateRS(){
 	IntReservationStation_Line *IntRsLine = NULL;
 	FpReservationStation_Line  *FPRsLine = NULL;
 	LoadBuffer  *LDBuffLine = NULL;
+	StoreBuffer  *STBuffLine = NULL;
 
 
+
+	// Update result from load - ST, FPMULL, FPADD
 	if (LoadUnitCDB.valid == TRUE) {
 
-		LDBuffLine = IntReservationStation;
-		while (LDBuffLine != NULL && LDBuffLine->NumOfRightOperands<1){
+		STBuffLine = StoreBufferResarvation;
+		while ((STBuffLine) != NULL && (STBuffLine->addressReady == FALSE)){
 
-			if (LDBuffLine->Qj == IntUnitCDB.numOfRobSupplier){
-				LDBuffLine->Vj = IntUnitCDB.result;
-				LDBuffLine->NumOfRightOperands++;
+			if (STBuffLine->Qj == LoadUnitCDB.numOfRobSupplier){
+				STBuffLine->Vj = LoadUnitCDB.result;
+				STBuffLine->NumOfRightOperands++;
 			}
-			LDBuffLine = IntRsLine->next;
+			STBuffLine = STBuffLine->next;
 		}
-	}
-
-	if (IntUnitCDB.valid == TRUE) {
-
-		IntRsLine = IntReservationStation;
-		while (IntRsLine != NULL && IntRsLine->NumOfRightOperands<2){
-
-			if (IntRsLine->Qj == IntUnitCDB.numOfRobSupplier){
-				IntRsLine->Vj = IntUnitCDB.result;
-				IntRsLine->NumOfRightOperands++;
-			}
-			if (IntRsLine->Qk == IntUnitCDB.numOfRobSupplier){
-				IntRsLine->Vk = IntUnitCDB.result;
-				IntRsLine->NumOfRightOperands++;
-			}
-
-			IntRsLine = IntRsLine->next;
-		}
-	}
-
-
-	if (FPUnitCDBMULL.valid == TRUE) {
 
 		FPRsLine = FpReservationStation_MUL;
 		while (FPRsLine != NULL && FPRsLine->NumOfRightOperands<2){
 
-			if (FPRsLine->Qj == FPUnitCDBMULL.numOfRobSupplier){
-				FPRsLine->Vj = FPUnitCDBMULL.result;
+			if (FPRsLine->Qj == LoadUnitCDB.numOfRobSupplier){
+				FPRsLine->Vj = LoadUnitCDB.result;
 				FPRsLine->NumOfRightOperands++;
 			}
-			if (FPRsLine->Qk == FPUnitCDBMULL.numOfRobSupplier){
-				FPRsLine->Vk = FPUnitCDBMULL.result;
+			if (FPRsLine->Qk == LoadUnitCDB.numOfRobSupplier){
+				FPRsLine->Vk = LoadUnitCDB.result;
 				FPRsLine->NumOfRightOperands++;
 			}
+			FPRsLine = FPRsLine->next;
 		}
-	}
-
-
-	if (FPUnitCDBADD.valid == TRUE) {
 
 		FPRsLine = FpReservationStation_ADD;
 		while (FPRsLine != NULL && FPRsLine->NumOfRightOperands<2){
 
-			if (FPRsLine->Qj == FPUnitCDBADD.numOfRobSupplier){
+			if (FPRsLine->Qj == LoadUnitCDB.numOfRobSupplier){
+				FPRsLine->Vj = LoadUnitCDB.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			if (FPRsLine->Qk == LoadUnitCDB.numOfRobSupplier){
+				FPRsLine->Vk = LoadUnitCDB.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			FPRsLine = FPRsLine->next;
+		}
+	}
+
+
+	// Update result from INTALU - INTALU
+	if (IntUnitCDB.valid == TRUE) {
+
+		if (IntUnitCDB.STLDIns == TRUE){
+
+			STBuffLine = StoreBufferResarvation;
+			while ((STBuffLine) != NULL){
+
+				if ((STBuffLine->addressReady == FALSE) && IntUnitCDB.issued == STBuffLine->issued){
+					STBuffLine->address = IntUnitCDB.result;
+					STBuffLine->addressReady = TRUE;
+				}
+				STBuffLine = STBuffLine->next;
+			}
+			
+			LDBuffLine = LoadBufferResarvation;
+			while ((LDBuffLine) != NULL){
+
+				if ((LDBuffLine->addressReady == FALSE) && IntUnitCDB.issued == LDBuffLine->issued){
+					LDBuffLine->address = IntUnitCDB.result;
+					LDBuffLine->addressReady = TRUE;
+				}
+				LDBuffLine = LDBuffLine->next;
+			}
+
+
+		}
+		else{
+			IntRsLine = IntReservationStation;
+			while (IntRsLine != NULL){
+
+				if (IntRsLine->Qj == IntUnitCDB.numOfRobSupplier  && IntRsLine->NumOfRightOperands < 2){
+					IntRsLine->Vj = IntUnitCDB.result;
+					IntRsLine->NumOfRightOperands++;
+				}
+				if (IntRsLine->Qk == IntUnitCDB.numOfRobSupplier  && IntRsLine->NumOfRightOperands < 2){
+					IntRsLine->Vk = IntUnitCDB.result;
+					IntRsLine->NumOfRightOperands++;
+				}
+				IntRsLine = IntRsLine->next;
+			}
+		}
+	}
+
+	// Update from FPMULL - FPMULL, FPADD, LD
+	if (FPUnitCDBMULL.valid == TRUE) {
+
+		STBuffLine = StoreBufferResarvation;
+		while (STBuffLine != NULL){
+
+		if (STBuffLine->Qj == FPUnitCDBMULL.numOfRobSupplier && (STBuffLine->NumOfRightOperands < 1)){
+				STBuffLine->Vj = FPUnitCDBMULL.result;
+				STBuffLine->NumOfRightOperands++;
+			}
+			STBuffLine = STBuffLine->next;
+		}
+
+		FPRsLine = FpReservationStation_MUL;
+		while (FPRsLine != NULL){
+
+			if (FPRsLine->Qj == FPUnitCDBMULL.numOfRobSupplier  && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vj = FPUnitCDBMULL.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			if (FPRsLine->Qk == FPUnitCDBMULL.numOfRobSupplier  && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vk = FPUnitCDBMULL.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			FPRsLine = FPRsLine->next;
+		}
+
+		FPRsLine = FpReservationStation_ADD;
+		while (FPRsLine != NULL){
+
+			if (FPRsLine->Qj == FPUnitCDBMULL.numOfRobSupplier && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vj = FPUnitCDBMULL.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			if (FPRsLine->Qk == FPUnitCDBMULL.numOfRobSupplier && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vk = FPUnitCDBMULL.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			FPRsLine = FPRsLine->next;
+		}
+	}
+
+	// Update from FPADD - FPMULL, FPADD, LD
+	if (FPUnitCDBADD.valid == TRUE) {
+
+		STBuffLine = IntReservationStation;
+		while ((STBuffLine) != NULL){
+
+			if (STBuffLine->Qj == FPUnitCDBADD.numOfRobSupplier && (STBuffLine->NumOfRightOperands < 1)){
+				STBuffLine->Vj = FPUnitCDBADD.result;
+				STBuffLine->NumOfRightOperands++;
+			}
+			STBuffLine = STBuffLine->next;
+		}
+
+		FPRsLine = FpReservationStation_MUL;
+		while (FPRsLine != NULL){
+
+			if (FPRsLine->Qj == FPUnitCDBADD.numOfRobSupplier  && FPRsLine->NumOfRightOperands<2){
 				FPRsLine->Vj = FPUnitCDBADD.result;
 				FPRsLine->NumOfRightOperands++;
 			}
-			if (FPRsLine->Qk == FPUnitCDBADD.numOfRobSupplier){
+			if (FPRsLine->Qk == FPUnitCDBADD.numOfRobSupplier  && FPRsLine->NumOfRightOperands<2){
 				FPRsLine->Vk = FPUnitCDBADD.result;
 				FPRsLine->NumOfRightOperands++;
 			}
+			FPRsLine = FPRsLine->next;
+		}
+
+		FPRsLine = FpReservationStation_ADD;
+		while (FPRsLine != NULL ){
+
+			if (FPRsLine->Qj == FPUnitCDBADD.numOfRobSupplier && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vj = FPUnitCDBADD.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			if (FPRsLine->Qk == FPUnitCDBADD.numOfRobSupplier && FPRsLine->NumOfRightOperands<2){
+				FPRsLine->Vk = FPUnitCDBADD.result;
+				FPRsLine->NumOfRightOperands++;
+			}
+			FPRsLine = FPRsLine->next;
 		}
 	}
 

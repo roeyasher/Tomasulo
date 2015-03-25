@@ -13,9 +13,7 @@ struct LoadBuffer {
 	BOOL inExecution;
 	BOOL done;
 	BOOL addressReady;
-	int Vj;
-	int Qj; //rob num
-	int NumOfRightOperands;
+	int DST;
 	int robNum;
 	int issued;
 	struct LoadBuffer *next;
@@ -41,9 +39,10 @@ typedef struct Memory_PiplineStage Memory_PiplineStage;
 struct Memory_PiplineStage {
 	int OPCODE;
 	int address;
+	int issued;
 	int numOfRobSupplier;
 	struct Memory_PiplineStage *next;
-	float Data_load;
+	float  Data_load;
 	float Data_store;
 };
 

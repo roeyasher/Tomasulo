@@ -7,6 +7,8 @@ typedef struct IntCDB IntCDB;
 struct IntCDB{
 	int numOfRobSupplier;
 	int result;
+	int issued;
+	BOOL STLDIns;
 	BOOL valid;
 };
 
@@ -22,7 +24,7 @@ typedef struct LoadCDB LoadCDB;
 struct LoadCDB{
 
 	int numOfRobSupplier;
-	int result;
+	float result;
 	BOOL valid;
 };
 

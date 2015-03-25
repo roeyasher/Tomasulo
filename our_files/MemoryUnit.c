@@ -119,23 +119,11 @@ BOOL InsertNewLoadInstr(){
 	/*for load instruction checking the opcode*/
 	available->OPCODE = LD;
 
-
-	// TODO move to int unit (Roey)
-	/*if it is possible - calculating the address*/
-	if(Integer_Registers[instr.SRC0].busy == FALSE){
-		address = Integer_Registers[instr.SRC0].value;
-		address = address + instr.IMM;
-		available->address = address;
-		available->addressReady = TRUE;
-	}
-	else {
-		return FALSE;
-	}
-
 	/*indicate that it is ok and the instruction was insert into the relevant reservation station*/
 	available->busy = TRUE;
 	available->inExecution = FALSE;
 	available->robNum = instr.numRob;
+	available->issued = cycle;
 
 	/*insert the label to the destination register*/
 	FP_Registers[instr.DST].busy = TRUE;
@@ -175,17 +163,6 @@ BOOL InsertNewStoreInstr(){
 
 	/*for store instruction - checking the opcode */
 	available->OPCODE = ST;
-
-	// TODO move to int unit (Roey)
-	/*check if we can calculate the address and the value is avaliable*/
-	if(Integer_Registers[instr.SRC0].busy == FALSE){
-		address = Integer_Registers[instr.SRC0].value;
-		address = address + instr.IMM;
-		available->address = address;
-	}
-	else {
-		return FALSE;
-	}
 
 	/*insert the FP value it is exist*/
 
@@ -248,23 +225,25 @@ BOOL LDBufferToMemoryExecution(){
 			Memory_Unit->OPCODE = load->OPCODE;
 			Memory_Unit->address = load->address;
 			Memory_Unit->numOfRobSupplier = load->robNum;
+			Memory_Unit->issued = load->issued;
+			load->done = TRUE;
+			break;
+			// Write on the FP register
+			//for (j = 0; j < TRACE_SIZE; j++){
+			//	if (trace[j].issued == load->issued)
+			//		break;
+			//}
+			//trace[j].execution = cycle;
 
-			for (j = 0; j < TRACE_SIZE; j++){
-				if (trace[j].issued == load->issued)
-					break;
-			}
-			trace[j].execution = cycle;
-
-			return TRUE;
+			
 			/*can execute and break the for a load instruction*/
 		}
 
-		/**/
-		return FALSE;
+		load = load->next;
 	}
 }
 
-BOOL STBufferToMemoryExecution(){
+void STBufferToMemoryExecution(){
 
 	/*this is the main function witch responsable on the execute instr*/
 	/*the function try to find a possible instr to execute by using some conditions and if it is ok it do so, else it is insert a nop to execute*/
@@ -275,26 +254,27 @@ BOOL STBufferToMemoryExecution(){
 	while (store != NULL)
 	{
 		/*if the minstore is null and the minload is not we can execute minload instr*/
-		if ((store->addressReady) && (store->NumOfRightOperands == 2) && (store->inExecution == FALSE)){
+		if ((store->addressReady) && (store->inExecution == FALSE) && (store->NumOfRightOperands == 1)){
 
 			store->inExecution = TRUE;
 			Memory_Unit->OPCODE = store->OPCODE;
 			Memory_Unit->address = store->address;
 			Memory_Unit->numOfRobSupplier = store->robNum;
+			Memory_Unit->issued = store->issued;
+			store->done = TRUE;
+			break;
 
-			for (j = 0; j < TRACE_SIZE; j++){
-				if (trace[j].issued == store->issued)
-					break;
-			}
-			trace[j].execution = cycle;
+			//for (j = 0; j < TRACE_SIZE; j++){
+			//	if (trace[j].issued == store->issued)
+			//		break;
+			//}
+			//trace[j].execution = cycle;
 
-			return TRUE;
 			/*can execute and break the for a load instruction*/
 		}
-
-		/**/
-		return FALSE;
+		store = store->next;
 	}
+
 }
 
 
@@ -314,11 +294,15 @@ void ExecuteMemoryCmd()
 
 	case LD:
 		/*load execution*/
-		execute->Data_load =(float) strtol(MainMemoryArray[execute->address], (char**)NULL, 16);;
+		execute->Data_load = (float)strtol(MainMemoryArray[execute->address], (char**)NULL, 16);
+		temp_load.numOfRobSupplier = execute->numOfRobSupplier;
+		temp_load.result = execute->Data_load;
 		break;
 
 	case ST:
 		execute->Data_store = FP_Registers[prevExecute->address].value;
+		updateFPRob(execute->numOfRobSupplier, execute->Data_store);
+		
 		/*store execution*/
 		break;
 
@@ -355,8 +339,6 @@ void EvictFromLoadAndStoreBuffer(){
 			load->inExecution=FALSE;
 			load->addressReady = FALSE;
 			load->issued = 0;
-			load->Qj = 0;
-			load->NumOfRightOperands = 0;
 			LD_Buff_Cnt--;
 		}
 		load=load->next;
@@ -370,7 +352,6 @@ void EvictFromLoadAndStoreBuffer(){
 			load->addressReady = FALSE;
 			store->issued=0;
 			store->Qj = 0;
-			store->NumOfRightOperands=0;
 			ST_Buff_Cnt--;
 		}
 		store=store->next;

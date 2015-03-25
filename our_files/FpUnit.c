@@ -136,6 +136,7 @@ void FP_ReservationStationToExecution(){
 			FP_executionPipeline_ADD->operand1 = line->Vj;
 			FP_executionPipeline_ADD->operand2 = line->Vk;
 			FP_executionPipeline_ADD->numOfSupplier = line->robNum;
+			line->done = TRUE;
 			line->inExecution=TRUE;
 
 			for (j=0;j<TRACE_SIZE;j++){
@@ -408,9 +409,9 @@ BOOL isFP_RS_MULL_FULL(){
 
 void simulateClockCycle_FpUnit(){
 
-	FP_ReservationStationToExecution();
 	FP_AdvanceFpPipeline_ADD();
 	FP_AdvanceFpPipeline_MUL();
+	FP_ReservationStationToExecution();
 	FP_EvictFromReservationStation();
 	return;
 }

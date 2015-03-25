@@ -75,18 +75,42 @@ BOOL insertRob(){
 	robCnt++;
 
 }
+void updateIntRob(int numRob, int value){
+
+	robLine *iter = robLines;
+
+	while (iter != NULL){
+		if (iter->numRob == numRob){
+			iter->intValue = value;
+			break;
+		}
+		iter = iter->next;
+	}
+	return;
+}
+
+void updateFPRob(int numRob, float value){
+
+	robLine *iter = robLines;
+
+	while (iter != NULL){
+		if (iter->numRob == numRob){
+			iter->fpValue = value;
+			break;
+		}
+		iter = iter->next;
+	}
+	return;
+}
 
 // commit if the first insruction that done
 BOOL commitRob(){
 	
 	robLine *node = robLines, *last = robLines;
-	char label[LABEL_SIZE];
 	int i = 0;
 	int tmp;
 
 	if (node->done == TRUE){
-
-		/// write to regs!.
 
 		/*update registers*/
 		for (i = 0; i<NUM_OF_INT_REGISTERS; i++){
@@ -101,7 +125,7 @@ BOOL commitRob(){
 
 		/*update registers*/
 		for (i = 0; i<NUM_OF_FP_REGISTERS; i++){
-			if ((FP_Registers[i].busy == TRUE) && Integer_Registers[i].robNum == node->numRob  && node->done == TRUE){
+			if ((FP_Registers[i].busy == TRUE) && FP_Registers[i].robNum == node->numRob  && node->done == TRUE){
 				FP_Registers[i].value = last->fpValue;
 				FP_Registers[i].busy = FALSE;
 				Integer_Registers[i].robNum = 0;

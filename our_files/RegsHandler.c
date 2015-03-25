@@ -16,7 +16,7 @@ void Initialize_FpRegisters(){
 	int i = 0;
 
 	for (i = 0; i<NUM_OF_FP_REGISTERS; i++){
-		FP_Registers[i].value = (float)i;
+		FP_Registers[i].value = 0;
 		FP_Registers[i].busy = FALSE;
 	}
 }

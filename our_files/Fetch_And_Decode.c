@@ -193,7 +193,7 @@ BOOL HaltAndWrongInstruction(){
 BOOL Decode(int *stop_decode){
 
 	GetInstructionFromQUeue();
-	if (strncmp(instr.name,"00000000",8)==FALSE)
+	if (strncmp(instr.name,"00000000",8)==0)
 	{
 		*stop_decode == TRUE; // don't decode more
 	}
@@ -228,13 +228,13 @@ BOOL InsertToRS(){
 		switch (InsType){
 
 		case Memory_LD_INS:
-			if (!isLD_Buff_FULL())
-				return InsertNewLoadInstr();
+			if (!isLD_Buff_FULL() && !isINT_RS_FULL())
+				return InsertNewLoadInstr() && Int_InsertToReservationStation();
 			break;
 
 		case Memory_ST_INS:
-			if (!isST_Buff_FULL())
-				return InsertNewStoreInstr();
+			if (!isST_Buff_FULL() && !isINT_RS_FULL())
+				return InsertNewStoreInstr() && Int_InsertToReservationStation();
 			break;
 
 		case  INT_INS:
