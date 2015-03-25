@@ -151,8 +151,7 @@ int main(int argc, char* argv[]){
 			SimulateClockCycle_IntUnit();
 			simulateClockCycle_FpUnit();
 
-			// TODO not sure if we need this condition over here (Roey);
-			if (FALSE == more_instruction) { break; }
+			
 
 
 			//***************************************************************************
