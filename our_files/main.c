@@ -141,11 +141,11 @@ int main(int argc, char* argv[]){
 			//1. Execution
 			//***************************************************************************
 
-<<<<<<< HEAD
+
 		//***************************************************************************
 		//1. CDB
 		//***************************************************************************
-=======
+
 			// Simulate all of the FU's
 			SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
 			SimulateClockCycle_IntUnit();
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
 
 			// TODO not sure if we need this condition over here (Roey);
 			if (FALSE == more_instruction) { break; }
->>>>>>> origin/master
+
 
 			//***************************************************************************
 			//1. CDB
@@ -161,12 +161,12 @@ int main(int argc, char* argv[]){
 
 			//TODO pass the CDB function the right values
 
-<<<<<<< HEAD
+
 		//***************************************************************************
 		//1. Commit
 		//***************************************************************************
 		// TODO add way to exit from the while loop. (Roey)
-=======
+
 			CDBControlInt(&temp_int);
 			CDBControlFPADD(&temp_fp_add);
 			CDBControlFPMULL(&temp_fp_mull);
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]){
 			//1. Commit
 			//***************************************************************************
 		}
->>>>>>> origin/master
+
 		commitRob();
 
 		//***************************************************************************

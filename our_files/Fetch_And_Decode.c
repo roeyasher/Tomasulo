@@ -129,11 +129,11 @@ BOOL Decode(int *stop_decode){
 	BOOL branch_list_is_empty = FALSE;
 
 	GetInstructionFromQUeue();
-<<<<<<< HEAD
+
 	if (strncmp(instr.name,"00000000",8)==0)
-=======
+
 	if (strncmp(instr.name, "00000000", 8) == FALSE)
->>>>>>> origin/master
+
 	{
 		*stop_decode == TRUE; // don't decode more
 	}

@@ -1,13 +1,9 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-<<<<<<< HEAD
-/*used to create new reservation station line*/
-IntReservationStation_Line *CreateNewIRSLNode(){
-=======
 //used to create new reservation station line
-IntReservationStation_Line *CreateNewIRSLNode(int index){
->>>>>>> origin/master
+IntReservationStation_Line *CreateNewIRSLNode(){
+
 
 	IntReservationStation_Line *temp = NULL;
 	temp = (IntReservationStation_Line*) malloc(sizeof(IntReservationStation_Line));
