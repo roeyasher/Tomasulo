@@ -128,9 +128,9 @@ BOOL HaltAndWrongInstruction(){
 BOOL Decode(int *stop_decode){
 	BOOL branch_list_is_empty = FALSE;
 
-	GetInstructionFromQUeue();
+	GetInstructionFromQUeue(stop_decode);
 
-	if (strncmp(instr.name,"00000000",8)==0)
+	
 
 	if (strncmp(instr.name, "00000000", 8) == FALSE)
 
@@ -282,28 +282,36 @@ BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_coun
 	return TRUE;
 }
 
-void * GetInstructionFromQUeue()
+void * GetInstructionFromQUeue(int *condition)
 {
-	
-	Instruction *hold_head = instruction_queue_head;
-	Instruction *node = instruction_queue_head;
-	instr.DST = instruction_queue_head->DST;
-	instr.IMM = instruction_queue_head->IMM;
-	strcpy(instr.name, instruction_queue_head->name);
-	instr.next = instruction_queue_head->next;
-	instr.OPCODE = instruction_queue_head->OPCODE;
-	instr.PC = instruction_queue_head->PC;
-	instr.SRC0 = instruction_queue_head->SRC0;
-	instr.SRC1 = instruction_queue_head->SRC1;
-
-	while (NULL != node->next)
+	if (strncmp(instruction_queue_head->name, "00000000", 8) != FALSE)
 	{
-		node = node->next;
+
+
+		Instruction *hold_head = instruction_queue_head;
+		Instruction *node = instruction_queue_head;
+		instr.DST = instruction_queue_head->DST;
+		instr.IMM = instruction_queue_head->IMM;
+		strcpy(instr.name, instruction_queue_head->name);
+		instr.next = instruction_queue_head->next;
+		instr.OPCODE = instruction_queue_head->OPCODE;
+		instr.PC = instruction_queue_head->PC;
+		instr.SRC0 = instruction_queue_head->SRC0;
+		instr.SRC1 = instruction_queue_head->SRC1;
+
+		while (NULL != node->next)
+		{
+			node = node->next;
+		}
+		instruction_queue_head = instruction_queue_head->next;
+		node->next = hold_head;
+		node->next->next = NULL;
+		strcpy(node->next->name, "00000000");
 	}
-	instruction_queue_head = instruction_queue_head->next;
-	node->next = hold_head;
-	node->next->next = NULL;
-	strcpy(node->next->name, "00000000");
+	else
+	{
+		*condition = TRUE;
+	}
 	return;
 }
 

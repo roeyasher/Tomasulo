@@ -22,7 +22,7 @@ int CharToInteger (char schar);
 
 void EmptyInsturcionQueue(int *counter);
 void freeInsturcionQueue();
-void * GetInstructionFromQUeue();
+void * GetInstructionFromQUeue(int *condition);
 void IntilaizeInstructionQueue();
 void FillTheFields(Instruction *instr_queue);
 BOOL HaltAndWrongInstruction(Instruction *temp);
