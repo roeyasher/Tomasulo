@@ -256,6 +256,21 @@ void SimulateClockCycle_IntUnit(){
 	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
 	return;
 }
+BOOL isINT_RS_empty(){
+	int Number_of_INTReservation_station = Configuration->int_nr_reservation;
+	int i = 0;
+
+	LoadBuffer *node = NULL;
+	node = IntReservationStation;
+	for (i = 1; i <Number_of_INTReservation_station; i++){
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+	return TRUE;
+}
+
 
 /*while (line != NULL)
 		{

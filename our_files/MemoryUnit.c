@@ -463,3 +463,34 @@ void MemInToMainMemory(char *memory[],char *memin_txt)
 
 	fclose(memin_txt);
 }
+
+
+
+BOOL isST_Buff_empety(){
+	int Number_of_MemReservation_station = Configuration->mem_nr_store_buffers;
+	int i = 0;
+	StoreBuffer *node = NULL;
+	node = StoreBufferResarvation;
+	for (i = 1; i<Number_of_MemReservation_station; i++){
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+	return TRUE;
+}
+
+BOOL isLD_Buff_emepty(){
+	int Number_of_MemReservation_station = Configuration->mem_nr_load_buffers;
+	int i = 0;
+
+	LoadBuffer *node = NULL;
+	node = LoadBufferResarvation;
+	for (i = 1; i < Number_of_MemReservation_station; i++){
+		if (TRUE == node->busy){
+			return FALSE;
+		}
+		node = node->next;
+	}
+	return TRUE;
+}
