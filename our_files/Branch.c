@@ -37,19 +37,13 @@ BOOL CalculateBranch()
 			if (Integer_Registers[instr.SRC0].value == Integer_Registers[instr.SRC1].value){
 				PC = PC + instr.IMM;
 				flag = TRUE;
-				trace[cycle].valid = TRUE;
-				trace[cycle].issued = cycle;
-				trace[cycle].execution = cycle;
-				strcpy(trace[cycle].instruction, instr.name);
+				trace[instr.num].execution_start = cycle;
 				return TRUE;
 			}
 			else{
 				PC = PC + 4;
 				flag = TRUE;
-				trace[cycle].valid = TRUE;
-				trace[cycle].issued = cycle;
-				trace[cycle].execution = cycle;
-				strcpy(trace[cycle].instruction, instr.name);
+				trace[instr.num].execution_start = cycle;
 				return TRUE;
 			}
 		}
@@ -67,19 +61,13 @@ BOOL CalculateBranch()
 			if (Integer_Registers[instr.SRC0].value != Integer_Registers[instr.SRC1].value){
 				PC = PC + instr.IMM;
 				flag = TRUE;
-				trace[cycle].valid = TRUE;
-				trace[cycle].issued = cycle;
-				trace[cycle].execution = cycle;
-				strcpy(trace[cycle].instruction, instr.name);
+				trace[instr.num].execution_start = cycle;
 				return TRUE;
 			}
 			else{
 				PC = PC + 4;
 				flag = TRUE;
-				trace[cycle].valid = TRUE;
-				trace[cycle].issued = cycle;
-				trace[cycle].execution = cycle;
-				strcpy(trace[cycle].instruction, instr.name);
+				trace[instr.num].execution_start = cycle;
 				return TRUE;
 			}
 		}
@@ -92,10 +80,7 @@ BOOL CalculateBranch()
 	case JUMP:
 		PC = PC + instr.IMM;
 		flag = TRUE;
-		trace[cycle].valid = TRUE;
-		trace[cycle].issued = cycle;
-		trace[cycle].execution = cycle;
-		strcpy(trace[cycle].instruction, instr.name);
+		trace[instr.num].execution_start = cycle;
 		break;
 		return TRUE;
 	default:

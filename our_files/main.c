@@ -85,6 +85,7 @@ int main(int argc, char* argv[]){
 	InitBuffers();
 	MemInToMainMemory(adressMainMemory, argv[2]);
 	InitFus();
+	instr.num = 0;
 
 	//***************************************************************************TODO-delete
 	//General Order:
@@ -129,36 +130,19 @@ int main(int argc, char* argv[]){
 		}
 		if (TRUE != flag)
 		{
-			// update the system from the CDB
-			CDBUpdateRob();
-			CDBUpdateRS();
-
-			if (!stop_decode)
-				// insert to the relevant RS 
-				instr_reservation = InsertToRS();
-		}
-			
+		
 
 			//***************************************************************************
 			//1. Commit
 			//***************************************************************************
+			
+			CDBUpdateRob();
+			CDBUpdateRS();
 			commitRob();
 			if (TRUE != flag)
 			{
 			
-			//***************************************************************************
-			//1. CDB
-			//***************************************************************************
-
-			//TODO pass the CDB function the right values
-
-
-			// TODO add way to exit from the while loop. (Roey)
-
-			CDBControlInt(&temp_int);
-			CDBControlFPADD(&temp_fp_add);
-			CDBControlFPMULL(&temp_fp_mull);
-			CDBControlLoad(&temp_load);
+	
 
 			//***************************************************************************
 			//1. Execution
@@ -170,7 +154,21 @@ int main(int argc, char* argv[]){
 			SimulateClockCycle_IntUnit();
 			simulateClockCycle_FpUnit();
 
+			//***************************************************************************
+			//1. CDB
+			//***************************************************************************
+
+			CDBControlInt(&temp_int);
+			CDBControlFPADD(&temp_fp_add);
+			CDBControlFPMULL(&temp_fp_mull);
+			CDBControlLoad(&temp_load);
+
 			}
+
+			if (!stop_decode)
+				// insert to the relevant RS 
+				instr_reservation = InsertToRS();
+		}
 			
 			cycle++;
 			

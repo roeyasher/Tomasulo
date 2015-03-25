@@ -26,7 +26,7 @@ struct FpReservationStation_Line{
 	BOOL done;
 	BOOL inExecution;
 	struct FpReservationStation_Line *next;
-	int issued;
+	int num;
 };
 
 /*Pipeline stages of FP Unit*/
@@ -34,6 +34,7 @@ typedef struct FP_PipelineStage FP_PipelineStage;
 struct FP_PipelineStage{
 	char name[BUFFER_SIZE];
 	int OPCODE;
+	int num;
 	BOOL busy;
 	float operand1,operand2;
 	float result;

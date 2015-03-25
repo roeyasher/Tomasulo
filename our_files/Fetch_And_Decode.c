@@ -86,24 +86,6 @@ Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head)
 	return instr_queue;
 }
 
-void FillTheFields(Instruction *instr_queue)
-{
-		/*this function fill the fields to a global parameter*/
-		instr.OPCODE = instr_queue->OPCODE;
-		instr.DST = instr_queue->DST;
-		instr.SRC0 = instr_queue->SRC0;
-		instr.SRC1 = instr_queue->SRC1;
-		instr.IMM = instr_queue->IMM;
-		instr.PC = instr_queue->PC;
-		instr.next = NULL;
-		strcpy(instr.name,instr_queue->name);
-}
-
-Instruction *DeleteTheInstrcutionsDistributor()
-{
-	return NULL;
-}
-
 // What the hell this function do?? (Roey)
 BOOL HaltAndWrongInstruction(){
 
@@ -113,12 +95,6 @@ BOOL HaltAndWrongInstruction(){
 	if (HALT == instr.OPCODE){
 		halt_flag = TRUE;
 		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
-		if (instr_reservation == TRUE){
-			trace[cycle].issued = cycle;
-			trace[cycle].valid = 1;
-			trace[cycle].execution = cycle;
-			strcpy(trace[cycle].instruction, instr.name);
-		}
 		return TRUE;
 	}
 	
@@ -178,6 +154,8 @@ BOOL InsertToRS(){
 	if (!isRobFull()) {
 
 		insertRob();
+		trace[instr.num].issued = cycle;
+		strcpy(trace[instr.num].instruction, instr.name);
 		switch (InsType){
 
 		case Memory_LD_INS:
@@ -298,6 +276,7 @@ void * GetInstructionFromQUeue(int *condition)
 		instr.PC = instruction_queue_head->PC;
 		instr.SRC0 = instruction_queue_head->SRC0;
 		instr.SRC1 = instruction_queue_head->SRC1;
+		instr.num++;
 
 		while (NULL != node->next)
 		{

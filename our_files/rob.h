@@ -8,9 +8,9 @@ struct robLine{
 
 	int OPCODE;
 	int numRob;					/*this is the label of the line.  start form 0... -1 indicate without rob num*/
-	int state;		
 	int address;
 	int intValue;			//TODO check if its ok!
+	int num;
 	float fpValue;
 	BOOL busy;								/*is this line in use*/
 	BOOL done;								/*did this line finish execution and can be evicted from Reservation Station*/

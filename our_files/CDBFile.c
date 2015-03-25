@@ -9,14 +9,10 @@ void CDBControlInt(Instruction *int_to_cdb)
 		IntUnitCDB.result = int_to_cdb->result;
 		IntUnitCDB.numOfRobSupplier = int_to_cdb->numOfRobSupplier;
 		IntUnitCDB.STLDIns = int_to_cdb->STLDIns;
-		IntUnitCDB.issued = int_to_cdb->issued;
+		IntUnitCDB.num = int_to_cdb->num;
 		IntUnitCDB.valid = TRUE;
-		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, int_to_cdb->name) == 0)){
-				trace[j].CDB = cycle;
-				break;
-			}
-		}
+		trace[IntUnitCDB.num].CDB = cycle;
+		memset(int_to_cdb, 0, sizeof(Instruction));
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -31,12 +27,9 @@ void CDBControlFPADD(Instruction *fp_to_cdb)
 		FPUnitCDBADD.result = fp_to_cdb->result;
 		FPUnitCDBADD.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBADD.valid = TRUE;
-		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, fp_to_cdb->name) == 0)){
-				trace[j].CDB = cycle;
-				break;
-			}
-		}
+		FPUnitCDBADD.num = fp_to_cdb->num;
+		trace[FPUnitCDBADD.num].CDB = cycle;
+		memset(fp_to_cdb, 0, sizeof(Instruction));
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -51,12 +44,9 @@ void CDBControlFPMULL(Instruction *fp_to_cdb)
 		FPUnitCDBMULL.result = fp_to_cdb->result;
 		FPUnitCDBMULL.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBMULL.valid = TRUE;
-		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, fp_to_cdb->name) == 0)){
-				trace[j].CDB = cycle;
-				break;
-			}
-		}
+		FPUnitCDBMULL.num = fp_to_cdb->num;
+		trace[FPUnitCDBMULL.num].CDB = cycle;
+		memset(fp_to_cdb, 0, sizeof(Instruction));
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -69,12 +59,9 @@ void CDBControlLoad(Instruction *load_to_cdb)
 		LoadUnitCDB.result = load_to_cdb->result;
 		LoadUnitCDB.valid = TRUE;
 		LoadUnitCDB.numOfRobSupplier = load_to_cdb->numOfRobSupplier;
-		for (j = 0; j<TRACE_SIZE; j++){
-			if ((strcmp(trace[j].instruction, load_to_cdb->name) == 0)){
-				trace[j].CDB = cycle;
-				break;
-			}
-		}
+		LoadUnitCDB.num = load_to_cdb->num;
+		trace[LoadUnitCDB.num].CDB = cycle;
+		memset(load_to_cdb, 0, sizeof(Instruction));
 	}
 	else
 		LoadUnitCDB.valid = FALSE;
@@ -172,7 +159,7 @@ void CDBUpdateRS(){
 			STBuffLine = StoreBufferResarvation;
 			while ((STBuffLine) != NULL){
 
-				if ((STBuffLine->addressReady == FALSE) && IntUnitCDB.issued == STBuffLine->issued){
+				if ((STBuffLine->addressReady == FALSE) && IntUnitCDB.num == STBuffLine->num){
 					STBuffLine->address = IntUnitCDB.result;
 					STBuffLine->addressReady = TRUE;
 				}
@@ -182,7 +169,7 @@ void CDBUpdateRS(){
 			LDBuffLine = LoadBufferResarvation;
 			while ((LDBuffLine) != NULL){
 
-				if ((LDBuffLine->addressReady == FALSE) && IntUnitCDB.issued == LDBuffLine->issued){
+				if ((LDBuffLine->addressReady == FALSE) && IntUnitCDB.num == LDBuffLine->num){
 					LDBuffLine->address = IntUnitCDB.result;
 					LDBuffLine->addressReady = TRUE;
 				}

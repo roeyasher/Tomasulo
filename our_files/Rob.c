@@ -66,7 +66,8 @@ BOOL insertRob(){
 	availableRobLine->address = instr.DST;
 	availableRobLine->done = FALSE;
 	availableRobLine->busy = TRUE;
-	availableRobLine->state = 2; // issue
+	availableRobLine->num = instr.num;
+
 	instr.numRob = availableRobLine->numRob;
 
 	robCnt++;
@@ -122,6 +123,7 @@ BOOL commitRob(){
 			sprintf(MainMemoryArray[node->address], "%08x", (unsigned int)node->fpValue);
 		}
 
+		trace[node->num].commit = cycle;
 		robLines = node->next;
 		tmp = node->numRob;
 		memset(node, 0, sizeof(robLine));

@@ -102,11 +102,8 @@ BOOL Int_InsertToReservationStation(){
 	available->busy = TRUE;
 	available->done = FALSE;
 	available->inExecution=FALSE;
-	available->issued=cycle;
+	available->num=instr.num;
 	strcpy(available->name, instr.name);
-	trace[cycle].issued=cycle;
-	trace[cycle].valid=TRUE;
-	strcpy(trace[cycle].instruction,instr.name);
 
 	Int_RS_Cnt++;
 	return TRUE;	
@@ -126,10 +123,11 @@ void ReservationStationToALU(){
 			Integer_ALU_Unit->operand1=line->Vj;
 			Integer_ALU_Unit->operand2=line->Vk;
 			Integer_ALU_Unit->numOfRobSupplier = line->robNum;
-			Integer_ALU_Unit->issued = line->issued;
+			Integer_ALU_Unit->num = line->num;
 			strcpy(Integer_ALU_Unit->name,line->name);
 			line->done = TRUE;
 			line->inExecution=TRUE;
+			trace[line->num].execution_start = cycle;
 			break;
 		}
 		line=line->next;
@@ -194,15 +192,11 @@ void AdvanceIntPipeline(){
 		case LD:
 			last->result = (last->operand1) + (last->operand2);
 			temp_int.STLDIns = TRUE;
-			temp_int.issued = last->issued;
-			strcpy(temp_int.name, last->name);
 			break;
 
 		case ST:
 			last->result = (last->operand1) + (last->operand2);
 			temp_int.STLDIns = TRUE;
-			temp_int.issued = last->issued;
-			strcpy(temp_int.name, last->name);
 			break;
 
 		default:
@@ -210,18 +204,10 @@ void AdvanceIntPipeline(){
 			break;
 		}
 
-		for (j = 0; j<TRACE_SIZE; j++){
-			if ((InsType == Memory_LD_INS) || (InsType == Memory_ST_INS) || (InsType == INT_INS)){
-				if ((strcmp(trace[j].instruction, last->name) == 0)){
-					trace[j].execution = cycle;
-					break;
-				}
-			}
-		}
-
 		// Preapre Values for CDB struct
 		temp_int.numOfRobSupplier = last->numOfRobSupplier;
 		temp_int.result = last->result;
+		temp_int.num = last->num;
 		strcpy(temp_int.name, last->name);
 	}
 

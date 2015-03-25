@@ -133,15 +133,11 @@ void FP_ReservationStationToExecution(){
 			FP_executionPipeline_ADD->operand1 = line->Vj;
 			FP_executionPipeline_ADD->operand2 = line->Vk;
 			FP_executionPipeline_ADD->numOfSupplier = line->robNum;
+			FP_executionPipeline_ADD->num = line->num;
 			strcpy(FP_executionPipeline_ADD->name, line->name);
 			line->done = TRUE;
 			line->inExecution=TRUE;
-
-			for (j=0;j<TRACE_SIZE;j++){
-				if (trace[j].issued == line->issued)
-					break;
-			}
-			trace[j].execution=cycle;
+			trace[line->num].execution_start=cycle;
 			break;
 		}
 		line=line->next;
@@ -157,14 +153,10 @@ void FP_ReservationStationToExecution(){
 				FP_executionPipeline_MUL->operand1=line->Vj;
 				FP_executionPipeline_MUL->operand2=line->Vk;
 				FP_executionPipeline_MUL->numOfSupplier = line->robNum;
+				FP_executionPipeline_MUL->num = line->num;
 				strcpy(FP_executionPipeline_MUL->name, line->name);
 				line->inExecution=TRUE;
-
-				for (j=0;j<TRACE_SIZE;j++){
-					if (trace[j].issued == line->issued)
-					break;
-				}
-				trace[j].execution=cycle;
+				trace[line->num].execution_start=cycle;
 				break;
 			}
 				line=line->next;
@@ -212,11 +204,6 @@ BOOL FP_InsertToReservationStations_ADD(){
 	available->busy=TRUE;
 	available->done=FALSE;
 	available->inExecution=FALSE;
-
-	available->issued=cycle;
-	trace[cycle].issued=cycle;
-	trace[cycle].valid=TRUE;
-	strcpy(trace[cycle].instruction,instr.name);
 
 	FP_RS_ADD_Cnt++;
 	return TRUE;
@@ -270,11 +257,6 @@ BOOL FP_InsertToReservationStations_MULL(){
 	available->busy=TRUE;
 	available->done=FALSE;
 	available->inExecution=FALSE;
-
-	available->issued=cycle;
-	trace[cycle].issued=cycle;
-	trace[cycle].valid=TRUE;
-	strcpy(trace[cycle].instruction,instr.name);
 
 	FP_RS_MULL_Cnt++;
 	return TRUE;
@@ -358,6 +340,7 @@ void FP_AdvanceFpPipeline_MUL(){
 	
 		// Preapre Values for CDB struct
 		temp_fp_mull.numOfRobSupplier = last->numOfSupplier;
+		temp_fp_mull.num = last->num;
 		temp_fp_mull.result = last->result;
 
 	}

@@ -7,7 +7,7 @@ typedef struct IntCDB IntCDB;
 struct IntCDB{
 	int numOfRobSupplier;
 	int result;
-	int issued;
+	int num;
 	BOOL STLDIns;
 	BOOL valid;
 };
@@ -18,6 +18,7 @@ struct FPCDB{
 	int numOfRobSupplier;
 	float result;
 	BOOL valid;
+	int num;
 };
 
 typedef struct LoadCDB LoadCDB;
@@ -26,6 +27,7 @@ struct LoadCDB{
 	int numOfRobSupplier;
 	float result;
 	BOOL valid;
+	int num;
 };
 
 void CDBControlInt(Instruction *int_to_cdb);

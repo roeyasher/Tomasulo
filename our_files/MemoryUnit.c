@@ -104,7 +104,7 @@ BOOL InsertNewLoadInstr(){
 	available->inExecution = FALSE;
 	available->addressReady = FALSE;
 	available->robNum = instr.numRob;
-	available->issued = cycle;
+	available->num = instr.num;
 	available->DST = instr.DST;
 
 	/*set the relevant register for result*/
@@ -153,11 +153,7 @@ BOOL InsertNewStoreInstr(){
 	available->inExecution = FALSE;
 	available->addressReady = FALSE;
 	available->robNum = instr.numRob;
-	available->issued=cycle;
-	//TODO take care of the trace (Roey)
-	//trace[cycle].issued=cycle;
-	//trace[cycle].valid=TRUE;
-	//strcpy(trace[cycle].instruction,instr.name);
+	available->num = instr.num;
 
 	ST_Buff_Cnt++;
 	return TRUE;
@@ -177,17 +173,10 @@ BOOL LDBufferToMemoryExecution(){
 			Memory_Unit->OPCODE = load->OPCODE;
 			Memory_Unit->address = load->address;
 			Memory_Unit->numOfRobSupplier = load->robNum;
-			Memory_Unit->issued = load->issued;
+			Memory_Unit->num = load->num;
 			Memory_Unit->DST = load->DST;
 			load->done = TRUE;
 			break;
-
-			// TODO take care of the trace.
-			//for (j = 0; j < TRACE_SIZE; j++){
-			//	if (trace[j].issued == load->issued)
-			//		break;
-			//}
-			//trace[j].execution = cycle;
 		}
 		load = load->next;
 	}
@@ -207,18 +196,10 @@ void STBufferToMemoryExecution(){
 			Memory_Unit->OPCODE = store->OPCODE;
 			Memory_Unit->address = store->address;
 			Memory_Unit->numOfRobSupplier = store->robNum;
-			Memory_Unit->issued = store->issued;
+			Memory_Unit->num = store->num;
 			Memory_Unit->Data_store = store->Vj;
 			store->done = TRUE;
 			break;
-			// TODO take care of the trace.
-			//for (j = 0; j < TRACE_SIZE; j++){
-			//	if (trace[j].issued == store->issued)
-			//		break;
-			//}
-			//trace[j].execution = cycle;
-
-			/*can execute and break the for a load instruction*/
 		}
 		store = store->next;
 	}
@@ -277,7 +258,7 @@ void EvictFromLoadAndStoreBuffer(){
 			load->done=FALSE;
 			load->inExecution=FALSE;
 			load->addressReady = FALSE;
-			load->issued = 0;
+			load->num = 0;
 			LD_Buff_Cnt--;
 		}
 		load=load->next;
@@ -289,7 +270,7 @@ void EvictFromLoadAndStoreBuffer(){
 			store->done=FALSE;
 			store->inExecution = FALSE;
 			store->addressReady = FALSE;
-			store->issued=0;
+			store->num=0;
 			store->Qj = 0;
 			ST_Buff_Cnt--;
 		}
