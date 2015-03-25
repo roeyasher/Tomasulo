@@ -26,6 +26,7 @@
 #define INT_INS 2
 #define FP_ADD_INS 3
 #define FP_MULL_INS 4
+#define BRANCHES 5
 
 
 #define SIZE_OF_CHAR 512
