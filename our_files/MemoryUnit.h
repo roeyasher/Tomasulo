@@ -23,7 +23,6 @@ typedef struct StoreBuffer StoreBuffer;
 struct StoreBuffer {
 	int address;
 	int OPCODE;
-	int SRC1;
 	BOOL busy;
 	BOOL inExecution;
 	BOOL done;
