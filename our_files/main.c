@@ -133,8 +133,9 @@ int main(int argc, char* argv[]){
 			CDBUpdateRob();
 			CDBUpdateRS();
 
-			// insert to the relevant RS 
-			instr_reservation = InsertToRS();
+			if (!stop_decode)
+				// insert to the relevant RS 
+				instr_reservation = InsertToRS();
 
 
 			//***************************************************************************
@@ -197,8 +198,8 @@ int main(int argc, char* argv[]){
 		// are we limited to number of cycle?? mybe need to delet this one (Roey);
 		if (cycle == 200000)
 			break;
-		if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
-			break;
+		//if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
+		//	break;
 	}
 
 
