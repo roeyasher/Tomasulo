@@ -1,22 +1,19 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-
+/*The function create a new node for a linked list*/
 robLine *CreateRLNewNode(int index){
 
-	/*this function create a new node for a linked list, for the load buffer*/
 	robLine *temp = NULL;
 	temp = (robLine*) malloc(sizeof(robLine));
 	memset(temp, 0, sizeof(robLine));
 	temp->numRob = index;
 	temp->next = NULL;
-	return temp;		/*NULL is returned if failure occured*/
-
+	return temp;
 }
 
-
+/*The function intilaize the Rob buffer*/
 void IntilaizeRob() {
-	/*this function intilaize the load buffer/reservation station*/
 
 	int Number_of_Rob_Lines = Configuration->rob_entries;
 	int i=0;
@@ -27,13 +24,12 @@ void IntilaizeRob() {
 	node = robLines;
 
 	for (i=2;i<=Number_of_Rob_Lines;i++)	{
-
 		node->next = CreateRLNewNode(i);
 		node = node->next;
 		node->busy = FALSE;
 	}
 }
-
+/*Check if the rob buffer empty*/
 void emptyRob(){
 
 	robLine *succ = robLines, *prev = robLines;
@@ -165,4 +161,5 @@ BOOL IsRobEmpty(){
 		}
 		node = node->next;
 	}
+	return TRUE;
 }

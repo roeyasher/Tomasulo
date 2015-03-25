@@ -1,9 +1,6 @@
 #ifndef LOAD_BUFFER_H
 #define LOAD_BUFFER_H
-
 #include "common.h"
-
-
 
 typedef struct LoadBuffer LoadBuffer;
 struct LoadBuffer {
@@ -72,5 +69,6 @@ void EvictFromLoadAndStoreBuffer();
 void MemInToMainMemory(char *memory[], char *memin_txt);
 BOOL isLD_Buff_emepty();
 BOOL isST_Buff_empety();
+
 #endif
 
