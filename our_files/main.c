@@ -28,33 +28,33 @@ Instruction temp_load;
 /*For Branch*/
 extern Instruction *Branch_List= NULL;
 /*For Rob*/
-robLine *robLines = NULL;/*load buffer/load reservation*/
+robLine *robLines = NULL;
 /**/
 
 /*For Integer Unit*/
-IntegerRegister Integer_Registers[NUM_OF_INT_REGISTERS];/*Integer Registers array*/
-IntReservationStation_Line *IntReservationStation = NULL;/*Integer reservation station*/
-IntALU_PipelineStage *Integer_ALU_Unit = NULL;/*Integer - ALU pipeline execute unit*/
+IntegerRegister Integer_Registers[NUM_OF_INT_REGISTERS];
+IntReservationStation_Line *IntReservationStation = NULL;
+IntALU_PipelineStage *Integer_ALU_Unit = NULL;
 /**/
 
 /*For FP Unit*/
-FpRegister FP_Registers[NUM_OF_FP_REGISTERS];/*FP register array*/
-FpReservationStation_Line *FpReservationStation_ADD = NULL;/*FP reservation station- for ADD instr*/
-FpReservationStation_Line *FpReservationStation_MUL = NULL;/*FP reservation station - for MUL instr*/
-FP_PipelineStage *FP_executionPipeline_ADD = NULL;/*the FP-ADD pipeline execute unit*/
-FP_PipelineStage *FP_executionPipeline_MUL = NULL;/*the FP-MUL pipeline execute unit*/
+FpRegister FP_Registers[NUM_OF_FP_REGISTERS];
+FpReservationStation_Line *FpReservationStation_ADD = NULL;
+FpReservationStation_Line *FpReservationStation_MUL = NULL;
+FP_PipelineStage *FP_executionPipeline_ADD = NULL;
+FP_PipelineStage *FP_executionPipeline_MUL = NULL;
 /**/
 
 /*for Memory Unit*/
 Instruction *my_instruction = NULL;
-LoadBuffer *LoadBufferResarvation = NULL;/*load buffer/load reservation*/
-StoreBuffer *StoreBufferResarvation = NULL;/*store buffer/store reservation*/
-Memory_PiplineStage *Memory_Unit = NULL;/*the memory pipeline execute unit*/
+LoadBuffer *LoadBufferResarvation = NULL;
+StoreBuffer *StoreBufferResarvation = NULL;
+Memory_PiplineStage *Memory_Unit = NULL;
 /**/
 
 /*For Fetch and Decode*/
 Instruction *instruction_queue_head = NULL;
-int PC = 0;/*a global parameter - program counter - indicate our location in the program*/
+int PC = 0;
 /**/
 
 /*create registers/memory/traces logs*/
@@ -68,7 +68,6 @@ void InitializeMemory(FILE *memin);
 /*initialize trace structure*/
 void InitializeTrace();
 
-/*check if all reservation stations are empty from instructions - used to know when to terminate program after issue of HALT*/
 int detectEnd();
 
 BOOL halt_flag = FALSE;
@@ -87,25 +86,11 @@ int main(int argc, char* argv[]){
 	InitFus();
 	instr.num = 0;
 
-	//***************************************************************************TODO-delete
-	//General Order:
-	//***************************************************************************
-	//1. Issue
-	// Instruction to main memory
-	// Updae from CDB to RS's
-	// RS
-	//2. Execution
-	// Run Fus
-	//3. CDB
-	//4. Commit
-	//***************************************************************************
-	//***************************************************************************
-
 	// Cycle Simulation
 	while (TRUE){
 
 		//***************************************************************************
-		//1. Issue
+		//  Issue
 		//***************************************************************************
 		if (TRUE != halt_flag){
 			// Fetch - Instructions from the main memory ----> to the instruction queue
@@ -125,7 +110,7 @@ int main(int argc, char* argv[]){
 				pc_counter_instruction = (PC / 4) + 1;
 			}
 			else{
-				instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
+				instruction_queue_counter--; 
 			}
 		}
 		if (TRUE != flag)
@@ -133,7 +118,7 @@ int main(int argc, char* argv[]){
 		
 
 			//***************************************************************************
-			//1. Commit
+			// Commit
 			//***************************************************************************
 			
 			CDBUpdateRob();
@@ -141,21 +126,19 @@ int main(int argc, char* argv[]){
 			commitRob();
 			if (TRUE != flag)
 			{
-			
-	
 
 			//***************************************************************************
-			//1. Execution
+			// Execution
 			//***************************************************************************
 
 			//cycle++;
 			// Simulate all of the FU's
-			SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
+			SimulateClockCycle_LoadUnit();
 			SimulateClockCycle_IntUnit();
 			simulateClockCycle_FpUnit();
 
 			//***************************************************************************
-			//1. CDB
+			//  CDB
 			//***************************************************************************
 
 			CDBControlInt(&temp_int);
@@ -164,7 +147,9 @@ int main(int argc, char* argv[]){
 			CDBControlLoad(&temp_load);
 
 			}
-
+			//***************************************************************************
+			//  RS
+			//***************************************************************************
 			if (!stop_decode)
 				// insert to the relevant RS 
 				instr_reservation = InsertToRS();
@@ -180,76 +165,26 @@ int main(int argc, char* argv[]){
 		
 		InsType = -1;
 
-		/*flag==TRUE when instr is BEQ/BNE/JUMP and fetch&decode unit has taken it. in that case instr_reservation should be TRUE*/
-		if ((flag == TRUE)){	/*if BEQ/BNE/JMP then flag is set to TRUE. otherwise instruction was not taken by any unit*/
+		if ((flag == TRUE)){	
 			instr_reservation = TRUE;
 		}
 
-		
-		//instruction_queue_counter--;
-
-		// are we limited to number of cycle?? mybe need to delet this one (Roey);
 		if (cycle == 200000)
 			break;
-		//if (TRUE == DoesRobAndRSEmpty()) // TODO whether its the right place
-		//	break;
 	
 	}
 
-
-
-	/*getting here means all instructions were issued followed by HALT instruction.*/
-
-	instr.OPCODE = -1;	/*not necessary*/ //TODO remove
-
-
-
-	/*after isuse of HALT, all instructions are for sure issued to reservation statinos. we must simulate new clock cycles until all reservation stations
-
-	are empty. then the process can terminate.*/
-
-
-
-	/* gadi : the second mistake is here and should be ! detectEND competibale to the way we wrote this function*/
-	//TODO remove the gadi comment
-
-	/*while(detectEnd()){*/
-
-//	while (!detectEnd()){ // stuck for ever
-	//	SimulateClockCycle_IntUnit();
-		//simulateClockCycle_FpUnit();
-		//SimulateClockCycle_LoadUnit(cycle, 1);
-		//cycle++;
-	//}
-
-	/*just in case*/
-	for (i = 0; i < 10000; i++){
-		SimulateClockCycle_IntUnit();
-		simulateClockCycle_FpUnit();
-		SimulateClockCycle_LoadUnit(cycle, 1);
-	}
-
 	/*the print function to log files: create 4 logfiles: trace,memorylog,registerlog(X2)*/
-	RegisterLog();		/*creates registers log*/
-	MemoryLog();		/*creates memory log*/
-	PrintTrace();		/*creates trace log*/
+	RegisterLog();		
+	MemoryLog();		
+	PrintTrace();		
 
 	/*close all files*/
 	_fcloseall();	/*just in case*/
 
-
-	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
-
 	freeInsturcionQueue();
-	printf("End of simulation. \nOutput files <%s> <%s> <%s> <%s>\n\n", argv[3], argv[4], argv[5], argv[6]);
+	printf("\nEnd of simulation.\n");
 
 	getchar();
 	return  0;
 }
-
-
-
-
-
-
-

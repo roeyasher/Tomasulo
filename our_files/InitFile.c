@@ -10,7 +10,6 @@ void InitBuffers(){
 	IntilaizeLoadBuffer();
 	IntilaizeStoreBuffer();
 	IntializeMemPipline();
-	//TODO enable me
 	IntilaizeMemoryArray();
 }
 void InitFus(){

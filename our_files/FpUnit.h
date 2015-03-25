@@ -4,16 +4,14 @@
 #include "common.h"
 
 /*FP Registers structure*/
-
 typedef struct FpRegister FpRegister;
 struct FpRegister {
-
 	float value;
 	BOOL busy;
 	int robNum;
 };
 
-/*FP Reservation station line. the reservation station will be a linked list of size according to configuration file*/
+/*FP Reservation station line.*/
 typedef struct FpReservationStation_Line FpReservationStation_Line;
 struct FpReservationStation_Line{
 	char name[BUFFER_SIZE];
@@ -45,34 +43,18 @@ struct FP_PipelineStage{
 int FP_RS_ADD_Cnt;
 int FP_RS_MULL_Cnt;
 
-/*Initialize FP registers*/
+
 void Initialize_FpRegisters();
-
-/*Create Reservation stations for MUL and ADD/SUB of FP*/
 void Initialize_FpReservationStations();
-
-/*Create Pipeline for executing FP operations. there are 2 pipelines: one for ADDS/SUBS and a second for MULTS*/
 void Initialize_FpPipelines();
-
-/*Insert next instruction to one of two reservation stations of FP if it's ADDS/SUBS/MULTS*/
 BOOL FP_InsertToReservationStations_ADD();
 BOOL FP_InsertToReservationStations_MUL();
-
-/*send instructions from both FP reservation stations to execution units*/
 void FP_ReservationStationToExecution();
-
-/*Remove Instructions from reservation stations after they finished executing and wrote result to CDB*/
 void FP_EvictFromReservationStation();
-
-/*advance pipelines one stage forward each clock cycle. last stage writes to CDB if needed*/
 void FP_AdvanceFpPipeline_ADD();
 void FP_AdvanceFpPipeline_MUL();
-
-/*simulate one clock cycle: advance pipeline, write to CDB if needed, evict done instruction from reservation station and
-put new ones if possible*/
 void simulateClockCycle_FpUnit();
 BOOL UpdateResultInRS();
-// Is the FP reservation station is empty
 BOOL isFP_RS_ADD_empty();
 BOOL isFP_RS_MULL_empty();
 #endif

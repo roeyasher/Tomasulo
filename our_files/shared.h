@@ -23,57 +23,34 @@ extern BOOL flag;
 extern BOOL halt_flag;
 
 /*For Rob*/
-
 extern robLine *robLines;
 
-/**/
-
-
 /*For Integer Unit*/
-
 extern IntegerRegister Integer_Registers [NUM_OF_INT_REGISTERS];
-
 extern IntReservationStation_Line *IntReservationStation;
-
 extern IntALU_PipelineStage *Integer_ALU_Unit;
 
 /*Branch list*/
 extern Instruction *Branch_List;
 
-
 /*For FP Unit*/
-
 extern FpRegister FP_Registers[NUM_OF_FP_REGISTERS];
-
 extern FpReservationStation_Line *FpReservationStation_ADD;
-
 extern FpReservationStation_Line *FpReservationStation_MUL;
-
 extern FP_PipelineStage *FP_executionPipeline_ADD;
-
 extern FP_PipelineStage *FP_executionPipeline_MUL;
 
-
-
 /*For fetch and decode*/
-
 extern Instruction *instruction_queue_head;
 extern int PC;
-
-/**/
 
 extern Memory_PiplineStage *Memory_Unit;
 extern LoadBuffer *LoadBufferResarvation;
 extern StoreBuffer *StoreBufferResarvation;
-
-
-
 extern int cycle;
-
 extern Trace trace[TRACE_SIZE];
 
 /*For CDB*/
-
 extern IntCDB IntUnitCDB;
 extern FPCDB FPUnitCDBADD;
 extern FPCDB FPUnitCDBMULL;

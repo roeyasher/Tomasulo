@@ -66,7 +66,7 @@ void InitializeConfiguration(char *ConfigFile){
 			memset(buff,0,BUFFER_SIZE);
 			fscanf(file,"%s",buff);
 	}
-	Config_Pointer->mem_nr_store_buffers=atoi(buff);//fix after debug
+	Config_Pointer->mem_nr_store_buffers=atoi(buff);
 
 	Configuration=Config_Pointer;
 	fclose(file);
@@ -76,7 +76,7 @@ FILE * FileOpen(char *input_path_file, const char* flags)
 {
 	FILE* file_to_open = NULL;
 	printf("FileOpen:%s\n", input_path_file);
-	file_to_open = fopen(input_path_file, flags); // warning: deprecated 
+	file_to_open = fopen(input_path_file, flags); 
 	if (NULL == file_to_open){
 		printf("The function FileOpen failed\n");
 	}

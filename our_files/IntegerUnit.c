@@ -212,7 +212,7 @@ void AdvanceIntPipeline(){
 	}
 
 	/* make the last node in the list the first one.*/
-	memset(last,0,sizeof(IntALU_PipelineStage)); //TODO check if WORK!
+	memset(last,0,sizeof(IntALU_PipelineStage)); 
 	last->busy = FALSE;
 	last->next = Integer_ALU_Unit;
 	Integer_ALU_Unit = last;

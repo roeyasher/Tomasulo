@@ -301,7 +301,7 @@ void FP_AdvanceFpPipeline_ADD(){
 
 	}
 	/*advance ADD pipeline one stage forward*/
-	memset(last,0,sizeof(FP_PipelineStage)); //TODO check if WORK!
+	memset(last,0,sizeof(FP_PipelineStage));
 	last->busy = FALSE;
 	last->next = FP_executionPipeline_ADD;
 	FP_executionPipeline_ADD = last;
@@ -346,7 +346,7 @@ void FP_AdvanceFpPipeline_MUL(){
 	}
 
 	/*advance ADD pipeline one stage forward*/
-	memset(last,0,sizeof(FP_PipelineStage)); //TODO check if WORK!
+	memset(last,0,sizeof(FP_PipelineStage));
 	last->busy = FALSE;
 	last->next = FP_executionPipeline_MUL;
 	FP_executionPipeline_MUL = last;

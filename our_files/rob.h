@@ -7,20 +7,18 @@ typedef struct robLine robLine;
 struct robLine{
 
 	int OPCODE;
-	int numRob;					/*this is the label of the line.  start form 0... -1 indicate without rob num*/
+	int numRob;				
 	int address;
-	int intValue;			//TODO check if its ok!
+	int intValue;		
 	int num;
 	float fpValue;
-	BOOL busy;								/*is this line in use*/
-	BOOL done;								/*did this line finish execution and can be evicted from Reservation Station*/
+	BOOL busy;								
+	BOOL done;								
 	BOOL inExecution;
-
-	struct robLine *next;	/*next line in reservation station*/
+	struct robLine *next;	
 };
 
 int robCnt;
-
 // Function Decleration
 robLine *CreateRLNewNode();
 void updateFPRob(int numRob, float value, int address);

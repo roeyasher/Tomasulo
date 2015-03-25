@@ -392,19 +392,3 @@ BOOL isLD_Buff_emepty(){
 	}
 	return TRUE;
 }
-////TODO check dependace adress between load after store!!!!!!!!!! (Roey)
-//BOOL IsNotTheSameAddress(int address, int robNum,int count){
-//
-//	/*the function is checking if the instr we want to execute is in the right order and can be execute*/
-//	StoreBuffer *store = StoreBufferResarvation;
-//	int length = Configuration->mem_nr_store_buffers;
-//	int i=0;
-//	for(i=0;i<length;i++)
-//	{
-//		if ((address == store->address) && (store->robNum == robNum) && (store->inExecution == FALSE) && (store->busy == TRUE)){
-//			return FALSE;
-//		}
-//		store=store->next;
-//	}
-//	return TRUE;
-//}

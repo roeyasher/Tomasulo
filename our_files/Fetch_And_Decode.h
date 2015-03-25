@@ -35,7 +35,6 @@ BOOL HaltAndWrongInstruction(Instruction *temp);
 BOOL Decode();
 BOOL LinkInstQueue(char instruction_line[], int *instruction_queue_counter, int PC);
 BOOL Fetch(char *memory[], int *pc_conter_to_fetch, int * instruction_queue_counter);
-Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head);
 BOOL InsertToRS();
 
 #endif

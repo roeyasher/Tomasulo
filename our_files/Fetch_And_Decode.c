@@ -1,9 +1,6 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "shared.h"
 
-//oooooo a stucture for a data base link,hands the Queue insruction decode and fetch ooo/////
-
-//oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo//
 
 int CharToInteger (char schar)
 { 
@@ -59,42 +56,17 @@ int CharToInteger (char schar)
 			return 15;
 			break;
 		default:
-			printf("bad char, so return 0, you gave me= %c\n", schar);
+			printf("bad char - Return 0, you gave me= %c\n", schar);
 			return 0;
 	}
 }
 
-
-
-
-
-
-
-
-Instruction *SearchTheElementInstByPc(Instruction *instruction_queue_head)
-{
-
-	/*a help function the do the fetch and decode main function*/
-
-	Instruction *instr_queue=instruction_queue_head;
-	while(instr_queue != NULL)
-	{
-		if(instr_queue->PC == PC)
-			return instr_queue;
-		instr_queue =(Instruction*) instr_queue->next;
-	}
-	return instr_queue;
-}
-
-// What the hell this function do?? (Roey)
 BOOL HaltAndWrongInstruction(){
 
-	//TODO: IS it right? can we call to function without a insrt init? (Roey)
 	if (instr.OPCODE == -1)	{ return TRUE; }
 
 	if (HALT == instr.OPCODE){
 		halt_flag = TRUE;
-		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
 		return TRUE;
 	}
 	
@@ -106,14 +78,11 @@ BOOL Decode(int *stop_decode){
 
 	GetInstructionFromQUeue(stop_decode);
 
-	
-
 	if (strncmp(instr.name, "00000000", 8) == FALSE)
 
 	{
 		*stop_decode == TRUE; // don't decode more
 	}
-	// TODO Updae RS from CDB with the last execution if CDB is VALID.
 
 	if (TRUE == HaltAndWrongInstruction())
 	{
@@ -295,9 +264,7 @@ void * GetInstructionFromQUeue(int *condition)
 }
 
 
-void EmptyInsturcionQueue(int *counter)
-
-{
+void EmptyInsturcionQueue(int *counter){
 	Instruction *node = NULL;
 	Instruction *node_last = NULL;
 	node = instruction_queue_head;
@@ -311,9 +278,7 @@ void EmptyInsturcionQueue(int *counter)
 	
 }
 
-void freeInsturcionQueue()
-
-{
+void freeInsturcionQueue(){
 	Instruction *node = NULL;
 	Instruction *node_last = NULL;
 	node = instruction_queue_head;
@@ -324,15 +289,12 @@ void freeInsturcionQueue()
 		free(node_last);
 		node_last = (Instruction*)node;
 	}
-	
 	instruction_queue_head=NULL;
 }
 
 
-
 void IntilaizeInstructionQueue() {
-	/*this function intilaize the load buffer/reservation station*/
-
+	
 	int i = 0;
 	Instruction *node = NULL;
 	instruction_queue_head = (Instruction *)malloc(1 * sizeof(Instruction));

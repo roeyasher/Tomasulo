@@ -175,8 +175,6 @@ void CDBUpdateRS(){
 				}
 				LDBuffLine = LDBuffLine->next;
 			}
-
-
 		}
 		else{
 			IntRsLine = IntReservationStation;
