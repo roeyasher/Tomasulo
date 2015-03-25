@@ -24,5 +24,5 @@ int robCnt;
 // Function Decleration
 robLine *CreateRLNewNode();
 void IntilaizeRob();
-
+BOOL IsRobEmpty();
 #endif
