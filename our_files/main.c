@@ -71,6 +71,7 @@ void InitializeTrace();
 /*check if all reservation stations are empty from instructions - used to know when to terminate program after issue of HALT*/
 int detectEnd();
 
+BOOL halt_flag = FALSE;
 int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
@@ -105,25 +106,26 @@ int main(int argc, char* argv[]){
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
+		if (TRUE == halt_flag){
+			// Fetch - Instructions from the main memory ----> to the instruction queue
+			while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
+				more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
+				pc_counter_instruction++;
+			}
 
-		// Fetch - Instructions from the main memory ----> to the instruction queue
-		while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
-			more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
-			pc_counter_instruction++;
-		}
-
-		// Decode and check Whether is it the end of the code
-		if (FALSE == stop_decode){
-			decode_value = Decode(&stop_decode);
-		}
-		more_instruction = (((int)more_instruction) &((int)decode_value));
-		if (TRUE == flag)
-		{
-			instruction_queue_counter = 0;
-			pc_counter_instruction = (PC/4)+1;
-		}
-		else{
-			instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
+			// Decode and check Whether is it the end of the code
+			if (FALSE == stop_decode){
+				decode_value = Decode(&stop_decode);
+			}
+			more_instruction = (((int)more_instruction) &((int)decode_value));
+			if (TRUE == flag)
+			{
+				instruction_queue_counter = 0;
+				pc_counter_instruction = (PC / 4) + 1;
+			}
+			else{
+				instruction_queue_counter--; //Shoud we put it somewhere else? (Roey)
+			}
 		}
 		if (TRUE != flag)
 		{

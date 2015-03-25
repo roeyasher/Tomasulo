@@ -20,7 +20,7 @@ extern Instruction instr;
 extern BOOL instr_reservation;
 extern int InsType;
 extern BOOL flag;
-
+extern BOOL halt_flag;
 
 /*For Rob*/
 

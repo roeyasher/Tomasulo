@@ -111,6 +111,7 @@ BOOL HaltAndWrongInstruction(){
 	if (instr.OPCODE == -1)	{ return TRUE; }
 
 	if (HALT == instr.OPCODE){
+		halt_flag = TRUE;
 		// simulate more clock cycles  Not sure if this is the way to do one more cycle (Roey)
 		if (instr_reservation == TRUE){
 			trace[cycle].issued = cycle;
