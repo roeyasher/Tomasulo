@@ -149,14 +149,7 @@ void ReservationStationToALU(){
 			line->inExecution=TRUE;			/*so it's not sent again to ALU*/
 			break;
 
-/*			for (j=0;j<TRACE_SIZE;j++){
-
-				if (trace[j].issued == line->issued){
-
-					trace[j].execution=cycle;
-					break;
-				}
-			}	*/	
+				
 			
 		}
 		line=line->next;
@@ -241,7 +234,18 @@ void AdvanceIntPipeline(){
 			// Opcode not in ALU unit
 			break;
 		}
+		//
 
+
+
+		for (j = 0; j<TRACE_SIZE; j++){
+			if ((InsType == Memory_LD_INS) || (InsType == Memory_ST_INS) || (InsType == INT_INS)){
+				if ((strcmp(trace[j].instruction, instr.name) == 0)){
+					trace[j].execution = cycle;
+					break;
+				}
+			}
+		}
 		/*opearate as CDB and update waiting stations and registers*/
 		/*update Integer Reservation satation*/
 	

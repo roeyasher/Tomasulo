@@ -75,7 +75,7 @@ BOOL halt_flag = FALSE;
 int main(int argc, char* argv[]){
 
 	char *adressMainMemory = MainMemoryArray[0];
-	int i = 0, pc_counter_instruction = 0, instruction_queue_counter = 0;
+	int i = 0,j=0, pc_counter_instruction = 0, instruction_queue_counter = 0;
 	BOOL reservation_stations_has_space = TRUE, rob_has_space = TRUE, more_instruction = TRUE,decode_value=TRUE,stop_decode=FALSE;
 	instr.OPCODE = -1;
 
@@ -142,11 +142,7 @@ int main(int argc, char* argv[]){
 			//1. Execution
 			//***************************************************************************
 
-
-		//***************************************************************************
-		//1. CDB
-		//***************************************************************************
-
+			cycle++;
 			// Simulate all of the FU's
 			SimulateClockCycle_LoadUnit(); /// what about store?!?! (Roey)
 			SimulateClockCycle_IntUnit();
@@ -162,11 +158,8 @@ int main(int argc, char* argv[]){
 			//TODO pass the CDB function the right values
 
 
-		//***************************************************************************
-		//1. Commit
-		//***************************************************************************
-		// TODO add way to exit from the while loop. (Roey)
-
+			// TODO add way to exit from the while loop. (Roey)
+			cycle++;
 			CDBControlInt(&temp_int);
 			CDBControlFPADD(&temp_fp_add);
 			CDBControlFPMULL(&temp_fp_mull);
@@ -221,12 +214,12 @@ int main(int argc, char* argv[]){
 
 	/*while(detectEnd()){*/
 
-	while (!detectEnd()){ // stuck for ever
-		SimulateClockCycle_IntUnit();
-		simulateClockCycle_FpUnit();
-		SimulateClockCycle_LoadUnit(cycle, 1);
-		cycle++;
-	}
+//	while (!detectEnd()){ // stuck for ever
+	//	SimulateClockCycle_IntUnit();
+		//simulateClockCycle_FpUnit();
+		//SimulateClockCycle_LoadUnit(cycle, 1);
+		//cycle++;
+	//}
 
 	/*just in case*/
 	for (i = 0; i < 10000; i++){

@@ -4,12 +4,19 @@
 
 void CDBControlInt(IntCDB *int_to_cdb)
 {
+	int j = 0;
 	if (int_to_cdb->numOfRobSupplier || int_to_cdb->STLDIns){
 		IntUnitCDB.result = int_to_cdb->result;
 		IntUnitCDB.numOfRobSupplier = int_to_cdb->numOfRobSupplier;
 		IntUnitCDB.STLDIns = int_to_cdb->STLDIns;
 		IntUnitCDB.issued = int_to_cdb->issued;
 		IntUnitCDB.valid = TRUE;
+		for (j = 0; j<TRACE_SIZE; j++){
+			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+				trace[j].CDB = cycle;
+				break;
+			}
+		}
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -19,10 +26,17 @@ void CDBControlInt(IntCDB *int_to_cdb)
 
 void CDBControlFPADD(FPCDB *fp_to_cdb)
 {
+	int j = 0;
 	if (fp_to_cdb->numOfRobSupplier){
 		FPUnitCDBADD.result = fp_to_cdb->result;
 		FPUnitCDBADD.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBADD.valid = TRUE;
+		for (j = 0; j<TRACE_SIZE; j++){
+			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+				trace[j].CDB = cycle;
+				break;
+			}
+		}
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -32,10 +46,17 @@ void CDBControlFPADD(FPCDB *fp_to_cdb)
 
 void CDBControlFPMULL(FPCDB *fp_to_cdb)
 {
+	int j = 0;
 	if (fp_to_cdb->numOfRobSupplier){
 		FPUnitCDBMULL.result = fp_to_cdb->result;
 		FPUnitCDBMULL.numOfRobSupplier = fp_to_cdb->numOfRobSupplier;
 		FPUnitCDBMULL.valid = TRUE;
+		for (j = 0; j<TRACE_SIZE; j++){
+			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+				trace[j].CDB = cycle;
+				break;
+			}
+		}
 	}
 	else
 		FPUnitCDBADD.valid = FALSE;
@@ -43,10 +64,17 @@ void CDBControlFPMULL(FPCDB *fp_to_cdb)
 }
 void CDBControlLoad(LoadCDB *load_to_cdb)
 {
+	int j = 0;
 	if (load_to_cdb->numOfRobSupplier){
 		LoadUnitCDB.result = load_to_cdb->result;
 		LoadUnitCDB.valid = TRUE;
 		LoadUnitCDB.numOfRobSupplier = load_to_cdb->numOfRobSupplier;
+		for (j = 0; j<TRACE_SIZE; j++){
+			if ((strcmp(trace[j].instruction, instr.name) == 0)){
+				trace[j].CDB = cycle;
+				break;
+			}
+		}
 	}
 	else
 		LoadUnitCDB.valid = FALSE;
