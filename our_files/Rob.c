@@ -70,6 +70,7 @@ BOOL insertRob(){
 	instr.numRob = availableRobLine->numRob;
 
 	robCnt++;
+	return TRUE;
 
 }
 /*Update Rob entry by ST*/
