@@ -16,6 +16,7 @@ struct FpRegister {
 /*FP Reservation station line. the reservation station will be a linked list of size according to configuration file*/
 typedef struct FpReservationStation_Line FpReservationStation_Line;
 struct FpReservationStation_Line{
+	char name[BUFFER_SIZE];
 	int OPCODE;
 	int robNum;
 	float Vj,Vk;
@@ -31,7 +32,7 @@ struct FpReservationStation_Line{
 /*Pipeline stages of FP Unit*/
 typedef struct FP_PipelineStage FP_PipelineStage;
 struct FP_PipelineStage{
-
+	char name[BUFFER_SIZE];
 	int OPCODE;
 	BOOL busy;
 	float operand1,operand2;

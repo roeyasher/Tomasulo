@@ -16,7 +16,7 @@ IntALU_PipelineStage *CreateNewIPLSNode(){
 	temp = (IntALU_PipelineStage*) malloc(sizeof(IntALU_PipelineStage));
 	memset(temp, 0, sizeof(IntALU_PipelineStage));
 	temp->next = NULL;
-	return temp;		/*NULL is returned if failure occured*/
+	return temp;
 }
 /*The function intilaize the INT RS*/
 void InitializeReservationStation(){
@@ -38,7 +38,6 @@ void InitializeReservationStation(){
 /*this function intilaize the execute memory unit*/
 void InitializeIntegerALU(){
 
-	/*How long is the pipeline*/
 	IntALU_PipelineStage *node = NULL;
 	int i = 0, length=0;
 	length=Configuration->int_delay;
@@ -51,13 +50,12 @@ void InitializeIntegerALU(){
 		node = node->next;
 	}
 }
-
+/*The function insert new inst to the RS*/
 BOOL Int_InsertToReservationStation(){
 
 	IntReservationStation_Line *available = NULL, *iter = IntReservationStation;
 	int length=Configuration->int_nr_reservation;
 	int i = 0;
-
 	
 	while (iter != NULL){
 		/*find available node*/
@@ -71,42 +69,35 @@ BOOL Int_InsertToReservationStation(){
 	if (available == NULL)
 		return FALSE;
 
-	/*operand j is always from register*/
+	/*j is always from register*/
 	if (Integer_Registers[instr.SRC0].busy == FALSE){
 		available->Vj = Integer_Registers[instr.SRC0].value;
-		available->NumOfRightOperands++;				/*operand is ready*/
+		available->NumOfRightOperands++;
 	}
-	else{
-		available->Qj = Integer_Registers[instr.SRC0].robNum;
-	}
+	else{available->Qj = Integer_Registers[instr.SRC0].robNum;}
 
 	if ((instr.OPCODE == ADD) || (instr.OPCODE == SUB)){
-		/*opernad k might be immediate or from register. check if ADD or SUB and register is not busy*/
+		/*opernad k might be immediate or from register.*/
 		if (Integer_Registers[instr.SRC1].busy == FALSE){
-
 			available->Vk = Integer_Registers[instr.SRC1].value;
-			available->NumOfRightOperands++;				/*operand is ready*/
+			available->NumOfRightOperands++;
 		}
-
 		/*copy label if value of register is not relevant*/
 		else{ available->Qk = Integer_Registers[instr.SRC1].robNum; }
 	}
-	else{/*put immediate if ADDI or SUBI*/
-
+	else{
+		/*put immediate if ADDI or SUBI*/
 		available->Vk=instr.IMM;
 		available->Qk = 0;
-		available->NumOfRightOperands++;				/*operand is ready*/
+		available->NumOfRightOperands++;
 	}
-
-	/*it's ADD or SUB and register is busy*/
-
-	/*update destination register to being busy and update label to know from whom result is given*/
+	/*Is it LD,ST Inst? calc the address*/
 	if (!(instr.OPCODE == ST) && !(instr.OPCODE == LD)){
 		Integer_Registers[instr.DST].busy = TRUE;
 		Integer_Registers[instr.DST].robNum = instr.numRob;
 		available->robNum = instr.numRob;
 	}
-
+	/*init the node*/
 	available->OPCODE = instr.OPCODE;
 	available->busy = TRUE;
 	available->done = FALSE;
@@ -118,19 +109,16 @@ BOOL Int_InsertToReservationStation(){
 	strcpy(trace[cycle].instruction,instr.name);
 
 	Int_RS_Cnt++;
-	return TRUE;								 /*means the instruction has been written to reservation station*/
+	return TRUE;	
 
 }
-
+/* Send the instruction from the buffer to Ex*/
 void ReservationStationToALU(){
 
-	int i=0,j=0;
-	int length=Configuration->int_nr_reservation;		/*how many Lines in reservation station*/
 	IntReservationStation_Line *line=IntReservationStation;
 
 	while (line != NULL){
-
-		/*check if a reservation has it's 2 operands. if so pass to ALU*/
+		/*check if a reservation has it's 2 operands.*/
 		if ((line->NumOfRightOperands == 2) && (line->inExecution==FALSE)){
 
 			Integer_ALU_Unit->busy=TRUE;
@@ -141,16 +129,13 @@ void ReservationStationToALU(){
 			Integer_ALU_Unit->issued = line->issued;
 			strcpy(Integer_ALU_Unit->name,line->name);
 			line->done = TRUE;
-			line->inExecution=TRUE;			/*so it's not sent again to ALU*/
+			line->inExecution=TRUE;
 			break;
-
-				
-			
 		}
 		line=line->next;
 	}
 }
-
+/*cleaning the finished fields*/
 void EvictFromIntReservationStation(){
 
 	int i=0;
@@ -158,10 +143,7 @@ void EvictFromIntReservationStation(){
 	IntReservationStation_Line *line=IntReservationStation;
 
 	while (line != NULL){
-
 		if (line->done == TRUE){
-
-			/*set Line as available and zero fields if needed (e.g  Qj,Qk so that argumnets won't be passed accidently*/
 			line->busy=FALSE;
 			line->done=FALSE;
 			line->inExecution=FALSE;
@@ -179,12 +161,8 @@ void EvictFromIntReservationStation(){
 
 void AdvanceIntPipeline(){
 
-	int i=0,j=0;
-	int length=Configuration->int_delay;		/*how long is the pipeline*/
-	
 	IntALU_PipelineStage *last=Integer_ALU_Unit, *prevLast=NULL, *NewNode=NULL,*temp=NULL;
-	IntReservationStation_Line *line = IntReservationStation;
-
+	int i = 0, j = 0;
 
 	/*get last to point to last stage of pipeline*/
 	prevLast = last;
@@ -192,9 +170,9 @@ void AdvanceIntPipeline(){
 		prevLast = last;
 		last=last->next;
 	}
-	
-	if (last->busy == TRUE) {			/*check if stage has an instruction or a bubble that went on*/
-		/*calculate result of operation. in reality it's done in stages but here it's done in one stage and we decide to do it int last stage*/
+
+	/*calculate result of operation.*/
+	if (last->busy == TRUE) {			
 		switch(last->OPCODE){
 
 		case ADD:
@@ -217,6 +195,7 @@ void AdvanceIntPipeline(){
 			last->result = (last->operand1) + (last->operand2);
 			temp_int.STLDIns = TRUE;
 			temp_int.issued = last->issued;
+			strcpy(temp_int.name, last->name);
 			break;
 
 		case ST:
@@ -227,12 +206,9 @@ void AdvanceIntPipeline(){
 			break;
 
 		default:
-			// Opcode not in ALU unit
+			/*Wrong OPCODE*/
 			break;
 		}
-		//
-
-
 
 		for (j = 0; j<TRACE_SIZE; j++){
 			if ((InsType == Memory_LD_INS) || (InsType == Memory_ST_INS) || (InsType == INT_INS)){
@@ -242,17 +218,14 @@ void AdvanceIntPipeline(){
 				}
 			}
 		}
-		/*opearate as CDB and update waiting stations and registers*/
-		/*update Integer Reservation satation*/
-	
+
 		// Preapre Values for CDB struct
 		temp_int.numOfRobSupplier = last->numOfRobSupplier;
 		temp_int.result = last->result;
-		strcpy(temp_int.name,last->name);
+		strcpy(temp_int.name, last->name);
 	}
 
-	/*waiting stations and registers were updated if not a bubble in last stage. Now must advance pipeline one stage foreward*/
-	/*if piepeline length is one then we erase content, set it as not busy and we are done*/
+	/* make the last node in the list the first one.*/
 	memset(last,0,sizeof(IntALU_PipelineStage)); //TODO check if WORK!
 	last->busy = FALSE;
 	last->next = Integer_ALU_Unit;
@@ -260,18 +233,19 @@ void AdvanceIntPipeline(){
 	prevLast->next = NULL;
 
 }
-
+// Is the RS full
 BOOL isINT_RS_FULL(){
 	return (Int_RS_Cnt == Configuration->int_nr_reservation);
 }
-
+/*a simulate clock cycle for the memory unit*/
 void SimulateClockCycle_IntUnit(){
 
-	AdvanceIntPipeline();					/*advance piepline*/
+	AdvanceIntPipeline();				
 	ReservationStationToALU();
-	EvictFromIntReservationStation();		/*evict done instructions from reservation station*/
+	EvictFromIntReservationStation();		
 	return;
 }
+//Is the RS empty
 BOOL isINT_RS_empty(){
 	int Number_of_INTReservation_station = Configuration->int_nr_reservation;
 	int i = 0;
@@ -286,31 +260,3 @@ BOOL isINT_RS_empty(){
 	}
 	return TRUE;
 }
-
-
-/*while (line != NULL)
-		{
-
-			if (line->Qj == last->numOfRobSupplier){
-				line->Vj = last->result;			//update waiting value
-line->NumOfRightOperands++;		//update number of ready operands
-			}
-
-			if (line->Qk == last->numOfRobSupplier){
-				line->Vk = last->result;			//update waiting value
-				line->NumOfRightOperands++;		//update number of ready operands
-			}
-
-			//we set reservation station state as done for this instruction
-			if ((last->numOfRobSupplier == line->robNum) && (line->inExecution == TRUE)){
-				line->done = TRUE;
-				for (j = 0; j<TRACE_SIZE; j++){
-					if (trace[j].issued == line->issued){
-						trace[j].CDB = cycle - 1;
-						break;
-					}
-				}
-			}
-			line = line->next;
-		}
-		*/

@@ -229,7 +229,7 @@ void ExecuteMemoryCmd()
 {
 	Memory_PiplineStage *execute = Memory_Unit, *prevExecute = NULL;
 	int i=0;
-	
+	/*get last to point to last stage of pipeline*/
 	prevExecute = execute;
 	while (execute->next != NULL) {
 		prevExecute = execute;
@@ -264,10 +264,9 @@ void ExecuteMemoryCmd()
 
 }
 
-
+/*cleaning the finished fields*/
 void EvictFromLoadAndStoreBuffer(){
-
-	/*cleaning the finished fields*/
+		
 	int i=0;
 	LoadBuffer *load = LoadBufferResarvation;
 	StoreBuffer *store = StoreBufferResarvation;
@@ -297,18 +296,17 @@ void EvictFromLoadAndStoreBuffer(){
 		store=store->next;
 	}
 }
-
+// Is The Buff FULL
 BOOL isST_Buff_FULL(){
 	return (ST_Buff_Cnt == Configuration->mem_nr_store_buffers);
 }
-
+// Is The Buff FULL
 BOOL isLD_Buff_FULL(){
 	return (LD_Buff_Cnt == Configuration->mem_nr_load_buffers);
 }
-
+/*a simulate clock cycle for the memory unit*/
 void SimulateClockCycle_LoadUnit(){
 
-	/*a simulate clock cycle for the memory unit*/
 	ExecuteMemoryCmd();
 	LDBufferToMemoryExecution();
 	STBufferToMemoryExecution();

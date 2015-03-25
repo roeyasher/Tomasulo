@@ -2,30 +2,28 @@
 #include "shared.h"
 
 FpReservationStation_Line *CreateNewFPRSNode(){
-
 	FpReservationStation_Line *temp = NULL;
 	temp = (FpReservationStation_Line*) malloc(sizeof(FpReservationStation_Line));
 	memset(temp, 0, sizeof(FpReservationStation_Line));
 	temp->next = NULL;
-	return temp;		/*NULL is returned if failure occured*/
+	return temp;
 }
 
 FP_PipelineStage *CreateNewFPPLNode(){
-
 	FP_PipelineStage *temp = NULL;
 	temp = (FP_PipelineStage*) malloc(sizeof(FP_PipelineStage));
 	memset(temp, 0, sizeof(FP_PipelineStage));
 	temp->next = NULL;
-	return temp;		/*NULL is returned if failure occured*/
+	return temp;
 }
 
 void Initialize_FpReservationStations(){
 
 	int lengthAdd=Configuration->add_nr_reservation;
 	int lengthMUL=Configuration->mul_nr_reservation;
-
+	
 	/*Create Reservation station for ADD unit*/
-	int i=0;
+	int i = 0;
 	FpReservationStation_Line *node=NULL;
 	FpReservationStation_ADD=CreateNewFPRSNode();
 	node = FpReservationStation_ADD;
@@ -98,7 +96,6 @@ void FP_EvictFromReservationStation(){
 		}
 		line=line->next;
 	}
-	
 
 	/*evict for MUL reservation station*/
 	line=FpReservationStation_MUL;
@@ -118,7 +115,7 @@ void FP_EvictFromReservationStation(){
 	}
 	
 }
-
+/*send from reservation station execution unit*/
 void FP_ReservationStationToExecution(){
 
 	int j;
@@ -136,6 +133,7 @@ void FP_ReservationStationToExecution(){
 			FP_executionPipeline_ADD->operand1 = line->Vj;
 			FP_executionPipeline_ADD->operand2 = line->Vk;
 			FP_executionPipeline_ADD->numOfSupplier = line->robNum;
+			strcpy(FP_executionPipeline_ADD->name, line->name);
 			line->done = TRUE;
 			line->inExecution=TRUE;
 
@@ -159,6 +157,7 @@ void FP_ReservationStationToExecution(){
 				FP_executionPipeline_MUL->operand1=line->Vj;
 				FP_executionPipeline_MUL->operand2=line->Vk;
 				FP_executionPipeline_MUL->numOfSupplier = line->robNum;
+				strcpy(FP_executionPipeline_MUL->name, line->name);
 				line->inExecution=TRUE;
 
 				for (j=0;j<TRACE_SIZE;j++){
@@ -171,51 +170,44 @@ void FP_ReservationStationToExecution(){
 				line=line->next;
 	}
 }
-
+/*The function insert new inst to the RS*/
 BOOL FP_InsertToReservationStations_ADD(){
 
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_ADD;
 	int lengthADD=Configuration->add_nr_reservation;
 	int i=0;
 
-	/*find an available line in reseravation station*/
 	while (iter != NULL){
-
+		/*find available node*/
 		if (iter->busy==FALSE){
 			available=iter;
 			break;
 		}
 		iter=iter->next;
 	}
-
-	/*case no available lines in reservation station*/
+	/*nothing available */
 	if (available == NULL)
 		return FALSE;
 
-	available->OPCODE = instr.OPCODE;
-
-	/*operand j*/
+	/*j is always from register*/
 	if (FP_Registers[instr.SRC0].busy == FALSE){
 		available->Vj = FP_Registers[instr.SRC0].value;
 		available->NumOfRightOperands++;			/*operand j is ready*/
 	}
-	else{
-		available->Qj = FP_Registers[instr.SRC0].robNum;	/*copy label of supplier if register is busy*/
-	}
+	else{available->Qj = FP_Registers[instr.SRC0].robNum;}
 
-	/*operand k. in FP ops there are no immediate*/
+	/*opernad k might be immediate or from register.*/
 	if (FP_Registers[instr.SRC1].busy == FALSE){
 		available->Vk = FP_Registers[instr.SRC1].value;
-		available->NumOfRightOperands++;			/*operand j is ready*/
+		available->NumOfRightOperands++;	
 	}
-	else{
-		available->Qk = FP_Registers[instr.SRC1].robNum;/*copy label of supplier if register is busy*/
-	}
+	else{available->Qk = FP_Registers[instr.SRC1].robNum;}
 
 	/*update destination register*/
 	FP_Registers[instr.DST].busy=TRUE;
 	FP_Registers[instr.DST].robNum = instr.numRob;;
 
+	available->OPCODE = instr.OPCODE;
 	available->robNum = instr.numRob;
 	available->busy=TRUE;
 	available->done=FALSE;
@@ -232,15 +224,12 @@ BOOL FP_InsertToReservationStations_ADD(){
 
 BOOL FP_InsertToReservationStations_MULL(){
 
-
 	FpReservationStation_Line *available=NULL,*iter=FpReservationStation_MUL;
 	int lengthMUL=Configuration->mul_nr_reservation;
 	int i=0;
 
-	/*find an available line in reseravation station*/
-
-	while (iter != NULL){
-		/*if not busy then assign to available*/
+		while (iter != NULL){
+		/*find available node*/
 		if (iter->busy == FALSE){
 			available = iter;
 			break;
@@ -248,14 +237,14 @@ BOOL FP_InsertToReservationStations_MULL(){
 		iter = iter->next;
 	}
 
-	/*case no available lines in reservation station*/
+	/*nothing available */
 	if (available == NULL)
 		return FALSE;
 
 	/*if there is a line available, check if instruction is mine. if so, take it to reseervation station*/
 	available->OPCODE = instr.OPCODE;
 
-	/*operand j*/
+	/*j is always from register*/
 	if (FP_Registers[instr.SRC0].busy == FALSE){
 		available->Vj = FP_Registers[instr.SRC0].value;
 		available->NumOfRightOperands++;			/*operand j is ready*/
@@ -289,17 +278,12 @@ BOOL FP_InsertToReservationStations_MULL(){
 
 	FP_RS_MULL_Cnt++;
 	return TRUE;
-
 }
 
 void FP_AdvanceFpPipeline_ADD(){
 
-	int j;
-	int lengthADD=Configuration->add_delay;
 	FP_PipelineStage *last=NULL, *prevLast=NULL, *temp=NULL,*NewNode=NULL;
-	FpReservationStation_Line *line=NULL;
-	StoreBuffer *storeLine=NULL;
-	int i=0;
+	int i=0,j=0;
 
 	/*start with ADD unit*/
 	/*get last to point to last stage of pipeline*/
@@ -323,15 +307,11 @@ void FP_AdvanceFpPipeline_ADD(){
 			break;
 
 		default:
-			//Opcode not in FP_ADD unit
+			/*Wrong OPCODE*/
 			break;
 
 		}
 
-		/*operate as CDB and update reservation station lines waiting for result and FP register file*/
-		/*update reservation stations. first ADD*/
-
-		line=FpReservationStation_ADD;
 		// Preapre Values for CDB struct
 		temp_fp_add.numOfRobSupplier = last->numOfSupplier;
 		temp_fp_add.result = last->result;
@@ -350,17 +330,11 @@ void FP_AdvanceFpPipeline_ADD(){
 
 void FP_AdvanceFpPipeline_MUL(){
 
-	int j;
-	int lengthMUL=Configuration->mul_delay;
 	FP_PipelineStage *last=NULL, *prevLast=NULL, *temp=NULL,*NewNode=NULL;
-	FpReservationStation_Line *line=NULL;
-	StoreBuffer *storeLine=NULL;
+	int i=0, j=0;
 
-	int i=0;
-
-	/*Now advance MUL pipeline and update waiting instructions in reservation stations and registers*/
 	/*get last to point to last stage of pipeline*/
-	last=FP_executionPipeline_MUL;
+	last = FP_executionPipeline_MUL;
 	prevLast = last;
 	while (last->next != NULL) {
 		prevLast = last;
@@ -377,20 +351,18 @@ void FP_AdvanceFpPipeline_MUL(){
 			break;
 			
 		default:
-		//Opcode not in FP_MUL unit
+			/*Wrong OPCODE*/
 			break;
 		}
 
-		/*operate as CDB and update reservation station lines waiting for result and FP register file*/
-
-
+	
 		// Preapre Values for CDB struct
 		temp_fp_mull.numOfRobSupplier = last->numOfSupplier;
 		temp_fp_mull.result = last->result;
 
 	}
 
-		/*Now advance MUL pipeline as well*/
+	/*advance ADD pipeline one stage forward*/
 	memset(last,0,sizeof(FP_PipelineStage)); //TODO check if WORK!
 	last->busy = FALSE;
 	last->next = FP_executionPipeline_MUL;
@@ -398,15 +370,15 @@ void FP_AdvanceFpPipeline_MUL(){
 	prevLast->next = NULL;
 
 	}
-
+// Is the RS full
 BOOL isFP_RS_ADD_FULL(){
 	return (FP_RS_ADD_Cnt == Configuration->add_nr_reservation);
 }
-
+// Is the RS full
 BOOL isFP_RS_MULL_FULL(){
 	return (FP_RS_MULL_Cnt == Configuration->mul_nr_reservation);
 }
-
+/*a simulate clock cycle for the memory unit*/
 void simulateClockCycle_FpUnit(){
 
 	FP_AdvanceFpPipeline_ADD();
@@ -415,6 +387,7 @@ void simulateClockCycle_FpUnit(){
 	FP_EvictFromReservationStation();
 	return;
 }
+//Is the RS empty
 BOOL isFP_RS_ADD_empty(){
 	FpReservationStation_Line  *node = FpReservationStation_ADD;
 	int lengthADD = Configuration->add_nr_reservation;
@@ -428,7 +401,7 @@ BOOL isFP_RS_ADD_empty(){
 	}
 }
 		
-
+//Is the RS empty
 BOOL isFP_RS_MULL_empty(){
 	FpReservationStation_Line *available = NULL, *node = FpReservationStation_MUL;
 	int lengthADD = Configuration->mul_nr_reservation;
@@ -441,128 +414,3 @@ BOOL isFP_RS_MULL_empty(){
 	}
 }
 
-
-/*
-
-while (line != NULL){
-
-if (!strcmp(line->Qj,last->LabelOfSupplier)){
-line->Vj=last->result;
-memset((void*)line->Qj,0,LABEL_SIZE);
-line->NumOfRightOperands++;
-}
-
-if (!strcmp(line->Qk,last->LabelOfSupplier)){
-line->Vk=last->result;
-memset((void*)line->Qk,0,LABEL_SIZE);
-line->NumOfRightOperands++;
-}
-//impossible for instruction to come from ADD reservation station as it's in MUL pipeline
-line = line->next;
-		}
-
-		//update MUL reservation station
-		line = FpReservationStation_MUL;
-		while (line != NULL){
-
-			if (!strcmp(line->Qj, last->LabelOfSupplier)){
-				line->Vj = last->result;
-				memset((void*)line->Qj, 0, LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			if (!strcmp(line->Qk, last->LabelOfSupplier)){
-				line->Vk = last->result;
-				memset((void*)line->Qk, 0, LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			//update instruction in reservation station as done
-			if (!strcmp(last->LabelOfSupplier, line->label)){
-				line->done = TRUE;
-				for (j = 0; j<TRACE_SIZE; j++){
-					if (trace[j].issued == line->issued)
-						break;
-				}
-				trace[j].CDB = cycle - 1;
-			}
-			line = line->next;
-		}
-
-		//update store buffers
-		storeLine = StoreBufferResarvation;
-		for (i = 0; i<Configuration->mem_nr_store_buffers; i++){
-			if (!strcmp(storeLine->Qj, last->LabelOfSupplier)){
-				storeLine->vj = last->result;
-				memset((void*)storeLine->Qj, 0, LABEL_SIZE);
-				storeLine->NumOfRightOperands++;
-			}
-			storeLine = storeLine->next;
-		}
-
-*/
-
-
-/*
-
-//ADD
-
-while (line != NULL){
-
-//update ADD reservation station
-if (!strcmp(line->Qj, last->LabelOfSupplier)){
-	line->Vj = last->result;
-	memset((void*)line->Qj, 0, LABEL_SIZE);
-	line->NumOfRightOperands++;
-}
-
-if (!strcmp(line->Qk, last->LabelOfSupplier)){
-	line->Vk = last->result;
-	memset((void*)line->Qk, 0, LABEL_SIZE);
-	line->NumOfRightOperands++;
-}
-
-//update instruction in reservation station as done
-if (!strcmp(last->LabelOfSupplier, line->label)){
-	line->done = TRUE;
-	for (j = 0; j<TRACE_SIZE; j++){
-		if (trace[j].issued == line->issued)
-			break;
-	}
-	trace[j].CDB = cycle - 1;
-}
-line = line->next;
-		}
-		//update MUL reservation station
-		line = FpReservationStation_MUL;
-		while (line != NULL){
-
-			//update ADD reservation station
-			if (!strcmp(line->Qj, last->LabelOfSupplier)){
-				line->Vj = last->result;
-				memset((void*)line->Qj, 0, LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-
-			if (!strcmp(line->Qk, last->LabelOfSupplier)){
-				line->Vk = last->result;
-				memset((void*)line->Qk, 0, LABEL_SIZE);
-				line->NumOfRightOperands++;
-			}
-			//impossible for instruction to come from MUL as it's in ADD piepline
-			line = line->next;
-		}
-
-		//update store buffers
-		storeLine = StoreBufferResarvation;
-
-		while (storeLine != NULL){
-
-			if (!strcmp(storeLine->Qj, last->LabelOfSupplier)){
-				storeLine->vj = last->result;
-				memset((void*)storeLine->Qj, 0, LABEL_SIZE);
-				storeLine->NumOfRightOperands++;
-			}
-			storeLine = storeLine->next;
-		}
-*/
