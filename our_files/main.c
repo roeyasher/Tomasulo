@@ -106,7 +106,7 @@ int main(int argc, char* argv[]){
 		//***************************************************************************
 		//1. Issue
 		//***************************************************************************
-		if (TRUE == halt_flag){
+		if (TRUE != halt_flag){
 			// Fetch - Instructions from the main memory ----> to the instruction queue
 			while ((more_instruction == TRUE) && (instruction_queue_counter < 16)){
 				more_instruction = Fetch(adressMainMemory, &pc_counter_instruction, &instruction_queue_counter);
